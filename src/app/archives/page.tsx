@@ -10,9 +10,7 @@ import {
   BookOpen,
   FileText,
   Search,
-  Filter,
   Download,
-  Eye,
   Grid,
   List,
 } from "lucide-react";
@@ -28,15 +26,6 @@ interface Issue {
   featured: boolean;
 }
 
-interface Article {
-  id: string;
-  title: string;
-  authors: string[];
-  doi: string;
-  pages: string;
-  type: string;
-  views: number;
-}
 
 export default function ArchivesPage() {
   const [expandedYear, setExpandedYear] = useState<number | null>(2025);
@@ -387,7 +376,7 @@ export default function ArchivesPage() {
           {/* CTA Section */}
           <div className="mt-12 bg-[#FAF7F8] border-2 border-[#EAD3D9] rounded-xl p-8 text-center">
             <h3 className="text-2xl font-bold text-[#7A0019] mb-4">
-              Can't Find What You're Looking For?
+              Can&apos;t Find What You&apos;re Looking For?
             </h3>
             <p className="text-gray-700 mb-6 max-w-2xl mx-auto">
               Use our advanced search to filter articles by author, keyword,

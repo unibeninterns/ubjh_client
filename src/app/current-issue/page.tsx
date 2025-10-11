@@ -36,8 +36,6 @@ interface Article {
 
 export default function CurrentIssuePage() {
   const [filterType, setFilterType] = useState<string>("all");
-  const [showIssueInfo, setShowIssueInfo] = useState(true);
-
   // Mock data for current issue
   const issueData = {
     volume: 1,

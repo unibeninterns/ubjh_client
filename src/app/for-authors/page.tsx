@@ -331,7 +331,7 @@ export default function ForAuthorsPage() {
                       </h3>
                       <p className="text-gray-700 mb-3">
                         Register for a free author account on our submission
-                        platform. If you're a returning author, simply log in
+                        platform. If you&apos;re a returning author, simply log in
                         with your credentials.
                       </p>
                       <div className="bg-[#FAF7F8] rounded-lg p-4 text-sm text-gray-600">
@@ -447,7 +447,7 @@ export default function ForAuthorsPage() {
                         Decision & Publication
                       </h3>
                       <p className="text-gray-700 mb-3">
-                        You'll receive a decision (accept, minor/major revisions,
+                        You&apos;ll receive a decision (accept, minor/major revisions,
                         or reject). Accepted articles are published online
                         immediately and assigned a DOI.
                       </p>
@@ -477,7 +477,7 @@ export default function ForAuthorsPage() {
                   </h2>
                   <p className="text-gray-700 mb-4 leading-relaxed">
                     This is a <strong>Diamond Open Access</strong> journal,
-                    meaning it's completely free for both authors and readers.
+                    meaning it&apos;s completely free for both authors and readers.
                     There are no submission fees, publication fees, color charges,
                     or any hidden costs.
                   </p>

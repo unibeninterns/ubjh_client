@@ -10,7 +10,6 @@ import {
   Quote,
   FileText,
   Calendar,
-  Eye,
   BookOpen,
   ExternalLink,
   ChevronRight,
@@ -21,7 +20,6 @@ import {
 } from "lucide-react";
 
 export default function ArticleDetailPage() {
-  const [activeSection, setActiveSection] = useState("abstract");
   const [copiedDOI, setCopiedDOI] = useState(false);
   const [citationFormat, setCitationFormat] = useState("APA");
 
