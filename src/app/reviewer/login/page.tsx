@@ -5,13 +5,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import { AlertCircle, Loader2, LogIn } from 'lucide-react';
 import Link from 'next/link';
 
-export default function AdminLoginPage() {
+export default function ReviewerLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [formError, setFormError] = useState('');
   const { login, isLoading, error, clearError } = useAuth();
 
-  // Clear form error when user starts typing
   useEffect(() => {
     if (email || password) {
       setFormError('');
@@ -24,7 +23,6 @@ export default function AdminLoginPage() {
     setFormError('');
     clearError();
     
-    // Basic validation
     if (!email || !password) {
       setFormError('Email and password are required');
       return;
@@ -37,10 +35,8 @@ export default function AdminLoginPage() {
     
     try {
       await login(email, password);
-      // Success handling is done in AuthContext
     } catch (err: any) {
       console.error('Login submission error:', err);
-      // Error is set in context
     }
   };
 
@@ -64,7 +60,7 @@ export default function AdminLoginPage() {
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-6 shadow-md rounded-lg sm:px-10">
           <h1 className="text-xl font-semibold text-center text-gray-900 mb-6">
-            Admin Login
+            Reviewer Login
           </h1>
           
           {displayError && (
@@ -94,7 +90,7 @@ export default function AdminLoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
-                  placeholder="admin@uniben.edu"
+                  placeholder="reviewer@example.com"
                   disabled={isLoading}
                 />
               </div>
