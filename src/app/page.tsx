@@ -82,8 +82,8 @@ export default function HumanitiesJournalHome() {
                 About
               </Link>
               <Link
-                href="/submit"
-                className="ml-4 bg-white text-[#7A0019] px-6 py-2 rounded-full font-semibold hover:bg-[#FFE9EE] transition-all shadow-lg hover:shadow-xl"
+                href="/submission"
+                className="bg-white text-[#7A0019] px-6 py-2 rounded-full font-semibold hover:bg-[#FFE9EE] transition-all shadow-lg hover:shadow-xl"
               >
                 Submit Manuscript
               </Link>
@@ -175,7 +175,7 @@ export default function HumanitiesJournalHome() {
             </div>
             <div className="flex gap-4">
               <Link
-                href="/submit"
+                href="/submission"
                 className="inline-flex items-center gap-2 bg-white text-[#7A0019] px-8 py-4 rounded-full font-bold hover:bg-[#FFE9EE] transition-all shadow-xl hover:shadow-2xl hover:scale-105"
               >
                 <FileText className="h-5 w-5" />
@@ -239,7 +239,7 @@ export default function HumanitiesJournalHome() {
                 </span>
               </div>
               <Link
-                href="/submit"
+                href="/submission"
                 className="inline-flex items-center gap-2 bg-[#7A0019] text-white px-6 py-3 rounded-full font-bold hover:bg-[#5A0A1A] transition-all"
               >
                 Submit Manuscript

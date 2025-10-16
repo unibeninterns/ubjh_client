@@ -47,6 +47,34 @@ interface CustomRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
 }
 
+export interface ManuscriptSubmissionData {
+  title: string;
+  abstract: string;
+  keywords: string[];
+  submitter: {
+    name: string;
+    email: string;
+    faculty: string;
+    affiliation: string;
+    orcid?: string;
+  };
+  coAuthors?: {
+    email: string;
+    name: string;
+    faculty: string;
+    affiliation: string;
+    orcid?: string;
+  }[];
+}
+
+export interface ManuscriptSubmissionResponse {
+  success: boolean;
+  message?: string;
+  data?: {
+    manuscriptId: string;
+  };
+}
+
 // Create API instance
 const createApi = (baseURL: string): AxiosInstance => {
   const api = axios.create({
@@ -264,6 +292,45 @@ export const authApi = {
       return response.data;
     } catch (error) {
       console.error("Token verification failed:", error);
+      throw error;
+    }
+  },
+};
+
+export const manuscriptApi = {
+  submitManuscript: async (
+    formData: FormData
+  ): Promise<ManuscriptSubmissionResponse> => {
+    try {
+      const response = await api.post("/submit/manuscript", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Manuscript submission failed:", error);
+      throw error;
+    }
+  },
+
+  reviseManuscript: async (
+    manuscriptId: string,
+    formData: FormData
+  ): Promise<ManuscriptSubmissionResponse> => {
+    try {
+      const response = await api.post(
+        `/submit/manuscript/${manuscriptId}/revise`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Manuscript revision failed:", error);
       throw error;
     }
   },

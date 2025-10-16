@@ -2,8 +2,9 @@
 
 import { useState, FormEvent, useEffect } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { AlertCircle, Loader2, LogIn } from 'lucide-react';
+import { AlertCircle, Loader2, LogIn, FileCheck } from 'lucide-react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function ReviewerLoginPage() {
   const [email, setEmail] = useState('');
@@ -11,6 +12,7 @@ export default function ReviewerLoginPage() {
   const [formError, setFormError] = useState('');
   const { login, isLoading, error, clearError } = useAuth();
 
+  // Clear form error when user starts typing
   useEffect(() => {
     if (email || password) {
       setFormError('');
@@ -35,127 +37,190 @@ export default function ReviewerLoginPage() {
     
     try {
       await login(email, password);
+      // Success handling is done in AuthContext
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       console.error('Login submission error:', err);
+      // Error is set in context
     }
   };
 
   const displayError = formError || error;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col justify-center">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <Link href="/">
-          <div className="mx-auto text-center cursor-pointer">
-            <h2 className="text-3xl font-bold text-purple-800 py-8">
-              DRID UNIBEN
-            </h2>
-            <p className="mt-1 text-gray-600">
-              Directorate of Research, Innovation and Development
-            </p>
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex flex-col">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-20">
+            <Link href="/" className="flex items-center gap-4 hover:opacity-80 transition-opacity">
+              <div className="w-14 h-14 bg-white rounded-lg flex items-center justify-center shadow-md">
+                <Image
+                  src="/uniben-logo.png"
+                  alt="UNIBEN Logo"
+                  width={48}
+                  height={48}
+                  className="rounded"
+                />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-[#7A0019] tracking-tight">
+                  UNIBEN Journal of Humanities
+                </h1>
+                <p className="text-sm text-gray-600">Reviewer Portal</p>
+              </div>
+            </Link>
+            <Link
+              href="/"
+              className="text-[#7A0019] hover:text-[#5A0A1A] font-semibold text-sm"
+            >
+              ← Back to Journal
+            </Link>
           </div>
-        </Link>
-      </div>
+        </div>
+      </header>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-6 shadow-md rounded-lg sm:px-10">
-          <h1 className="text-xl font-semibold text-center text-gray-900 mb-6">
-            Reviewer Login
-          </h1>
-          
-          {displayError && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-md">
-              <div className="flex items-center">
-                <AlertCircle className="h-5 w-5 text-red-500 mr-2 flex-shrink-0" />
-                <p className="text-sm text-red-600">{displayError}</p>
+      {/* Main Content */}
+      <div className="flex-1 flex items-center justify-center px-4 py-12">
+        <div className="max-w-md w-full">
+          {/* Login Card */}
+          <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+            {/* Card Header */}
+            <div className="bg-[#fffbfb] px-8 py-8 text-center">
+              <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+                <FileCheck className="h-10 w-10 text-[#7A0019]" />
               </div>
-            </div>
-          )}
-          
-          <form className="space-y-6" onSubmit={handleSubmit}>
-            <div>
-              <label 
-                htmlFor="email" 
-                className="block text-sm font-medium text-gray-700"
-              >
-                Email Address
-              </label>
-              <div className="mt-1">
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
-                  placeholder="reviewer@example.com"
-                  disabled={isLoading}
-                />
-              </div>
+              <h2 className="text-2xl font-bold text-[#7A0019] mb-2">
+                Reviewer Login
+              </h2>
+              <p className="text-[#7A0019] text-sm">
+                Access your peer review dashboard
+              </p>
             </div>
 
-            <div>
-              <label 
-                htmlFor="password" 
-                className="block text-sm font-medium text-gray-700"
-              >
-                Password
-              </label>
-              <div className="mt-1">
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="current-password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-purple-500 focus:border-purple-500 sm:text-sm"
-                  disabled={isLoading}
-                />
-              </div>
+            {/* Card Body */}
+            <div className="px-8 py-8">
+              {displayError && (
+                <div className="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-lg">
+                  <div className="flex items-start gap-3">
+                    <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="text-sm font-semibold text-red-800 mb-1">
+                        Login Failed
+                      </h4>
+                      <p className="text-sm text-red-600">{displayError}</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+              
+              <form className="space-y-6" onSubmit={handleSubmit}>
+                <div>
+                  <label 
+                    htmlFor="email" 
+                    className="block text-sm font-semibold text-gray-700 mb-2"
+                  >
+                    Email Address
+                  </label>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="appearance-none block w-full px-4 py-3 border-2 border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7A0019] focus:border-transparent transition-all text-gray-900"
+                    placeholder="reviewer@uniben.edu"
+                    disabled={isLoading}
+                  />
+                </div>
+
+                <div>
+                  <label 
+                    htmlFor="password" 
+                    className="block text-sm font-semibold text-gray-700 mb-2"
+                  >
+                    Password
+                  </label>
+                  <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    autoComplete="current-password"
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="appearance-none block w-full px-4 py-3 border-2 border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7A0019] focus:border-transparent transition-all text-gray-900"
+                    placeholder="Enter your password"
+                    disabled={isLoading}
+                  />
+                </div>
+
+                <div>
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="w-full flex justify-center items-center gap-3 py-3.5 px-4 border border-transparent rounded-lg text-base font-bold text-white bg-[#7A0019] hover:bg-[#5A0A1A] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#7A0019] disabled:bg-gray-300 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-xl"
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="animate-spin h-5 w-5" />
+                        Signing in...
+                      </>
+                    ) : (
+                      <>
+                        <LogIn className="h-5 w-5" />
+                        Sign In
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
             </div>
 
-            <div>
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-purple-800 hover:bg-purple-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-purple-500 disabled:bg-purple-300 disabled:cursor-not-allowed transition-colors"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="animate-spin -ml-1 mr-2 h-5 w-5" />
-                    Logging in...
-                  </>
-                ) : (
-                  <>
-                    <LogIn className="h-5 w-5 mr-2" />
-                    Sign in
-                  </>
-                )}
-              </button>
+            {/* Card Footer */}
+            <div className="px-8 py-6 bg-gray-50 border-t border-gray-200">
+              <div className="flex items-center justify-center gap-6 text-sm">
+                <Link 
+                  href="/" 
+                  className="text-[#7A0019] hover:text-[#5A0A1A] font-medium transition-colors"
+                >
+                  Homepage
+                </Link>
+                <span className="text-gray-300">|</span>
+                <Link 
+                  href="/contact" 
+                  className="text-[#7A0019] hover:text-[#5A0A1A] font-medium transition-colors"
+                >
+                  Need Help?
+                </Link>
+              </div>
             </div>
-          </form>
-          
-          <div className="mt-6">
-            <div className="text-center">
-              <Link 
-                href="/" 
-                className="text-sm text-purple-600 hover:text-purple-500"
+          </div>
+
+          {/* Additional Info */}
+          <div className="mt-6 text-center">
+            <p className="text-sm text-gray-600">
+              Looking for a different portal?
+            </p>
+            <div className="mt-3 flex justify-center gap-4">
+              <Link
+                href="/author/login"
+                className="text-sm text-[#7A0019] hover:text-[#5A0A1A] font-medium underline"
               >
-                Return to Homepage
+                Author Login
               </Link>
             </div>
           </div>
         </div>
       </div>
       
-      <footer className="mt-auto bg-gray-100">
-        <div className="container mx-auto px-4 py-6">
+      {/* Footer */}
+      <footer className="bg-white border-t border-gray-200 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <p className="text-center text-sm text-gray-600">
-            © {new Date().getFullYear()} DRID UNIBEN. All rights reserved.
+            © {new Date().getFullYear()} University of Benin — UNIBEN Journal of Humanities. All rights reserved.
           </p>
         </div>
       </footer>

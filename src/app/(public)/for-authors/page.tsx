@@ -696,7 +696,7 @@ export default function ForAuthorsPage() {
                   Start your submission now through our online platform
                 </p>
                 <Link
-                  href="/submit"
+                  href="/submission"
                   className="block w-full bg-white text-[#7A0019] text-center px-6 py-3 rounded-lg font-bold hover:bg-[#FFE9EE] transition-all shadow-lg"
                 >
                   Submit Manuscript

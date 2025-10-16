@@ -1,142 +1,403 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
+import { useState, useRef, FormEvent } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 import {
-  FileText,
-  CheckCircle,
-  Users,
   Upload,
-  Send,
-  ArrowRight,
-  Clock,
-  Shield,
-  Globe,
-  HelpCircle,
-  Mail,
-  BookOpen,
   AlertCircle,
-  Download,
-} from "lucide-react";
+  CheckCircle,
+  Send,
+  Loader2,
+  X,
+  Plus,
+  Info,
+  FileText,
+  Users,
+  ExternalLink,
+} from 'lucide-react';
+import { manuscriptApi } from '@/services/api';
 
-export default function SubmissionPortalPage() {
-  const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
+interface CoAuthor {
+  id: string;
+  name: string;
+  email: string;
+  faculty: string;
+  affiliation: string;
+  orcid: string;
+}
 
-  const submissionSteps = [
-    {
-      number: 1,
-      title: "Create Account / Login",
-      description:
-        "Register for a free author account or log in if you're a returning user. Your account allows you to track submission status and manage revisions.",
-      icon: Users,
-      duration: "2-3 minutes",
-    },
-    {
-      number: 2,
-      title: "Prepare Your Manuscript",
-      description:
-        "Ensure your manuscript follows our formatting guidelines. Use our template and include all required sections: abstract, keywords, main text, and references.",
-      icon: FileText,
-      duration: "Before submission",
-    },
-    {
-      number: 3,
-      title: "Fill Submission Form",
-      description:
-        "Enter article metadata including title, authors, affiliations, abstract, and keywords. Provide ORCID iDs for all authors (recommended).",
-      icon: Upload,
-      duration: "5-10 minutes",
-    },
-    {
-      number: 4,
-      title: "Upload Manuscript Files",
-      description:
-        "Upload your main manuscript (PDF or DOCX) and any supplementary materials. Maximum file size: 10MB per file.",
-      icon: Upload,
-      duration: "2-5 minutes",
-    },
-    {
-      number: 5,
-      title: "Add Contributors",
-      description:
-        "List all co-authors with their contact information, affiliations, and ORCID iDs. Designate the corresponding author.",
-      icon: Users,
-      duration: "3-5 minutes",
-    },
-    {
-      number: 6,
-      title: "Submit & Track",
-      description:
-        "Review your submission, agree to terms, and submit. You'll receive immediate confirmation and can track progress through your dashboard.",
-      icon: Send,
-      duration: "1-2 minutes",
-    },
-  ];
+interface FormErrors {
+  [key: string]: string;
+}
 
-  const requirements = [
-    {
-      title: "Original Research",
-      description: "Must be original work not published elsewhere",
-      met: true,
-    },
-    {
-      title: "Submission Guidelines",
-      description: "Follows journal formatting requirements",
-      met: true,
-    },
-    {
-      title: "File Format",
-      description: "PDF or DOC/DOCX format",
-      met: true,
-    },
-    {
-      title: "Abstract",
-      description: "150-300 words (not required for book reviews)",
-      met: true,
-    },
-    {
-      title: "ORCID iDs",
-      description: "Recommended for all authors",
-      met: false,
-    },
-    {
-      title: "Data Availability",
-      description: "Statement required for empirical research",
-      met: true,
-    },
-  ];
+export default function ManuscriptSubmissionPage() {
+  // Form state
+  const [formData, setFormData] = useState({
+    title: '',
+    abstract: '',
+    keywords: '',
+    submitterName: '',
+    submitterEmail: '',
+    submitterFaculty: '',
+    submitterAffiliation: '',
+    submitterOrcid: '',
+  });
 
-  const faqs = [
-    {
-      question: "How long does the submission process take?",
-      answer:
-        "The online submission form takes approximately 15-20 minutes to complete. This includes entering metadata, uploading files, and adding co-author information.",
-    },
-    {
-      question: "What file formats do you accept?",
-      answer:
-        "We accept PDF, DOC, and DOCX formats for the main manuscript. Supplementary files can be in various formats including CSV, XLSX, PNG, and JPG.",
-    },
-    {
-      question: "Do I need an ORCID iD to submit?",
-      answer:
-        "While not mandatory, we strongly recommend that all authors have ORCID iDs. They help distinguish you from other researchers and make your work more discoverable.",
-    },
-    {
-      question: "Can I track my submission status?",
-      answer:
-        "Yes! Once you submit, you'll receive a submission ID and can log into your author dashboard to track the peer review process and editorial decisions.",
-    },
-    {
-      question: "What happens after I submit?",
-      answer:
-        "You'll receive an email confirmation immediately. The Editor-in-Chief will conduct an initial assessment (7-10 days), then your manuscript will be sent for peer review if suitable. Typical timeline to first decision is 3-6 weeks.",
-    },
-  ];
+  const [coAuthors, setCoAuthors] = useState<CoAuthor[]>([]);
+  const [showCoAuthorForm, setShowCoAuthorForm] = useState(false);
+  const [currentCoAuthor, setCurrentCoAuthor] = useState({
+    name: '',
+    email: '',
+    faculty: '',
+    affiliation: '',
+    orcid: '',
+  });
+
+  // File state
+  const [manuscriptFile, setManuscriptFile] = useState<File | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Submission states
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+  const [formErrors, setFormErrors] = useState<FormErrors>({});
+
+  // Agreement state
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
+
+  // Handle input changes
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+    // Clear error for this field
+    if (formErrors[name]) {
+      setFormErrors(prev => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  // Handle co-author input changes
+  const handleCoAuthorInputChange = (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const { name, value } = e.target;
+    setCurrentCoAuthor(prev => ({ ...prev, [name]: value }));
+  };
+
+  // Add co-author
+  const addCoAuthor = () => {
+    if (
+      !currentCoAuthor.name ||
+      !currentCoAuthor.email ||
+      !currentCoAuthor.faculty ||
+      !currentCoAuthor.affiliation ||
+      !currentCoAuthor.orcid
+    ) {
+      alert('Please fill in all fields for the co-author');
+      return;
+    }
+
+    const newCoAuthor: CoAuthor = {
+      id: Date.now().toString(),
+      ...currentCoAuthor,
+    };
+
+    setCoAuthors(prev => [...prev, newCoAuthor]);
+    setCurrentCoAuthor({
+      name: '',
+      email: '',
+      faculty: '',
+      affiliation: '',
+      orcid: '',
+    });
+    setShowCoAuthorForm(false);
+  };
+
+  // Remove co-author
+  const removeCoAuthor = (id: string) => {
+    setCoAuthors(prev => prev.filter(author => author.id !== id));
+  };
+
+  // File validation
+  const validateFile = (file: File): boolean => {
+    setSubmitError('');
+
+    // Check file type
+    if (file.type !== 'application/pdf') {
+      setSubmitError('Only PDF files are accepted');
+      return false;
+    }
+
+    // Check file size (10MB max)
+    if (file.size > 10 * 1024 * 1024) {
+      setSubmitError('File size should not exceed 10MB');
+      return false;
+    }
+
+    return true;
+  };
+
+  // Handle file selection
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && validateFile(file)) {
+      setManuscriptFile(file);
+    } else if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  // Drag and drop handlers
+  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+
+    const file = e.dataTransfer.files?.[0];
+    if (file && validateFile(file)) {
+      setManuscriptFile(file);
+    }
+  };
+
+  // Validate ORCID format
+  const validateOrcid = (orcid: string): boolean => {
+    const orcidRegex = /^\d{4}-\d{4}-\d{4}-\d{3}[0-9X]$/;
+    return orcidRegex.test(orcid);
+  };
+
+  // Validate form
+  const validateForm = (): boolean => {
+    const errors: FormErrors = {};
+
+    if (!formData.title.trim()) {
+      errors.title = 'Title is required';
+    } else if (formData.title.length < 10) {
+      errors.title = 'Title must be at least 10 characters';
+    }
+
+    if (!formData.abstract.trim()) {
+      errors.abstract = 'Abstract is required';
+    } else if (formData.abstract.length < 100) {
+      errors.abstract = 'Abstract must be at least 100 characters';
+    }
+
+    if (!formData.keywords.trim()) {
+      errors.keywords = 'At least one keyword is required';
+    }
+
+    if (!formData.submitterName.trim()) {
+      errors.submitterName = 'Your name is required';
+    }
+
+    if (!formData.submitterEmail.trim()) {
+      errors.submitterEmail = 'Your email is required';
+    }
+
+    if (!formData.submitterFaculty.trim()) {
+      errors.submitterFaculty = 'Faculty/Department is required';
+    }
+
+    if (!formData.submitterAffiliation.trim()) {
+      errors.submitterAffiliation = 'Affiliation is required';
+    }
+
+    if (!formData.submitterOrcid.trim()) {
+      errors.submitterOrcid = 'ORCID iD is required';
+    } else if (!validateOrcid(formData.submitterOrcid)) {
+      errors.submitterOrcid = 'Please enter a valid ORCID iD (format: 0000-0000-0000-0000)';
+    }
+
+    if (!manuscriptFile) {
+      errors.manuscriptFile = 'Please upload your manuscript PDF';
+    }
+
+    if (!agreedToTerms) {
+      errors.terms = 'You must agree to the terms and conditions';
+    }
+
+    setFormErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      setSubmitError('Please fix the errors in the form');
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitError('');
+
+    try {
+      // Create FormData for API submission
+      const apiFormData = new FormData();
+
+      // Parse keywords
+      const keywordsArray = formData.keywords
+        .split(',')
+        .map(k => k.trim())
+        .filter(k => k.length > 0);
+
+      // Create submission data
+      const submissionData = {
+        title: formData.title,
+        abstract: formData.abstract,
+        keywords: keywordsArray,
+        submitter: {
+          name: formData.submitterName,
+          email: formData.submitterEmail,
+          faculty: formData.submitterFaculty,
+          affiliation: formData.submitterAffiliation,
+          orcid: formData.submitterOrcid,
+        },
+        coAuthors: coAuthors.map(author => ({
+          email: author.email,
+          name: author.name,
+          faculty: author.faculty,
+          affiliation: author.affiliation,
+          orcid: author.orcid,
+        })),
+      };
+
+      // Append JSON data
+      Object.entries(submissionData).forEach(([key, value]) => {
+        apiFormData.append(key, JSON.stringify(value));
+      });
+
+      // Append manuscript file
+      if (manuscriptFile) {
+        apiFormData.append('manuscriptFile', manuscriptFile);
+      }
+
+      // Submit to API
+      const response = await manuscriptApi.submitManuscript(apiFormData);
+
+      if (response.success) {
+        setIsSubmitted(true);
+      } else {
+        setSubmitError(response.message || 'Submission failed. Please try again.');
+      }
+    } catch (error: any) {
+      console.error('Submission error:', error);
+      setSubmitError(
+        error?.response?.data?.message ||
+        'Failed to submit manuscript. Please try again later.'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Reset form
+  const resetForm = () => {
+    setFormData({
+      title: '',
+      abstract: '',
+      keywords: '',
+      submitterName: '',
+      submitterEmail: '',
+      submitterFaculty: '',
+      submitterAffiliation: '',
+      submitterOrcid: '',
+    });
+    setCoAuthors([]);
+    setManuscriptFile(null);
+    setAgreedToTerms(false);
+    setIsSubmitted(false);
+    setSubmitError('');
+    setFormErrors({});
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  // Success page
+  if (isSubmitted) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <header className="bg-[#7A0019] text-white shadow-lg">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-20">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 bg-white rounded-lg flex items-center justify-center">
+                  <Image
+                    src="/uniben-logo.png"
+                    alt="UNIBEN Logo"
+                    width={48}
+                    height={48}
+                    className="rounded"
+                  />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold tracking-tight">
+                    UNIBEN Journal of Humanities
+                  </h1>
+                </div>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <main className="container mx-auto px-4 py-12">
+          <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+            <div className="p-12 text-center">
+              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <CheckCircle className="h-12 w-12 text-green-600" />
+              </div>
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">
+                Submission Successful!
+              </h2>
+              <p className="text-lg text-gray-600 mb-6">
+                Your manuscript has been submitted successfully and is now under review.
+              </p>
+              <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6 mb-8">
+                <h3 className="font-semibold text-blue-900 mb-2">What happens next?</h3>
+                <ul className="text-sm text-blue-800 space-y-2 text-left">
+                  <li>• You will receive a confirmation email shortly</li>
+                  <li>• Your login credentials will be sent within 24 hours</li>
+                  <li>• You can track your submission status from your author dashboard</li>
+                  <li>• Initial review typically takes 7-10 days</li>
+                </ul>
+              </div>
+              <button
+                onClick={resetForm}
+                className="inline-flex items-center gap-2 bg-[#7A0019] text-white px-8 py-3 rounded-full font-semibold hover:bg-[#5A0A1A] transition-all"
+              >
+                Submit Another Manuscript
+              </button>
+            </div>
+          </div>
+        </main>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-[#7A0019] text-white shadow-lg sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -161,434 +422,581 @@ export default function SubmissionPortalPage() {
               </div>
             </div>
             <Link
-              href="/"
+              href="/submission"
               className="text-white hover:text-[#FFE9EE] font-semibold"
             >
-              ← Back to Journal
+              ← Back
             </Link>
           </div>
         </div>
       </header>
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-[#7A0019] to-[#5A0A1A] text-white py-20">
-        <div className="absolute inset-0 opacity-10">
-                  {/* Placeholder for subtle pattern/texture */}
-                  <Image
-                    src="/academic-pattern.png"
-                    alt=""
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
-              <Send className="h-4 w-4" />
-              <span className="text-sm font-semibold">Online Submission</span>
-            </div>
-            <h1 className="text-5xl font-bold mb-6 leading-tight font-serif">
-              Submit Your Manuscript
-            </h1>
-            <p className="text-xl text-[#FFE9EE] mb-8 leading-relaxed">
-              Join scholars advancing knowledge in the humanities. Fast review,
-              no fees, global reach.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="inline-flex items-center gap-2 bg-white text-[#7A0019] px-8 py-4 rounded-full font-bold hover:bg-[#FFE9EE] transition-all shadow-xl hover:shadow-2xl text-lg">
-                <Send className="h-6 w-6" />
-                Start New Submission
-              </button>
-              <button className="inline-flex items-center gap-2 bg-transparent border-2 border-white text-white px-8 py-4 rounded-full font-bold hover:bg-white hover:text-[#7A0019] transition-all text-lg">
-                <Users className="h-6 w-6" />
-                Login to Dashboard
-              </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Why Publish With Us */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-[#7A0019] mb-4 font-serif">
-              Why Publish With Us?
-            </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Experience a seamless submission process with transparent review
-              and no hidden costs
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-4 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="h-8 w-8 text-green-600" />
-              </div>
-              <h3 className="text-xl font-bold text-[#212121] mb-2">
-                No Fees
+      {/* Main Content */}
+      <main className="container mx-auto px-4 py-8 max-w-5xl">
+        {/* Important Notice */}
+        <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6 mb-8">
+          <div className="flex items-start gap-3">
+            <Info className="h-6 w-6 text-blue-600 flex-shrink-0 mt-0.5" />
+            <div>
+              <h3 className="font-semibold text-blue-900 mb-2">
+                No Account Required
               </h3>
-              <p className="text-gray-600">
-                Diamond Open Access — completely free for authors and readers
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Clock className="h-8 w-8 text-blue-600" />
-              </div>
-              <h3 className="text-xl font-bold text-[#212121] mb-2">
-                Fast Review
-              </h3>
-              <p className="text-gray-600">
-                3–6 weeks to first decision with rigorous double-anonymous peer
-                review
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Globe className="h-8 w-8 text-purple-600" />
-              </div>
-              <h3 className="text-xl font-bold text-[#212121] mb-2">
-                Global Reach
-              </h3>
-              <p className="text-gray-600">
-                Crossref DOIs, Google Scholar indexing, and international
-                visibility
-              </p>
-            </div>
-
-            <div className="text-center">
-              <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="h-8 w-8 text-yellow-600" />
-              </div>
-              <h3 className="text-xl font-bold text-[#212121] mb-2">
-                You Keep Rights
-              </h3>
-              <p className="text-gray-600">
-                Authors retain copyright under CC BY 4.0 open access license
+              <p className="text-sm text-blue-800">
+                You don&apos;t need to create an account to submit your manuscript. Simply fill out the form below, and an account will be automatically created for you. You&apos;ll receive your login credentials via email within 24 hours to access your author dashboard and track your submission.
               </p>
             </div>
           </div>
         </div>
-      </section>
 
-      {/* Submission Process */}
-      <section className="py-16 bg-[#FAF7F8]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-[#7A0019] mb-4 font-serif">
-              Submission Process
-            </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Six simple steps from preparation to submission
-            </p>
+        {submitError && (
+          <div className="bg-red-50 border-2 border-red-200 rounded-lg p-4 mb-6">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
+              <p className="text-red-800">{submitError}</p>
+            </div>
           </div>
+        )}
 
-          <div className="relative">
-            {/* Connecting Line */}
-            <div className="hidden md:block absolute left-1/2 transform -translate-x-1/2 top-12 bottom-12 w-1 bg-[#EAD3D9]"></div>
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Manuscript Details */}
+          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="bg-[#7A0019] text-white px-6 py-4 flex items-center gap-3">
+              <FileText className="h-6 w-6" />
+              <h2 className="text-xl font-semibold">Manuscript Details</h2>
+            </div>
 
-            <div className="space-y-12">
-              {submissionSteps.map((step, idx) => (
-                <div
-                  key={step.number}
-                  className={`relative flex gap-8 items-start ${
-                    idx % 2 === 0 ? "md:flex-row" : "md:flex-row-reverse"
+            <div className="p-6 space-y-6">
+              {/* Title */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Manuscript Title *
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  value={formData.title}
+                  onChange={handleInputChange}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#7A0019] focus:border-transparent ${
+                    formErrors.title ? 'border-red-500' : 'border-gray-300'
                   }`}
-                >
-                  {/* Step Content */}
-                  <div
-                    className={`flex-1 bg-white border-2 border-[#EAD3D9] rounded-xl p-6 hover:shadow-xl transition-all ${
-                      idx % 2 === 0 ? "md:text-right" : "md:text-left"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3 mb-4">
-                      <step.icon className="h-6 w-6 text-[#7A0019]" />
-                      <h3 className="text-xl font-bold text-[#212121]">
-                        {step.title}
-                      </h3>
-                    </div>
-                    <p className="text-gray-700 leading-relaxed mb-3">
-                      {step.description}
-                    </p>
-                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#FFE9EE] border border-[#E6B6C2] text-[#5A0A1A] rounded-full text-xs font-semibold">
-                      <Clock className="h-3 w-3" />
-                      {step.duration}
-                    </div>
-                  </div>
-
-                  {/* Step Number */}
-                  <div className="flex-shrink-0 w-16 h-16 bg-[#7A0019] rounded-full flex items-center justify-center text-white font-bold text-2xl z-10 shadow-lg">
-                    {step.number}
-                  </div>
-
-                  {/* Spacer for alternating layout */}
-                  <div className="hidden md:block flex-1"></div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="mt-12 text-center">
-            <p className="text-gray-600 mb-6">
-              <strong>Total estimated time:</strong> 15-20 minutes
-            </p>
-            <button className="inline-flex items-center gap-2 bg-[#7A0019] text-white px-8 py-4 rounded-full font-bold hover:bg-[#5A0A1A] transition-all shadow-xl text-lg">
-              Begin Submission Process
-              <ArrowRight className="h-5 w-5" />
-            </button>
-          </div>
-        </div>
-      </section>
-
-      {/* Requirements Checklist */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl font-bold text-[#7A0019] mb-4 font-serif">
-                Submission Requirements
-              </h2>
-              <p className="text-gray-600">
-                Ensure your manuscript meets these criteria before submission
-              </p>
-            </div>
-
-            <div className="bg-[#FAF7F8] border-2 border-[#EAD3D9] rounded-xl p-8">
-              <div className="space-y-4">
-                {requirements.map((req, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-start gap-4 p-4 bg-white rounded-lg"
-                  >
-                    {req.met ? (
-                      <CheckCircle className="h-6 w-6 text-green-600 flex-shrink-0 mt-0.5" />
-                    ) : (
-                      <AlertCircle className="h-6 w-6 text-yellow-600 flex-shrink-0 mt-0.5" />
-                    )}
-                    <div className="flex-1">
-                      <h3 className="font-bold text-[#212121] mb-1">
-                        {req.title}
-                      </h3>
-                      <p className="text-sm text-gray-600">{req.description}</p>
-                    </div>
-                    {!req.met && (
-                      <span className="text-xs text-yellow-800 bg-yellow-100 px-2 py-1 rounded-full font-semibold">
-                        Recommended
-                      </span>
-                    )}
-                  </div>
-                ))}
+                  placeholder="Enter your manuscript title"
+                />
+                {formErrors.title && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="h-4 w-4" />
+                    {formErrors.title}
+                  </p>
+                )}
               </div>
 
-              <div className="mt-8 pt-8 border-t-2 border-[#EAD3D9]">
-                <h3 className="font-bold text-[#212121] mb-4 flex items-center gap-2">
-                  <Download className="h-5 w-5 text-[#7A0019]" />
-                  Helpful Resources
-                </h3>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <a
-                    href="/files/UBJH_Manuscript_Template.docx"
-                    className="flex items-center gap-3 p-4 bg-white border-2 border-[#EAD3D9] rounded-lg hover:border-[#7A0019] transition-colors"
-                  >
-                    <FileText className="h-5 w-5 text-[#7A0019]" />
-                    <div>
-                      <div className="font-semibold text-[#212121] text-sm">
-                        Manuscript Template
-                      </div>
-                      <div className="text-xs text-gray-600">DOCX format</div>
-                    </div>
-                  </a>
-                  <a
-                    href="/files/UBJH_Author_Guidelines.pdf"
-                    className="flex items-center gap-3 p-4 bg-white border-2 border-[#EAD3D9] rounded-lg hover:border-[#7A0019] transition-colors"
-                  >
-                    <FileText className="h-5 w-5 text-[#7A0019]" />
-                    <div>
-                      <div className="font-semibold text-[#212121] text-sm">
-                        Author Guidelines
-                      </div>
-                      <div className="text-xs text-gray-600">PDF format</div>
-                    </div>
-                  </a>
+              {/* Abstract */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Abstract * (150-300 words)
+                </label>
+                <textarea
+                  name="abstract"
+                  value={formData.abstract}
+                  onChange={handleInputChange}
+                  rows={8}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#7A0019] focus:border-transparent ${
+                    formErrors.abstract ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  placeholder="Enter your abstract (minimum 100 characters)"
+                />
+                <div className="flex justify-between mt-1">
+                  <div>
+                    {formErrors.abstract && (
+                      <p className="text-sm text-red-600 flex items-center gap-1">
+                        <AlertCircle className="h-4 w-4" />
+                        {formErrors.abstract}
+                      </p>
+                    )}
+                  </div>
+                  <span className="text-sm text-gray-500">
+                    {formData.abstract.length} characters
+                  </span>
                 </div>
+              </div>
+
+              {/* Keywords */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Keywords * (4-6 keywords, separated by commas)
+                </label>
+                <input
+                  type="text"
+                  name="keywords"
+                  value={formData.keywords}
+                  onChange={handleInputChange}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#7A0019] focus:border-transparent ${
+                    formErrors.keywords ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  placeholder="e.g., postcolonial literature, African philosophy, cultural studies"
+                />
+                {formErrors.keywords && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="h-4 w-4" />
+                    {formErrors.keywords}
+                  </p>
+                )}
               </div>
             </div>
           </div>
-        </div>
-      </section>
 
-      {/* FAQs */}
-      <section className="py-16 bg-[#FAF7F8]">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-[#7A0019] mb-4 font-serif">
-              Frequently Asked Questions
-            </h2>
-            <p className="text-gray-600">
-              Quick answers to common submission questions
-            </p>
-          </div>
+          {/* Author Information */}
+          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="bg-[#7A0019] text-white px-6 py-4 flex items-center gap-3">
+              <Users className="h-6 w-6" />
+              <h2 className="text-xl font-semibold">Primary Author (You)</h2>
+            </div>
 
-          <div className="space-y-4">
-            {faqs.map((faq, idx) => (
-              <div
-                key={idx}
-                className="bg-white border-2 border-[#EAD3D9] rounded-xl overflow-hidden"
-              >
-                <button
-                  onClick={() =>
-                    setExpandedFAQ(expandedFAQ === idx ? null : idx)
-                  }
-                  className="w-full flex items-center justify-between p-6 text-left hover:bg-[#FAF7F8] transition-colors"
-                >
-                  <div className="flex items-start gap-3 flex-1">
-                    <HelpCircle className="h-5 w-5 text-[#7A0019] flex-shrink-0 mt-0.5" />
-                    <h3 className="font-bold text-[#212121]">{faq.question}</h3>
-                  </div>
-                  <ArrowRight
-                    className={`h-5 w-5 text-gray-400 flex-shrink-0 transition-transform ${
-                      expandedFAQ === idx ? "rotate-90" : ""
+            <div className="p-6 space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Full Name *
+                  </label>
+                  <input
+                    type="text"
+                    name="submitterName"
+                    value={formData.submitterName}
+                    onChange={handleInputChange}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#7A0019] focus:border-transparent ${
+                      formErrors.submitterName ? 'border-red-500' : 'border-gray-300'
                     }`}
+                    placeholder="Your full name"
                   />
-                </button>
-                {expandedFAQ === idx && (
-                  <div className="px-6 pb-6">
-                    <p className="text-gray-700 leading-relaxed pl-8">
-                      {faq.answer}
+                  {formErrors.submitterName && (
+                    <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                      <AlertCircle className="h-4 w-4" />
+                      {formErrors.submitterName}
                     </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Email Address *
+                  </label>
+                  <input
+                    type="email"
+                    name="submitterEmail"
+                    value={formData.submitterEmail}
+                    onChange={handleInputChange}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#7A0019] focus:border-transparent ${
+                      formErrors.submitterEmail ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder="your.email@institution.edu"
+                  />
+                  {formErrors.submitterEmail && (
+                    <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                      <AlertCircle className="h-4 w-4" />
+                      {formErrors.submitterEmail}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Faculty/Department *
+                  </label>
+                  <input
+                    type="text"
+                    name="submitterFaculty"
+                    value={formData.submitterFaculty}
+                    onChange={handleInputChange}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#7A0019] focus:border-transparent ${
+                      formErrors.submitterFaculty ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder="e.g., Arts, English Department"
+                  />
+                  {formErrors.submitterFaculty && (
+                    <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                      <AlertCircle className="h-4 w-4" />
+                      {formErrors.submitterFaculty}
+                    </p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Institutional Affiliation *
+                  </label>
+                  <input
+                    type="text"
+                    name="submitterAffiliation"
+                    value={formData.submitterAffiliation}
+                    onChange={handleInputChange}
+                    className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#7A0019] focus:border-transparent ${
+                      formErrors.submitterAffiliation ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder="University of Benin, Nigeria"
+                  />
+                  {formErrors.submitterAffiliation && (
+                    <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                      <AlertCircle className="h-4 w-4" />
+                      {formErrors.submitterAffiliation}
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* ORCID with help text */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  ORCID iD * (Required)
+                </label>
+                <input
+                  type="text"
+                  name="submitterOrcid"
+                  value={formData.submitterOrcid}
+                  onChange={handleInputChange}
+                  className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#7A0019] focus:border-transparent ${
+                    formErrors.submitterOrcid ? 'border-red-500' : 'border-gray-300'
+                  }`}
+                  placeholder="0000-0000-0000-0000"
+                />
+                {formErrors.submitterOrcid && (
+                  <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="h-4 w-4" />
+                    {formErrors.submitterOrcid}
+                  </p>
+                )}
+                <div className="mt-2 bg-amber-50 border border-amber-200 rounded-lg p-3">
+                  <p className="text-sm text-amber-800 mb-2">
+                    <strong>Don&apos;t have an ORCID iD?</strong> It&apos;s free and takes 2 minutes to register:
+                  </p>
+                  <ol className="text-sm text-amber-700 space-y-1 ml-4 list-decimal">
+                    <li>Visit <a href="https://orcid.org/register" target="_blank" rel="noopener noreferrer" className="text-[#7A0019] underline font-medium">https://orcid.org/register</a></li>
+                    <li>Fill in your basic information (name, email, password)</li>
+                    <li>Set your visibility preferences</li>
+                    <li>Copy your 16-digit ORCID iD (format: 0000-0000-0000-0000)</li>
+                    <li>Paste it in the field above</li>
+                  </ol>
+                  <a
+                    href="https://orcid.org/register"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 mt-3 text-sm text-[#7A0019] hover:text-[#5A0A1A] font-semibold"
+                  >
+                    Register for ORCID iD
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Co-Authors Section */}
+          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="bg-[#7A0019] text-white px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Users className="h-6 w-6" />
+                <h2 className="text-xl font-semibold">Co-Authors (Optional)</h2>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowCoAuthorForm(!showCoAuthorForm)}
+                className="flex items-center gap-2 bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg transition-colors"
+              >
+                <Plus className="h-5 w-5" />
+                Add Co-Author
+              </button>
+            </div>
+
+            <div className="p-6">
+              {/* Co-Author List */}
+              {coAuthors.length > 0 && (
+                <div className="space-y-3 mb-6">
+                  {coAuthors.map((author) => (
+                    <div
+                      key={author.id}
+                      className="flex items-start justify-between p-4 bg-gray-50 border border-gray-200 rounded-lg"
+                    >
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-900">{author.name}</h4>
+                        <p className="text-sm text-gray-600">{author.email}</p>
+                        <p className="text-sm text-gray-600">
+                          {author.affiliation}
+                          {author.faculty && ` • ${author.faculty}`}
+                        </p>
+                        {author.orcid && (
+                          <p className="text-sm text-gray-500">ORCID: {author.orcid}</p>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeCoAuthor(author.id)}
+                        className="ml-4 text-red-600 hover:text-red-800 p-1"
+                      >
+                        <X className="h-5 w-5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Co-Author Form */}
+              {showCoAuthorForm && (
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 space-y-4">
+                  <h3 className="font-semibold text-gray-900 mb-4">Add Co-Author</h3>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Name *
+                      </label>
+                      <input
+                        type="text"
+                        name="name"
+                        value={currentCoAuthor.name}
+                        onChange={handleCoAuthorInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#7A0019] focus:border-transparent"
+                        placeholder="Co-author's full name"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Email *
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={currentCoAuthor.email}
+                        onChange={handleCoAuthorInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#7A0019] focus:border-transparent"
+                        placeholder="email@institution.edu"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Faculty/Department *
+                      </label>
+                      <input
+                        type="text"
+                        name="faculty"
+                        value={currentCoAuthor.faculty}
+                        onChange={handleCoAuthorInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#7A0019] focus:border-transparent"
+                        placeholder="Faculty or department"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Affiliation *
+                      </label>
+                      <input
+                        type="text"
+                        name="affiliation"
+                        value={currentCoAuthor.affiliation}
+                        onChange={handleCoAuthorInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#7A0019] focus:border-transparent"
+                        placeholder="Institution name"
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        ORCID iD *
+                      </label>
+                      <input
+                        type="text"
+                        name="orcid"
+                        value={currentCoAuthor.orcid}
+                        onChange={handleCoAuthorInputChange}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#7A0019] focus:border-transparent"
+                        placeholder="0000-0000-0000-0000"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={addCoAuthor}
+                      className="flex-1 bg-[#7A0019] text-white px-4 py-2 rounded-lg hover:bg-[#5A0A1A] transition-colors font-medium"
+                    >
+                      Add Co-Author
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowCoAuthorForm(false);
+                        setCurrentCoAuthor({
+                          name: '',
+                          email: '',
+                          faculty: '',
+                          affiliation: '',
+                          orcid: '',
+                        });
+                      }}
+                      className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {coAuthors.length === 0 && !showCoAuthorForm && (
+                <p className="text-center text-gray-500 py-8">
+                  No co-authors added yet. Click &quot;Add Co-Author&quot; to include collaborators.
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* File Upload Section */}
+          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="bg-[#7A0019] text-white px-6 py-4 flex items-center gap-3">
+              <Upload className="h-6 w-6" />
+              <h2 className="text-xl font-semibold">Manuscript Upload</h2>
+            </div>
+
+            <div className="p-6">
+              <p className="text-gray-700 mb-4">
+                Please upload your complete manuscript in PDF format. Ensure it follows the{' '}
+                <Link href="/for-authors" className="text-[#7A0019] underline hover:text-[#5A0A1A]">
+                  author guidelines
+                </Link>.
+              </p>
+
+              <div
+                className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+                  isDragging
+                    ? 'border-[#7A0019] bg-[#FFE9EE]'
+                    : manuscriptFile
+                    ? 'border-green-500 bg-green-50'
+                    : 'border-gray-300 hover:border-[#7A0019]'
+                }`}
+                onDragEnter={handleDragEnter}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+              >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf"
+                  onChange={handleFileChange}
+                  className="hidden"
+                  id="manuscript-upload"
+                />
+
+                {manuscriptFile ? (
+                  <div className="space-y-3">
+                    <CheckCircle className="h-12 w-12 text-green-600 mx-auto" />
+                    <div>
+                      <p className="font-semibold text-gray-900">{manuscriptFile.name}</p>
+                      <p className="text-sm text-gray-500">
+                        {(manuscriptFile.size / (1024 * 1024)).toFixed(2)} MB
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setManuscriptFile(null);
+                        if (fileInputRef.current) {
+                          fileInputRef.current.value = '';
+                        }
+                      }}
+                      className="text-red-600 hover:text-red-800 text-sm font-medium"
+                    >
+                      Remove file
+                    </button>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <Upload className="h-12 w-12 text-gray-400 mx-auto" />
+                    <div>
+                      <label
+                        htmlFor="manuscript-upload"
+                        className="cursor-pointer text-[#7A0019] hover:text-[#5A0A1A] font-semibold"
+                      >
+                        Click to upload
+                      </label>
+                      <span className="text-gray-600"> or drag and drop</span>
+                    </div>
+                    <p className="text-sm text-gray-500">PDF only, up to 10MB</p>
                   </div>
                 )}
               </div>
-            ))}
+
+              {formErrors.manuscriptFile && (
+                <p className="mt-2 text-sm text-red-600 flex items-center gap-1">
+                  <AlertCircle className="h-4 w-4" />
+                  {formErrors.manuscriptFile}
+                </p>
+              )}
+            </div>
           </div>
 
-          <div className="mt-8 text-center">
-            <p className="text-gray-600 mb-4">Still have questions?</p>
-            <Link
-              href="/for-authors"
-              className="inline-flex items-center gap-2 text-[#7A0019] hover:text-[#5A0A1A] font-semibold"
+          {/* Terms and Conditions */}
+          <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="p-6">
+              <div className="space-y-4">
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={agreedToTerms}
+                    onChange={(e) => setAgreedToTerms(e.target.checked)}
+                    className="mt-1 h-5 w-5 text-[#7A0019] rounded focus:ring-[#7A0019]"
+                  />
+                  <span className="text-sm text-gray-700">
+                    I confirm that this manuscript is original work, has not been published elsewhere,
+                    and is not under consideration by another journal. I agree to the{' '}
+                    <Link href="/policies" className="text-[#7A0019] underline hover:text-[#5A0A1A]">
+                      journal policies
+                    </Link>{' '}
+                    and{' '}
+                    <Link href="/for-authors" className="text-[#7A0019] underline hover:text-[#5A0A1A]">
+                      submission guidelines
+                    </Link>
+                    . I understand that my manuscript will undergo double-anonymous peer review.
+                  </span>
+                </label>
+                {formErrors.terms && (
+                  <p className="text-sm text-red-600 flex items-center gap-1">
+                    <AlertCircle className="h-4 w-4" />
+                    {formErrors.terms}
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {/* Submit Button */}
+          <div className="flex justify-center pb-8">
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className={`inline-flex items-center gap-3 px-8 py-4 rounded-full font-bold text-lg shadow-xl transition-all ${
+                isSubmitting
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-[#7A0019] hover:bg-[#5A0A1A] text-white hover:shadow-2xl'
+              }`}
             >
-              View Full Author Guidelines
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* Support Section */}
-      <section className="py-16 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 gap-8">
-            {/* Technical Support */}
-            <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-8">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                  <HelpCircle className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-blue-900 mb-3">
-                    Technical Support
-                  </h3>
-                  <p className="text-gray-700 mb-4">
-                    Having trouble with the submission system? Our technical
-                    team can help with login issues, file uploads, and system
-                    errors.
-                  </p>
-                  <a
-                    href="mailto:support@uniben.edu"
-                    className="inline-flex items-center gap-2 text-blue-700 hover:text-blue-900 font-semibold"
-                  >
-                    <Mail className="h-4 w-4" />
-                    support@uniben.edu
-                  </a>
-                </div>
-              </div>
-            </div>
-
-            {/* Editorial Office */}
-            <div className="bg-purple-50 border-2 border-purple-200 rounded-xl p-8">
-              <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Mail className="h-6 w-6 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-purple-900 mb-3">
-                    Editorial Office
-                  </h3>
-                  <p className="text-gray-700 mb-4">
-                    Questions about manuscript preparation, journal scope, or
-                    editorial policies? Contact our editorial team.
-                  </p>
-                  <a
-                    href="mailto:journalhumanities@uniben.edu"
-                    className="inline-flex items-center gap-2 text-purple-700 hover:text-purple-900 font-semibold"
-                  >
-                    <Mail className="h-4 w-4" />
-                    journalhumanities@uniben.edu
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Final CTA */}
-      <section className="bg-gradient-to-br from-[#7A0019] to-[#5A0A1A] py-20">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <BookOpen className="h-16 w-16 text-white mx-auto mb-6" />
-          <h2 className="text-4xl font-bold text-white mb-6 font-serif">
-            Ready to Share Your Research?
-          </h2>
-          <p className="text-xl text-[#FFE9EE] mb-8 leading-relaxed">
-            Join scholars from across Africa and beyond in advancing humanities
-            knowledge through rigorous, open access scholarship.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="inline-flex items-center gap-2 bg-white text-[#7A0019] px-8 py-4 rounded-full font-bold hover:bg-[#FFE9EE] transition-all shadow-xl text-lg">
-              <Send className="h-6 w-6" />
-              Start Your Submission
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="animate-spin h-6 w-6" />
+                  Submitting...
+                </>
+              ) : (
+                <>
+                  <Send className="h-6 w-6" />
+                  Submit Manuscript
+                </>
+              )}
             </button>
-            <Link
-              href="/for-authors"
-              className="inline-flex items-center gap-2 bg-transparent border-2 border-white text-white px-8 py-4 rounded-full font-bold hover:bg-white hover:text-[#7A0019] transition-all text-lg"
-            >
-              <FileText className="h-6 w-6" />
-              Read Guidelines First
-            </Link>
           </div>
-
-          <div className="mt-12 pt-12 border-t border-white/20">
-            <div className="grid md:grid-cols-3 gap-8 text-left">
-              <div>
-                <div className="text-3xl font-bold mb-2">0 NGN</div>
-                <div className="text-sm text-[#FFE9EE]">
-                  Article Processing Charges
-                </div>
-              </div>
-              <div>
-                <div className="text-3xl font-bold mb-2">3-6 Weeks</div>
-                <div className="text-sm text-[#FFE9EE]">
-                  Average Review Time
-                </div>
-              </div>
-              <div>
-                <div className="text-3xl font-bold mb-2">CC BY 4.0</div>
-                <div className="text-sm text-[#FFE9EE]">
-                  Open Access License
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+        </form>
+      </main>
 
       {/* Footer */}
-      <footer className="bg-[#FAF7F8] border-t border-[#EAD3D9] py-8">
+      <footer className="bg-gray-100 border-t border-gray-200 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-600">
             <p>
@@ -596,28 +1004,16 @@ export default function SubmissionPortalPage() {
               of Humanities
             </p>
             <div className="flex gap-4 mt-4 md:mt-0">
-              <Link
-                href="/about"
-                className="hover:text-[#7A0019]"
-              >
+              <Link href="/about" className="hover:text-[#7A0019]">
                 About
               </Link>
-              <Link
-                href="/policies"
-                className="hover:text-[#7A0019]"
-              >
+              <Link href="/policies" className="hover:text-[#7A0019]">
                 Policies
               </Link>
-              <Link
-                href="/for-authors"
-                className="hover:text-[#7A0019]"
-              >
+              <Link href="/for-authors" className="hover:text-[#7A0019]">
                 Author Guidelines
               </Link>
-              <Link
-                href="/contact"
-                className="hover:text-[#7A0019]"
-              >
+              <Link href="/contact" className="hover:text-[#7A0019]">
                 Contact
               </Link>
             </div>

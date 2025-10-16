@@ -544,7 +544,7 @@ export default function AboutPage() {
                   Join our community of scholars advancing humanities research
                 </p>
                 <Link
-                  href="/submit"
+                  href="/submission"
                   className="block w-full bg-[#7A0019] text-white text-center px-6 py-3 rounded-lg font-bold hover:bg-[#5A0A1A] transition-colors"
                 >
                   Submit Manuscript
