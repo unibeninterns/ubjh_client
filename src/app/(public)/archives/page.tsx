@@ -11,9 +11,8 @@ import {
   FileText,
   Search,
   Download,
-  Grid,
-  List,
 } from "lucide-react";
+import Header from "@/components/Header";
 
 interface Issue {
   volume: number;
@@ -26,15 +25,12 @@ interface Issue {
   featured: boolean;
 }
 
-
 export default function ArchivesPage() {
   const [expandedYear, setExpandedYear] = useState<number | null>(2025);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterYear, setFilterYear] = useState<string>("all");
   const [filterType, setFilterType] = useState<string>("all");
-  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
 
-  // Mock data
   const issues: Issue[] = [
     {
       volume: 1,
@@ -68,38 +64,8 @@ export default function ArchivesPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="bg-[#7A0019] text-white shadow-lg sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-white rounded-lg flex items-center justify-center">
-                <Image
-                  src="/uniben-logo.png"
-                  alt="UNIBEN Logo"
-                  width={48}
-                  height={48}
-                  className="rounded"
-                />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold tracking-tight">
-                  UNIBEN Journal of Humanities
-                </h1>
-                <p className="text-sm text-[#FFE9EE] font-medium">Archives</p>
-              </div>
-            </div>
-            <Link
-              href="/"
-              className="text-white hover:text-[#FFE9EE] font-semibold"
-            >
-              ← Back to Journal
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Header/>
 
-      {/* Hero Section */}
       <section className="bg-gradient-to-br from-[#7A0019] to-[#5A0A1A] text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
@@ -118,11 +84,9 @@ export default function ArchivesPage() {
         </div>
       </section>
 
-      {/* Search & Filter Bar */}
       <section className="bg-[#FAF7F8] border-b-2 border-[#EAD3D9] py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row gap-4">
-            {/* Search */}
             <div className="flex-1 relative">
               <input
                 type="text"
@@ -134,7 +98,6 @@ export default function ArchivesPage() {
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
             </div>
 
-            {/* Filters */}
             <div className="flex gap-3">
               <select
                 value={filterYear}
@@ -160,38 +123,11 @@ export default function ArchivesPage() {
                   </option>
                 ))}
               </select>
-
-              {/* View Toggle */}
-              <div className="flex border-2 border-[#EAD3D9] rounded-lg overflow-hidden">
-                <button
-                  onClick={() => setViewMode("grid")}
-                  className={`px-4 py-3 ${
-                    viewMode === "grid"
-                      ? "bg-[#7A0019] text-white"
-                      : "bg-white text-gray-700 hover:bg-gray-50"
-                  } transition-colors`}
-                  aria-label="Grid view"
-                >
-                  <Grid className="h-5 w-5" />
-                </button>
-                <button
-                  onClick={() => setViewMode("list")}
-                  className={`px-4 py-3 border-l-2 border-[#EAD3D9] ${
-                    viewMode === "list"
-                      ? "bg-[#7A0019] text-white"
-                      : "bg-white text-gray-700 hover:bg-gray-50"
-                  } transition-colors`}
-                  aria-label="List view"
-                >
-                  <List className="h-5 w-5" />
-                </button>
-              </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Archives Content */}
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {years.length === 0 ? (
@@ -211,7 +147,6 @@ export default function ArchivesPage() {
                   key={year}
                   className="bg-white border-2 border-[#EAD3D9] rounded-xl overflow-hidden"
                 >
-                  {/* Year Header */}
                   <button
                     onClick={() => toggleYear(year)}
                     className="w-full flex items-center justify-between p-6 hover:bg-[#FAF7F8] transition-colors"
@@ -237,111 +172,65 @@ export default function ArchivesPage() {
                     )}
                   </button>
 
-                  {/* Issues Grid/List */}
                   {expandedYear === year && (
                     <div className="border-t-2 border-[#EAD3D9] p-6">
-                      {viewMode === "grid" ? (
-                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                          {issuesByYear[year].map((issue) => (
-                            <Link
-                              key={`${issue.volume}-${issue.issue}`}
-                              href={`/current-issue`}
-                              className="group bg-white border-2 border-[#EAD3D9] rounded-xl overflow-hidden hover:shadow-xl hover:border-[#7A0019] transition-all"
-                            >
-                              <div className="relative h-64">
-                                <Image
-                                  src={issue.coverImage}
-                                  alt={`Volume ${issue.volume}, Issue ${issue.issue}`}
-                                  fill
-                                  className="object-cover"
-                                />
+                      <div className="space-y-4">
+                        {issuesByYear[year].map((issue) => (
+                          <Link
+                            key={`${issue.volume}-${issue.issue}`}
+                            href={`/current-issue`}
+                            className="group flex gap-6 bg-white border-2 border-[#EAD3D9] rounded-xl overflow-hidden hover:shadow-xl hover:border-[#7A0019] transition-all p-4"
+                          >
+                            <div className="relative w-32 h-48 flex-shrink-0">
+                              <Image
+                                src={issue.coverImage}
+                                alt={`Volume ${issue.volume}, Issue ${issue.issue}`}
+                                fill
+                                className="object-cover rounded-lg"
+                              />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-start justify-between mb-2">
+                                <h3 className="text-xl font-bold text-[#212121] group-hover:text-[#7A0019] transition-colors">
+                                  Volume {issue.volume}, Issue {issue.issue} (
+                                  {issue.year})
+                                </h3>
                                 {issue.featured && (
-                                  <div className="absolute top-4 right-4">
-                                    <span className="inline-flex items-center px-3 py-1 bg-yellow-400 text-yellow-900 rounded-full text-xs font-bold">
-                                      CURRENT
-                                    </span>
-                                  </div>
+                                  <span className="inline-flex items-center px-3 py-1 bg-yellow-400 text-yellow-900 rounded-full text-xs font-bold">
+                                    CURRENT
+                                  </span>
                                 )}
                               </div>
-                              <div className="p-4">
-                                <h3 className="text-lg font-bold text-[#212121] mb-2 group-hover:text-[#7A0019] transition-colors">
-                                  Volume {issue.volume}, Issue {issue.issue}
-                                </h3>
-                                <p className="text-sm text-gray-600 mb-3">
-                                  Published: {issue.publishDate}
-                                </p>
-                                <div className="flex items-center justify-between text-sm text-gray-600 mb-3">
-                                  <span className="flex items-center gap-1">
-                                    <FileText className="h-4 w-4" />
-                                    {issue.articleCount} articles
-                                  </span>
-                                </div>
-                                <div className="text-xs font-mono text-gray-500">
-                                  {issue.doi}
-                                </div>
+                              <p className="text-gray-600 mb-3">
+                                Published: {issue.publishDate}
+                              </p>
+                              <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-3">
+                                <span className="flex items-center gap-1">
+                                  <FileText className="h-4 w-4" />
+                                  {issue.articleCount} articles
+                                </span>
+                                <span className="flex items-center gap-1">
+                                  <Calendar className="h-4 w-4" />
+                                  {issue.publishDate}
+                                </span>
                               </div>
-                            </Link>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="space-y-4">
-                          {issuesByYear[year].map((issue) => (
-                            <Link
-                              key={`${issue.volume}-${issue.issue}`}
-                              href={`/current-issue`}
-                              className="group flex gap-6 bg-white border-2 border-[#EAD3D9] rounded-xl overflow-hidden hover:shadow-xl hover:border-[#7A0019] transition-all p-4"
-                            >
-                              <div className="relative w-32 h-48 flex-shrink-0">
-                                <Image
-                                  src={issue.coverImage}
-                                  alt={`Volume ${issue.volume}, Issue ${issue.issue}`}
-                                  fill
-                                  className="object-cover rounded-lg"
-                                />
+                              <div className="text-xs font-mono text-gray-500 mb-4">
+                                DOI: {issue.doi}
                               </div>
-                              <div className="flex-1">
-                                <div className="flex items-start justify-between mb-2">
-                                  <h3 className="text-xl font-bold text-[#212121] group-hover:text-[#7A0019] transition-colors">
-                                    Volume {issue.volume}, Issue {issue.issue} (
-                                    {issue.year})
-                                  </h3>
-                                  {issue.featured && (
-                                    <span className="inline-flex items-center px-3 py-1 bg-yellow-400 text-yellow-900 rounded-full text-xs font-bold">
-                                      CURRENT
-                                    </span>
-                                  )}
-                                </div>
-                                <p className="text-gray-600 mb-3">
-                                  Published: {issue.publishDate}
-                                </p>
-                                <div className="flex flex-wrap gap-4 text-sm text-gray-600 mb-3">
-                                  <span className="flex items-center gap-1">
-                                    <FileText className="h-4 w-4" />
-                                    {issue.articleCount} articles
-                                  </span>
-                                  <span className="flex items-center gap-1">
-                                    <Calendar className="h-4 w-4" />
-                                    {issue.publishDate}
-                                  </span>
-                                </div>
-                                <div className="text-xs font-mono text-gray-500 mb-4">
-                                  DOI: {issue.doi}
-                                </div>
-                                <div className="flex gap-3">
-                                  <span className="inline-flex items-center gap-2 bg-[#7A0019] text-white px-4 py-2 rounded-lg font-semibold text-sm">
-                                    <BookOpen className="h-4 w-4" />
-                                    View Issue
-                                  </span>
-                                  <span className="inline-flex items-center gap-2 border-2 border-[#7A0019] text-[#7A0019] px-4 py-2 rounded-lg font-semibold text-sm">
-                                    <Download className="h-4 w-4" />
-                                    Download PDF
-                                  </span>
-                                </div>
+                              <div className="flex gap-3">
+                                <span className="inline-flex items-center gap-2 bg-[#7A0019] text-white px-4 py-2 rounded-lg font-semibold text-sm">
+                                  <BookOpen className="h-4 w-4" />
+                                  View Issue
+                                </span>
+                                <span className="inline-flex items-center gap-2 border-2 border-[#7A0019] text-[#7A0019] px-4 py-2 rounded-lg font-semibold text-sm">
+                                  <Download className="h-4 w-4" />
+                                  Download PDF
+                                </span>
                               </div>
-                            </Link>
-                          ))}
-                        </div>
-                      )}
+                            </div>
+                          </Link>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -349,7 +238,6 @@ export default function ArchivesPage() {
             </div>
           )}
 
-          {/* Stats Section */}
           <div className="mt-12 grid md:grid-cols-4 gap-6">
             <div className="bg-gradient-to-br from-[#7A0019] to-[#5A0A1A] text-white rounded-xl p-6 text-center">
               <div className="text-4xl font-bold mb-2">{issues.length}</div>
@@ -373,7 +261,6 @@ export default function ArchivesPage() {
             </div>
           </div>
 
-          {/* CTA Section */}
           <div className="mt-12 bg-[#FAF7F8] border-2 border-[#EAD3D9] rounded-xl p-8 text-center">
             <h3 className="text-2xl font-bold text-[#7A0019] mb-4">
               Can&apos;t Find What You&apos;re Looking For?
@@ -402,7 +289,6 @@ export default function ArchivesPage() {
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="bg-[#FAF7F8] border-t border-[#EAD3D9] py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-600">
@@ -411,22 +297,13 @@ export default function ArchivesPage() {
               of Humanities
             </p>
             <div className="flex gap-4 mt-4 md:mt-0">
-              <Link
-                href="/about"
-                className="hover:text-[#7A0019]"
-              >
+              <Link href="/about" className="hover:text-[#7A0019]">
                 About
               </Link>
-              <Link
-                href="/policies"
-                className="hover:text-[#7A0019]"
-              >
+              <Link href="/policies" className="hover:text-[#7A0019]">
                 Policies
               </Link>
-              <Link
-                href="/contact"
-                className="hover:text-[#7A0019]"
-              >
+              <Link href="/contact" className="hover:text-[#7A0019]">
                 Contact
               </Link>
             </div>

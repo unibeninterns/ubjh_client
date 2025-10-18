@@ -18,6 +18,7 @@ import {
   Award,
   Globe,
 } from "lucide-react";
+import Header from "@/components/Header"
 
 export default function ForAuthorsPage() {
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
@@ -61,38 +62,7 @@ export default function ForAuthorsPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header - Simplified version, in production this would be a component */}
-      <header className="bg-[#7A0019] text-white shadow-lg sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-white rounded-lg flex items-center justify-center">
-                <Image
-                  src="/uniben-logo.png"
-                  alt="UNIBEN Logo"
-                  width={48}
-                  height={48}
-                  className="rounded"
-                />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold tracking-tight">
-                  UNIBEN Journal of Humanities
-                </h1>
-                <p className="text-sm text-[#FFE9EE] font-medium">
-                  Diamond Open Access
-                </p>
-              </div>
-            </div>
-            <Link
-              href="/"
-              className="text-white hover:text-[#FFE9EE] font-semibold"
-            >
-              ← Back to Journal
-            </Link>
-          </div>
-        </div>
-      </header>
+     <Header/>
 
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-[#7A0019] to-[#5A0A1A] text-white py-16">
@@ -320,31 +290,12 @@ export default function ForAuthorsPage() {
                 <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-[#EAD3D9]"></div>
 
                 <div className="space-y-8">
-                  {/* Step 1 */}
-                  <div className="relative flex gap-6">
-                    <div className="flex-shrink-0 w-16 h-16 bg-[#7A0019] rounded-full flex items-center justify-center text-white font-bold text-xl z-10">
-                      1
-                    </div>
-                    <div className="flex-1 pt-2">
-                      <h3 className="text-xl font-bold text-[#212121] mb-2">
-                        Create Account / Login
-                      </h3>
-                      <p className="text-gray-700 mb-3">
-                        Register for a free author account on our submission
-                        platform. If you&apos;re a returning author, simply log in
-                        with your credentials.
-                      </p>
-                      <div className="bg-[#FAF7F8] rounded-lg p-4 text-sm text-gray-600">
-                        <strong>Tip:</strong> Register your ORCID iD during
-                        account creation for seamless integration.
-                      </div>
-                    </div>
-                  </div>
+          
 
                   {/* Step 2 */}
                   <div className="relative flex gap-6">
                     <div className="flex-shrink-0 w-16 h-16 bg-[#7A0019] rounded-full flex items-center justify-center text-white font-bold text-xl z-10">
-                      2
+                      1
                     </div>
                     <div className="flex-1 pt-2">
                       <h3 className="text-xl font-bold text-[#212121] mb-2">
@@ -372,7 +323,7 @@ export default function ForAuthorsPage() {
                   {/* Step 3 */}
                   <div className="relative flex gap-6">
                     <div className="flex-shrink-0 w-16 h-16 bg-[#7A0019] rounded-full flex items-center justify-center text-white font-bold text-xl z-10">
-                      3
+                      2
                     </div>
                     <div className="flex-1 pt-2">
                       <h3 className="text-xl font-bold text-[#212121] mb-2">
@@ -395,7 +346,7 @@ export default function ForAuthorsPage() {
                   {/* Step 4 */}
                   <div className="relative flex gap-6">
                     <div className="flex-shrink-0 w-16 h-16 bg-[#7A0019] rounded-full flex items-center justify-center text-white font-bold text-xl z-10">
-                      4
+                      3
                     </div>
                     <div className="flex-1 pt-2">
                       <h3 className="text-xl font-bold text-[#212121] mb-2">
@@ -418,7 +369,7 @@ export default function ForAuthorsPage() {
                   {/* Step 5 */}
                   <div className="relative flex gap-6">
                     <div className="flex-shrink-0 w-16 h-16 bg-[#7A0019] rounded-full flex items-center justify-center text-white font-bold text-xl z-10">
-                      5
+                      4
                     </div>
                     <div className="flex-1 pt-2">
                       <h3 className="text-xl font-bold text-[#212121] mb-2">
@@ -439,8 +390,8 @@ export default function ForAuthorsPage() {
 
                   {/* Step 6 */}
                   <div className="relative flex gap-6">
-                    <div className="flex-shrink-0 w-16 h-16 bg-[#0F7B3F] rounded-full flex items-center justify-center text-white font-bold text-xl z-10">
-                      6
+                    <div className="flex-shrink-0 w-16 h-16 bg-[#7A0019] rounded-full flex items-center justify-center text-white font-bold text-xl z-10">
+                      5
                     </div>
                     <div className="flex-1 pt-2">
                       <h3 className="text-xl font-bold text-[#212121] mb-2">
@@ -466,7 +417,7 @@ export default function ForAuthorsPage() {
             </section>
 
             {/* Article Processing Charges */}
-            <section id="apcs" className="bg-gradient-to-br from-green-50 to-emerald-50 border-2 border-green-200 rounded-xl p-8">
+            <section id="apcs" className="to-emerald-50 border-2 border-[#EAD3D9] rounded-xl p-8">
               <div className="flex items-start gap-4">
                 <div className="flex-shrink-0 w-16 h-16 bg-green-600 rounded-full flex items-center justify-center">
                   <CheckCircle className="h-8 w-8 text-white" />
@@ -843,9 +794,9 @@ export default function ForAuthorsPage() {
               </div>
 
               {/* Trust Badge */}
-              <div className="bg-green-50 border-2 border-green-200 rounded-xl p-6 text-center">
-                <Award className="h-12 w-12 text-green-600 mx-auto mb-3" />
-                <h3 className="font-bold text-green-900 mb-2">
+              <div className="border-2 border-[#EAD3D9] rounded-xl p-6 text-center">
+                <Award className="h-12 w-12 text-[#7A0019] mx-auto mb-3" />
+                <h3 className="font-bold text-[#7A0019] mb-2">
                   Diamond Open Access
                 </h3>
                 <p className="text-sm text-gray-700">

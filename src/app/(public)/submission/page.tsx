@@ -19,6 +19,7 @@ import {
   AlertCircle,
   Download,
 } from "lucide-react";
+import Header from "@/components/Header";
 
 export default function SubmissionPortalPage() {
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
@@ -26,14 +27,6 @@ export default function SubmissionPortalPage() {
   const submissionSteps = [
     {
       number: 1,
-      title: "Create Account / Login",
-      description:
-        "Register for a free author account or log in if you're a returning user. Your account allows you to track submission status and manage revisions.",
-      icon: Users,
-      duration: "2-3 minutes",
-    },
-    {
-      number: 2,
       title: "Prepare Your Manuscript",
       description:
         "Ensure your manuscript follows our formatting guidelines. Use our template and include all required sections: abstract, keywords, main text, and references.",
@@ -41,7 +34,7 @@ export default function SubmissionPortalPage() {
       duration: "Before submission",
     },
     {
-      number: 3,
+      number: 2,
       title: "Fill Submission Form",
       description:
         "Enter article metadata including title, authors, affiliations, abstract, and keywords. Provide ORCID iDs for all authors (recommended).",
@@ -49,7 +42,7 @@ export default function SubmissionPortalPage() {
       duration: "5-10 minutes",
     },
     {
-      number: 4,
+      number: 3,
       title: "Upload Manuscript Files",
       description:
         "Upload your main manuscript (PDF or DOCX) and any supplementary materials. Maximum file size: 10MB per file.",
@@ -57,7 +50,7 @@ export default function SubmissionPortalPage() {
       duration: "2-5 minutes",
     },
     {
-      number: 5,
+      number: 4,
       title: "Add Contributors",
       description:
         "List all co-authors with their contact information, affiliations, and ORCID iDs. Designate the corresponding author.",
@@ -65,7 +58,7 @@ export default function SubmissionPortalPage() {
       duration: "3-5 minutes",
     },
     {
-      number: 6,
+      number: 5,
       title: "Submit & Track",
       description:
         "Review your submission, agree to terms, and submit. You'll receive immediate confirmation and can track progress through your dashboard.",
@@ -138,37 +131,7 @@ export default function SubmissionPortalPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-[#7A0019] text-white shadow-lg sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-white rounded-lg flex items-center justify-center">
-                <Image
-                  src="/uniben-logo.png"
-                  alt="UNIBEN Logo"
-                  width={48}
-                  height={48}
-                  className="rounded"
-                />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold tracking-tight">
-                  UNIBEN Journal of Humanities
-                </h1>
-                <p className="text-sm text-[#FFE9EE] font-medium">
-                  Submit Your Manuscript
-                </p>
-              </div>
-            </div>
-            <Link
-              href="/"
-              className="text-white hover:text-[#FFE9EE] font-semibold"
-            >
-              ← Back to Journal
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Header/>
 
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-[#7A0019] to-[#5A0A1A] text-white py-20">
@@ -229,8 +192,8 @@ export default function SubmissionPortalPage() {
 
           <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="h-8 w-8 text-green-600" />
+              <div className="w-16 h-16 bg-[#7A0019] rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="h-8 w-8 text-[#EAD3D9]" />
               </div>
               <h3 className="text-xl font-bold text-[#212121] mb-2">
                 No Fees
@@ -241,8 +204,8 @@ export default function SubmissionPortalPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Clock className="h-8 w-8 text-blue-600" />
+              <div className="w-16 h-16 bg-[#7A0019] rounded-full flex items-center justify-center mx-auto mb-4">
+                <Clock className="h-8 w-8 text-[#EAD3D9]" />
               </div>
               <h3 className="text-xl font-bold text-[#212121] mb-2">
                 Fast Review
@@ -254,8 +217,8 @@ export default function SubmissionPortalPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Globe className="h-8 w-8 text-purple-600" />
+              <div className="w-16 h-16 bg-[#7A0019] rounded-full flex items-center justify-center mx-auto mb-4">
+                <Globe className="h-8 w-8 text-[#EAD3D9]" />
               </div>
               <h3 className="text-xl font-bold text-[#212121] mb-2">
                 Global Reach
@@ -267,8 +230,8 @@ export default function SubmissionPortalPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="h-8 w-8 text-yellow-600" />
+              <div className="w-16 h-16 bg-[#7A0019] rounded-full flex items-center justify-center mx-auto mb-4">
+                <Shield className="h-8 w-8 text-[#EAD3D9]" />
               </div>
               <h3 className="text-xl font-bold text-[#212121] mb-2">
                 You Keep Rights
@@ -493,13 +456,13 @@ export default function SubmissionPortalPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-8">
             {/* Technical Support */}
-            <div className="bg-blue-50 border-2 border-blue-200 rounded-xl p-8">
+            <div className="border-2 border-[#EAD3D9] rounded-xl p-8">
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
-                  <HelpCircle className="h-6 w-6 text-white" />
+                <div className="w-12 h-12 bg-[#7A0019] rounded-full flex items-center justify-center flex-shrink-0">
+                  <HelpCircle className="h-6 w-6 text-[#EAD3D9]" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-blue-900 mb-3">
+                  <h3 className="text-xl font-bold text-[#7A0019] mb-3">
                     Technical Support
                   </h3>
                   <p className="text-gray-700 mb-4">
@@ -509,23 +472,23 @@ export default function SubmissionPortalPage() {
                   </p>
                   <a
                     href="mailto:support@uniben.edu"
-                    className="inline-flex items-center gap-2 text-blue-700 hover:text-blue-900 font-semibold"
+                    className="inline-flex items-center gap-2 text-[#7A0019] hover:text-[#7a0018ea] font-semibold"
                   >
                     <Mail className="h-4 w-4" />
-                    support@uniben.edu
+                    drid@uniben.edu
                   </a>
                 </div>
               </div>
             </div>
 
             {/* Editorial Office */}
-            <div className="bg-purple-50 border-2 border-purple-200 rounded-xl p-8">
+            <div className="border-2 border-[#EAD3D9] rounded-xl p-8">
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-purple-600 rounded-full flex items-center justify-center flex-shrink-0">
-                  <Mail className="h-6 w-6 text-white" />
+                <div className="w-12 h-12 bg-[#7A0019] rounded-full flex items-center justify-center flex-shrink-0">
+                  <Mail className="h-6 w-6 text-[#EAD3D9]" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-purple-900 mb-3">
+                  <h3 className="text-xl font-bold text-[#7A0019] mb-3">
                     Editorial Office
                   </h3>
                   <p className="text-gray-700 mb-4">
@@ -534,7 +497,7 @@ export default function SubmissionPortalPage() {
                   </p>
                   <a
                     href="mailto:journalhumanities@uniben.edu"
-                    className="inline-flex items-center gap-2 text-purple-700 hover:text-purple-900 font-semibold"
+                    className="inline-flex items-center gap-2 text-[#7A0019] hover:text-purple-900 font-semibold"
                   >
                     <Mail className="h-4 w-4" />
                     journalhumanities@uniben.edu
@@ -577,19 +540,19 @@ export default function SubmissionPortalPage() {
           <div className="mt-12 pt-12 border-t border-white/20">
             <div className="grid md:grid-cols-3 gap-8 text-left">
               <div>
-                <div className="text-3xl font-bold mb-2">0 NGN</div>
+                <div className="text-3xl text-white font-bold mb-2">0 NGN</div>
                 <div className="text-sm text-[#FFE9EE]">
                   Article Processing Charges
                 </div>
               </div>
               <div>
-                <div className="text-3xl font-bold mb-2">3-6 Weeks</div>
+                <div className="text-3xl text-white font-bold mb-2">3-6 Weeks</div>
                 <div className="text-sm text-[#FFE9EE]">
                   Average Review Time
                 </div>
               </div>
               <div>
-                <div className="text-3xl font-bold mb-2">CC BY 4.0</div>
+                <div className="text-3xl text-white font-bold mb-2">CC BY 4.0</div>
                 <div className="text-sm text-[#FFE9EE]">
                   Open Access License
                 </div>

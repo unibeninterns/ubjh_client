@@ -122,7 +122,7 @@ export default function HumanitiesJournalHome() {
                     placeholder="Search articles..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-64 px-4 py-2 pl-10 rounded-full border border-[#EAD3D9] focus:outline-none focus:ring-2 focus:ring-[#7A0019] text-sm"
+                    className="w-64 px-4 py-2 pl-10 rounded-full border border-[#5A0A1A] focus:outline-none focus:ring-2 focus:ring-[#7A0019] text-black text-sm"
                   />
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 </div>
@@ -193,62 +193,7 @@ export default function HumanitiesJournalHome() {
         </div>
       </section>
 
-      {/* Call for Papers Alert */}
-      <section className="bg-[#FFE9EE] border-b-4 border-[#7A0019]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex items-start gap-6">
-            <div className="flex-shrink-0">
-              <div className="w-12 h-12 bg-[#7A0019] rounded-full flex items-center justify-center">
-                <FileText className="h-6 w-6 text-white" />
-              </div>
-            </div>
-            <div className="flex-1">
-              <h3 className="text-2xl font-bold text-[#7A0019] mb-2">
-                Call for Papers — Volume 1 (2025), Issue 1
-              </h3>
-              <p className="text-gray-700 mb-4 leading-relaxed">
-                We invite original research, reviews, and short communications.
-                No Article Processing Charges (Diamond Open Access). Authors
-                retain copyright under{" "}
-                <a
-                  href="https://creativecommons.org/licenses/by/4.0/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#7A0019] font-semibold hover:underline"
-                >
-                  CC BY 4.0
-                </a>
-                .
-              </p>
-              <div className="flex flex-wrap gap-3 mb-4">
-                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-[#7A0019] text-[#7A0019] rounded-full text-sm font-semibold">
-                  <CheckCircle className="h-4 w-4" />
-                  Double-anonymous review
-                </span>
-                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-[#7A0019] text-[#7A0019] rounded-full text-sm font-semibold">
-                  <Clock className="h-4 w-4" />
-                  3–6 weeks to first decision
-                </span>
-                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-[#7A0019] text-[#7A0019] rounded-full text-sm font-semibold">
-                  <Globe className="h-4 w-4" />
-                  DOIs via Crossref
-                </span>
-                <span className="inline-flex items-center gap-2 px-4 py-2 bg-white border-2 border-[#7A0019] text-[#7A0019] rounded-full text-sm font-semibold">
-                  <Shield className="h-4 w-4" />
-                  Long-term preservation via PKP PN
-                </span>
-              </div>
-              <Link
-                href="/submission"
-                className="inline-flex items-center gap-2 bg-[#7A0019] text-white px-6 py-3 rounded-full font-bold hover:bg-[#5A0A1A] transition-all"
-              >
-                Submit Manuscript
-                <ChevronRight className="h-4 w-4" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+     
 
       {/* Current Issue Highlight */}
       <section className="py-16 bg-white">
@@ -276,9 +221,6 @@ export default function HumanitiesJournalHome() {
                 <span className="inline-flex items-center px-3 py-1 bg-[#FFE9EE] border border-[#E6B6C2] text-[#5A0A1A] rounded-full text-xs font-bold">
                   RESEARCH ARTICLE
                 </span>
-                <span className="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-bold">
-                  OPEN ACCESS
-                </span>
               </div>
               <h3 className="text-xl font-bold text-[#212121] mb-3 group-hover:text-[#7A0019] transition-colors font-serif">
                 Decolonizing Legal Education in West Africa: A Critical
@@ -301,10 +243,6 @@ export default function HumanitiesJournalHome() {
                   <FileText className="h-4 w-4" />
                   PDF
                 </button>
-                <button className="flex items-center gap-2 px-4 py-2 border-2 border-[#7A0019] text-[#7A0019] rounded-lg hover:bg-[#FFE9EE] transition-colors text-sm font-semibold">
-                  <BookOpen className="h-4 w-4" />
-                  HTML
-                </button>
                 <button className="flex items-center gap-2 px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-semibold">
                   <Download className="h-4 w-4" />
                   Cite
@@ -317,9 +255,6 @@ export default function HumanitiesJournalHome() {
               <div className="flex gap-2 mb-4">
                 <span className="inline-flex items-center px-3 py-1 bg-[#FFE9EE] border border-[#E6B6C2] text-[#5A0A1A] rounded-full text-xs font-bold">
                   REVIEW ARTICLE
-                </span>
-                <span className="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-bold">
-                  OPEN ACCESS
                 </span>
               </div>
               <h3 className="text-xl font-bold text-[#212121] mb-3 group-hover:text-[#7A0019] transition-colors font-serif">
@@ -342,10 +277,6 @@ export default function HumanitiesJournalHome() {
                 <button className="flex items-center gap-2 px-4 py-2 bg-[#7A0019] text-white rounded-lg hover:bg-[#5A0A1A] transition-colors text-sm font-semibold">
                   <FileText className="h-4 w-4" />
                   PDF
-                </button>
-                <button className="flex items-center gap-2 px-4 py-2 border-2 border-[#7A0019] text-[#7A0019] rounded-lg hover:bg-[#FFE9EE] transition-colors text-sm font-semibold">
-                  <BookOpen className="h-4 w-4" />
-                  HTML
                 </button>
                 <button className="flex items-center gap-2 px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-semibold">
                   <Download className="h-4 w-4" />

@@ -17,6 +17,7 @@ import {
   Eye,
   Quote,
 } from "lucide-react";
+import Header from "@/components/Header";
 
 interface Article {
   id: string;
@@ -250,38 +251,7 @@ export default function CurrentIssuePage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-[#7A0019] text-white shadow-lg sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-white rounded-lg flex items-center justify-center">
-                <Image
-                  src="/uniben-logo.png"
-                  alt="UNIBEN Logo"
-                  width={48}
-                  height={48}
-                  className="rounded"
-                />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold tracking-tight">
-                  UNIBEN Journal of Humanities
-                </h1>
-                <p className="text-sm text-[#FFE9EE] font-medium">
-                  Current Issue
-                </p>
-              </div>
-            </div>
-            <Link
-              href="/"
-              className="text-white hover:text-[#FFE9EE] font-semibold"
-            >
-              ← Back to Journal
-            </Link>
-          </div>
-        </div>
-      </header>
-
+     <Header/>
       {/* Issue Header */}
       <section className="bg-gradient-to-br from-[#7A0019] to-[#5A0A1A] text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -338,10 +308,6 @@ export default function CurrentIssuePage() {
               </div>
 
               <div className="flex flex-wrap gap-3">
-                <button className="inline-flex items-center gap-2 bg-white text-[#7A0019] px-6 py-3 rounded-lg font-semibold hover:bg-[#FFE9EE] transition-all shadow-lg">
-                  <Download className="h-5 w-5" />
-                  Download Full Issue (PDF)
-                </button>
                 <button className="inline-flex items-center gap-2 bg-transparent border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-[#7A0019] transition-all">
                   <Share2 className="h-5 w-5" />
                   Share Issue

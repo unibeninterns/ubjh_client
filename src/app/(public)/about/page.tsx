@@ -13,42 +13,12 @@ import {
   Shield,
   CheckCircle,
 } from "lucide-react";
+import Header from "@/components/Header"
 
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
-      <header className="bg-[#7A0019] text-white shadow-lg sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-white rounded-lg flex items-center justify-center">
-                <Image
-                  src="/uniben-logo.png"
-                  alt="UNIBEN Logo"
-                  width={48}
-                  height={48}
-                  className="rounded"
-                />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold tracking-tight">
-                  UNIBEN Journal of Humanities
-                </h1>
-                <p className="text-sm text-[#FFE9EE] font-medium">
-                  Diamond Open Access
-                </p>
-              </div>
-            </div>
-            <Link
-              href="/"
-              className="text-white hover:text-[#FFE9EE] font-semibold"
-            >
-              ← Back to Journal
-            </Link>
-          </div>
-        </div>
-      </header>
+     <Header/>
 
       {/* Hero Section */}
       <section className="relative bg-gradient-to-br from-[#7A0019] to-[#5A0A1A] text-white py-20">
@@ -514,10 +484,6 @@ export default function AboutPage() {
               <div className="bg-gradient-to-br from-[#7A0019] to-[#5A0A1A] text-white rounded-xl p-6">
                 <h3 className="text-lg font-bold mb-6">At a Glance</h3>
                 <div className="space-y-4">
-                  <div className="pb-4 border-b border-white/20">
-                    <div className="text-3xl font-bold mb-1">2025</div>
-                    <div className="text-sm text-[#FFE9EE]">Year Launched</div>
-                  </div>
                   <div className="pb-4 border-b border-white/20">
                     <div className="text-3xl font-bold mb-1">Diamond OA</div>
                     <div className="text-sm text-[#FFE9EE]">
