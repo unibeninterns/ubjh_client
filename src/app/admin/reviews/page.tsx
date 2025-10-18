@@ -83,7 +83,7 @@ interface Faculty {
 }
 
 export default function ProposalReviewsPage() {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated } = useAuth();
   const router = useRouter();
 
   const [proposals, setProposals] = useState<ProposalReview[]>([]);
@@ -104,11 +104,7 @@ export default function ProposalReviewsPage() {
 
   const limit = 10;
 
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      router.push('/admin/login');
-    }
-  }, [authLoading, isAuthenticated, router]);
+
 
   const loadData = useCallback(async () => {
     try {

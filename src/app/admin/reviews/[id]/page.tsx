@@ -139,7 +139,7 @@ const criteriaMaxScores: { [key: string]: number } = {
 };
 
 export default function ProposalReviewDetailsPage() {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated } = useAuth();
   const router = useRouter();
   const params = useParams();
   const proposalId = params.id as string;
@@ -148,11 +148,7 @@ export default function ProposalReviewDetailsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      router.push('/admin/login');
-    }
-  }, [authLoading, isAuthenticated, router]);
+
 
   const loadProposalDetails = useCallback(async () => {
   try {

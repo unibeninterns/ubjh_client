@@ -27,6 +27,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
+  isInitialLoading: boolean;
   isAuthenticated: boolean;
   error: string | null;
   login: (email: string, password: string) => Promise<void>;
@@ -44,14 +45,14 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children, userType }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   // Set up the auth failure handler for this context
   useEffect(() => {
     const handleAuthFailure = async () => {
-      console.log(`Handling ${userType} authentication failure`);
       await clearAllData();
       setUser(null);
 
@@ -113,13 +114,15 @@ export const AuthProvider = ({ children, userType }: AuthProviderProps) => {
       console.error("Auth check failed:", error);
       setUser(null);
       return false;
-    } finally {
-      setIsLoading(false);
     }
   }, [userType]);
 
   useEffect(() => {
-    checkAuth();
+    const initialAuth = async () => {
+      await checkAuth();
+      setIsInitialLoading(false);
+    };
+    initialAuth();
   }, [checkAuth]);
 
   // Login function
@@ -173,17 +176,26 @@ export const AuthProvider = ({ children, userType }: AuthProviderProps) => {
         throw new Error('Invalid login response');
       }
     } catch (err: any) {
-      let errorMessage = 'An error occurred during login';
+      let errorMessage = 'An error occurred during login.';
 
-      if (err?.response?.data?.message) {
+      const authErrorMessages = [
+        'Access denied: Admin privileges required',
+        'Access denied: author privileges required',
+        'Access denied: Reviewer privileges required',
+        'No account found with this email address',
+        'Incorrect password',
+      ];
+
+      if (err?.response?.data?.message && authErrorMessages.includes(err.response.data.message)) {
+        errorMessage = 'Invalid credentials';
+      } else if (err?.response?.data?.message) {
         errorMessage = err.response.data.message;
-      } else if (err?.message) {
+      } else if (err.message) {
         errorMessage = err.message;
       }
 
-      console.error('Login error:', errorMessage);
+      console.error('Login error:', err);
       setError(errorMessage);
-      throw new Error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -225,6 +237,7 @@ export const AuthProvider = ({ children, userType }: AuthProviderProps) => {
   const value: AuthContextType = {
     user,
     isLoading,
+    isInitialLoading,
     isAuthenticated: !!user,
     error,
     login,
@@ -250,30 +263,20 @@ export function withAdminAuth<P extends object>(
   Component: ComponentType<P>
 ) {
   return function AdminProtected(props: P) {
-    const { user, isLoading, checkAuth } = useAuth();
+    const { user, isInitialLoading } = useAuth();
     const router = useRouter();
-    const [retryCount, setRetryCount] = useState(0);
-    const MAX_RETRIES = 1;
 
     useEffect(() => {
-      if (!isLoading && !user && retryCount < MAX_RETRIES) {
-        const retryAuth = async () => {
-          setRetryCount((prev) => prev + 1);
-          const success = await checkAuth();
-          
-          if (!success) {
-            router.push('/admin/login');
-          }
-        };
-        retryAuth();
-      } else if (!isLoading && !user) {
-        router.push('/admin/login');
-      } else if (!isLoading && user && user.role !== 'admin') {
-        router.push('/');
+      if (!isInitialLoading) {
+        if (!user) {
+          router.push('/admin/login');
+        } else if (user.role !== 'admin') {
+          router.push('/');
+        }
       }
-    }, [user, isLoading, router, checkAuth, retryCount]);
+    }, [user, isInitialLoading, router]);
 
-    if (isLoading) {
+    if (isInitialLoading || !user || user.role !== 'admin') {
       return (
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
@@ -283,8 +286,6 @@ export function withAdminAuth<P extends object>(
         </div>
       );
     }
-
-    if (!user || user.role !== 'admin') return null;
 
     return <Component {...props} />;
   };
@@ -295,30 +296,20 @@ export function withAuthorAuth<P extends object>(
   Component: ComponentType<P>
 ) {
   return function AuthorProtected(props: P) {
-    const { user, isLoading, checkAuth } = useAuth();
+    const { user, isInitialLoading } = useAuth();
     const router = useRouter();
-    const [retryCount, setRetryCount] = useState(0);
-    const MAX_RETRIES = 1;
 
     useEffect(() => {
-      if (!isLoading && !user && retryCount < MAX_RETRIES) {
-        const retryAuth = async () => {
-          setRetryCount((prev) => prev + 1);
-          const success = await checkAuth();
-          
-          if (!success) {
-            router.push('/author/login');
-          }
-        };
-        retryAuth();
-      } else if (!isLoading && !user) {
-        router.push('/author/login');
-      } else if (!isLoading && user && user.role !== 'author') {
-        router.push('/');
+      if (!isInitialLoading) {
+        if (!user) {
+          router.push('/author/login');
+        } else if (user.role !== 'author') {
+          router.push('/');
+        }
       }
-    }, [user, isLoading, router, checkAuth, retryCount]);
+    }, [user, isInitialLoading, router]);
 
-    if (isLoading) {
+    if (isInitialLoading || !user || user.role !== 'author') {
       return (
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
@@ -328,8 +319,6 @@ export function withAuthorAuth<P extends object>(
         </div>
       );
     }
-
-    if (!user || user.role !== 'author') return null;
 
     return <Component {...props} />;
   };
@@ -340,30 +329,20 @@ export function withReviewerAuth<P extends object>(
   Component: ComponentType<P>
 ) {
   return function ReviewerProtected(props: P) {
-    const { user, isLoading, checkAuth } = useAuth();
+    const { user, isInitialLoading } = useAuth();
     const router = useRouter();
-    const [retryCount, setRetryCount] = useState(0);
-    const MAX_RETRIES = 1;
 
     useEffect(() => {
-      if (!isLoading && !user && retryCount < MAX_RETRIES) {
-        const retryAuth = async () => {
-          setRetryCount((prev) => prev + 1);
-          const success = await checkAuth();
-          
-          if (!success) {
-            router.push('/reviewer/login');
-          }
-        };
-        retryAuth();
-      } else if (!isLoading && !user) {
-        router.push('/reviewer/login');
-      } else if (!isLoading && user && user.role !== 'reviewer') {
-        router.push('/');
+      if (!isInitialLoading) {
+        if (!user) {
+          router.push('/reviewer/login');
+        } else if (user.role !== 'reviewer') {
+          router.push('/');
+        }
       }
-    }, [user, isLoading, router, checkAuth, retryCount]);
+    }, [user, isInitialLoading, router]);
 
-    if (isLoading) {
+    if (isInitialLoading || !user || user.role !== 'reviewer') {
       return (
         <div className="flex items-center justify-center min-h-screen">
           <div className="text-center">
@@ -373,8 +352,6 @@ export function withReviewerAuth<P extends object>(
         </div>
       );
     }
-
-    if (!user || user.role !== 'reviewer') return null;
 
     return <Component {...props} />;
   };

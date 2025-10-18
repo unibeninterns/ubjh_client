@@ -75,6 +75,134 @@ export interface ManuscriptSubmissionResponse {
   };
 }
 
+// Manuscript Interfaces
+export interface Manuscript {
+  _id: string;
+  title: string;
+  abstract: string;
+  keywords: string[];
+  status:
+    | "submitted"
+    | "under_review"
+    | "in_reconciliation"
+    | "approved"
+    | "rejected"
+    | "minor_revision"
+    | "major_revision"
+    | "revised";
+  submitter: {
+    _id: string;
+    name: string;
+    email: string;
+    assignedFaculty?: string;
+  };
+  coAuthors?: Array<{
+    _id: string;
+    name: string;
+    email: string;
+  }>;
+  pdfFile: string;
+  createdAt: string;
+  updatedAt: string;
+  isArchived: boolean;
+}
+
+export interface ManuscriptListResponse {
+  success: boolean;
+  count: number;
+  totalPages: number;
+  currentPage: number;
+  data: Manuscript[];
+}
+
+export interface ManuscriptDetailResponse {
+  success: boolean;
+  data: Manuscript;
+}
+
+export interface ManuscriptStatistics {
+  success: boolean;
+  data: {
+    total: number;
+    byStatus: {
+      [key: string]: number;
+    };
+  };
+}
+
+export interface Faculty {
+  faculty: string;
+  departments: string[];
+}
+
+export interface FacultiesResponse {
+  success: boolean;
+  data: Faculty[];
+}
+
+export interface AssignFacultyRequest {
+  faculty: string;
+  manuscriptId: string;
+}
+
+export interface AssignFacultyResponse {
+  success: boolean;
+  message: string;
+  data: {
+    userId: string;
+    assignedFaculty: string;
+  };
+}
+
+export interface EligibleReviewer {
+  _id: string;
+  name: string;
+  email: string;
+  facultyTitle?: string;
+  totalReviewsCount?: number;
+  completionRate?: number;
+}
+
+export interface EligibleReviewersResponse {
+  success: boolean;
+  data: {
+    eligibleReviewers: EligibleReviewer[];
+    proposalInfo: {
+      title: string;
+      submitterFaculty: string;
+    };
+  };
+}
+
+export interface AssignReviewerRequest {
+  assignmentType: "automatic" | "manual";
+  reviewerId?: string;
+}
+
+export interface AssignReviewerResponse {
+  success: boolean;
+  message: string;
+  data?: {
+    reviewer: {
+      id: string;
+      name: string;
+      email: string;
+    };
+    dueDate: Date;
+  };
+}
+
+export interface ReassignReviewRequest {
+  assignmentType: "automatic" | "manual";
+  newReviewerId?: string;
+}
+
+export interface ReassignReviewResponse {
+  success: boolean;
+  message: string;
+  data?: any;
+}
+
 // Create API instance
 const createApi = (baseURL: string): AxiosInstance => {
   const api = axios.create({
@@ -331,6 +459,163 @@ export const manuscriptApi = {
       return response.data;
     } catch (error) {
       console.error("Manuscript revision failed:", error);
+      throw error;
+    }
+  },
+};
+
+export const manuscriptAdminApi = {
+  // Get all manuscripts with filters
+  getManuscripts: async (params: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    faculty?: string;
+    sort?: string;
+    order?: "asc" | "desc";
+    isArchived?: boolean;
+  }): Promise<ManuscriptListResponse> => {
+    try {
+      const response = await api.get("/admin/manuscripts", { params });
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch manuscripts:", error);
+      throw error;
+    }
+  },
+
+  // Get manuscript by ID
+  getManuscriptById: async (id: string): Promise<ManuscriptDetailResponse> => {
+    try {
+      const response = await api.get(`/admin/manuscripts/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch manuscript:", error);
+      throw error;
+    }
+  },
+
+  // Get manuscript statistics
+  getStatistics: async (): Promise<ManuscriptStatistics> => {
+    try {
+      const response = await api.get("/admin/statistics");
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch statistics:", error);
+      throw error;
+    }
+  },
+
+  // Get faculties with data
+  getFacultiesWithData: async (): Promise<FacultiesResponse> => {
+    try {
+      const response = await api.get("/admin/faculties/data");
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch faculties data:", error);
+      throw error;
+    }
+  },
+
+  // Get faculties with manuscripts
+  getFacultiesWithManuscripts: async (): Promise<FacultiesResponse> => {
+    try {
+      const response = await api.get("/admin/faculties-with-manuscripts");
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch faculties with manuscripts:", error);
+      throw error;
+    }
+  },
+
+  // Assign faculty to manuscript
+  assignFaculty: async (
+    data: AssignFacultyRequest
+  ): Promise<AssignFacultyResponse> => {
+    try {
+      const response = await api.post("/admin/faculties/assign", data);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to assign faculty:", error);
+      throw error;
+    }
+  },
+
+  // Assign reviewer to manuscript
+  assignReviewer: async (
+    manuscriptId: string,
+    data: AssignReviewerRequest
+  ): Promise<AssignReviewerResponse> => {
+    try {
+      const response = await api.post(
+        `/admin/assign-review/${manuscriptId}`,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to assign reviewer:", error);
+      throw error;
+    }
+  },
+
+  // Get eligible reviewers for manuscript
+  getEligibleReviewers: async (
+    manuscriptId: string
+  ): Promise<EligibleReviewersResponse> => {
+    try {
+      const response = await api.get(
+        `/admin/assign-review/${manuscriptId}/eligible-reviewers`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch eligible reviewers:", error);
+      throw error;
+    }
+  },
+
+  // Reassign regular review
+  reassignRegularReview: async (
+    reviewId: string,
+    data: ReassignReviewRequest
+  ): Promise<ReassignReviewResponse> => {
+    try {
+      const response = await api.put(
+        `/admin/reassign-review/${reviewId}`,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to reassign review:", error);
+      throw error;
+    }
+  },
+
+  // Reassign reconciliation review
+  reassignReconciliationReview: async (
+    reviewId: string,
+    data: ReassignReviewRequest
+  ): Promise<ReassignReviewResponse> => {
+    try {
+      const response = await api.put(
+        `/admin/reassign-review/${reviewId}`,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to reassign reconciliation review:", error);
+      throw error;
+    }
+  },
+
+  // Get existing reviewers for manuscript
+  getExistingReviewers: async (manuscriptId: string) => {
+    try {
+      const response = await api.get(
+        `/admin/reassign-review/existing-reviewers/${manuscriptId}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch existing reviewers:", error);
       throw error;
     }
   },

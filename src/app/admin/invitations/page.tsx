@@ -2,7 +2,7 @@
 
 import { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import * as api from "@/services/api";
-import AdminLayout from '@/components/admin/AdminLayout';
+import { AdminLayout } from '@/components/admin/AdminLayout';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -61,7 +61,7 @@ interface ErrorType {
 }
 
 function AdminInvitationsPage() {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [faculties, setFaculties] = useState<Faculty[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
@@ -87,13 +87,8 @@ function AdminInvitationsPage() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      router.push('/admin/login');
-    }
-  }, [authLoading, isAuthenticated, router]);
-
-  useEffect(() => {
     const fetchInvitations = async () => {
+      if (!isAuthenticated) return;
       try {
         const response = await api.getReviewerInvitations(); // Changed API call
         setInvitations(response.data || []);
@@ -106,10 +101,11 @@ function AdminInvitationsPage() {
     };
   
     fetchInvitations();
-  }, []);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     const fetchFaculties = async () => {
+      if (!isAuthenticated) return;
       try {
         const response = await api.getFaculties();
         setFaculties(response);
@@ -119,7 +115,7 @@ function AdminInvitationsPage() {
     };
   
     fetchFaculties();
-  }, []);
+  }, [isAuthenticated]);
 
   useEffect(() => {
     const fetchDepartments = async () => {

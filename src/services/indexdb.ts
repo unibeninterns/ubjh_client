@@ -1,5 +1,5 @@
 const DB_NAME = "hms-portal";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const TOKEN_STORE = "auth-tokens";
 const USER_DATA_STORE = "user-data";
 

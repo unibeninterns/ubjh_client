@@ -28,7 +28,7 @@ interface Researcher {
 }
 
 function AdminResearchersPage() {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [researchers, setResearchers] = useState<Researcher[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
@@ -39,14 +39,11 @@ function AdminResearchersPage() {
   const router = useRouter();
   // Removed useToast initialization
 
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      router.push('/admin/login');
-    }
-  }, [authLoading, isAuthenticated, router]);
+
 
   useEffect(() => {
     const fetchResearchers = async () => {
+      if (!isAuthenticated) return;
       try {
         const response = await api.getResearchersWithProposals(); // Use the correct API
         setResearchers(response.data); // Assuming response.data is the array of researchers
@@ -59,7 +56,7 @@ function AdminResearchersPage() {
     };
 
     fetchResearchers();
-  }, []); // Empty dependency array to fetch data only once
+  }, [isAuthenticated]); // Empty dependency array to fetch data only once
 
   const handleSendCredentials = async (researcherId: string) => {
     setSendingCredentials(researcherId); // Set loading state for this researcher

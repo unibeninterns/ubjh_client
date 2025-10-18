@@ -374,9 +374,9 @@ export default function ManuscriptSubmissionPage() {
               <p className="text-lg text-gray-600 mb-6">
                 Your manuscript has been submitted successfully and is now under review.
               </p>
-              <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6 mb-8">
-                <h3 className="font-semibold text-blue-900 mb-2">What happens next?</h3>
-                <ul className="text-sm text-blue-800 space-y-2 text-left">
+              <div className="bg-blue-50 border-1 border-[#7A0019] rounded-lg p-6 mb-8">
+                <h3 className="font-semibold text-[#7A0019] mb-2">What happens next?</h3>
+                <ul className="text-sm text-[#7A0019] space-y-2 text-left">
                   <li>• You will receive a confirmation email shortly</li>
                   <li>• Your login credentials will be sent within 24 hours</li>
                   <li>• You can track your submission status from your author dashboard</li>
@@ -434,14 +434,14 @@ export default function ManuscriptSubmissionPage() {
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 max-w-5xl">
         {/* Important Notice */}
-        <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6 mb-8">
+        <div className="bg-blue-50 border-1 border-[#7A0019] rounded-lg p-6 mb-8">
           <div className="flex items-start gap-3">
-            <Info className="h-6 w-6 text-blue-600 flex-shrink-0 mt-0.5" />
+            <Info className="h-6 w-6 text-[#7A0019] flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="font-semibold text-blue-900 mb-2">
+              <h3 className="font-semibold text-[#7A0019] mb-2">
                 No Account Required
               </h3>
-              <p className="text-sm text-blue-800">
+              <p className="text-sm text-[#7A0019]">
                 You don&apos;t need to create an account to submit your manuscript. Simply fill out the form below, and an account will be automatically created for you. You&apos;ll receive your login credentials via email within 24 hours to access your author dashboard and track your submission.
               </p>
             </div>

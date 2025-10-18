@@ -48,7 +48,7 @@ interface ProposalDetails {
 }
 
 function ResearcherDetailsPage() {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [researcherData, setResearcherData] = useState<{ researcher: ResearcherDetails, proposals: ProposalDetails[] } | null>(null); // State to hold both researcher and proposals
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
@@ -57,11 +57,7 @@ function ResearcherDetailsPage() {
   const params = useParams();
   const researcherId = params.id as string; // Get the researcher ID from the URL
 
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      router.push('/admin/login');
-    }
-  }, [authLoading, isAuthenticated, router]);
+
 
   useEffect(() => {
     if (!researcherId) {
@@ -71,6 +67,7 @@ function ResearcherDetailsPage() {
     }
 
     const fetchResearcherDetails = async () => {
+      if (!isAuthenticated) return;
       try {
         const response = await api.getResearcherDetails(researcherId); // Use the correct API
         setResearcherData(response.data);
@@ -83,7 +80,7 @@ function ResearcherDetailsPage() {
     };
 
     fetchResearcherDetails();
-  }, [researcherId]); // Fetch data when researcherId changes
+  }, [researcherId, isAuthenticated]); // Fetch data when researcherId changes
 
   if (isLoading) {
     return (

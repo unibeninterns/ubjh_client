@@ -12,18 +12,21 @@ export default function AdminLoginPage() {
   const [formError, setFormError] = useState('');
   const { login, isLoading, error, clearError } = useAuth();
 
-  // Clear form error when user starts typing
-  useEffect(() => {
-    if (email || password) {
-      setFormError('');
-      clearError();
-    }
-  }, [email, password, clearError]);
+  const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    setFormError('');
+    clearError();
+  };
+
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+    setFormError('');
+    clearError();
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setFormError('');
-    clearError();
     
     if (!email || !password) {
       setFormError('Email and password are required');
@@ -129,7 +132,7 @@ export default function AdminLoginPage() {
                     autoComplete="email"
                     required
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    onChange={handleEmailChange}
                     className="appearance-none block w-full px-4 py-3 border-2 border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7A0019] focus:border-transparent transition-all text-gray-900"
                     placeholder="admin@uniben.edu"
                     disabled={isLoading}
@@ -150,7 +153,7 @@ export default function AdminLoginPage() {
                     autoComplete="current-password"
                     required
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+                    onChange={handlePasswordChange}
                     className="appearance-none block w-full px-4 py-3 border-2 border-gray-300 rounded-lg placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7A0019] focus:border-transparent transition-all text-gray-900"
                     placeholder="Enter your password"
                     disabled={isLoading}

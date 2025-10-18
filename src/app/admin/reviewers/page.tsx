@@ -131,7 +131,7 @@ interface ReviewerDetails {
 }
 
 export default function AdminReviewersPage() {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [reviewers, setReviewers] = useState<Reviewer[]>([]);
   const [selectedReviewer, setSelectedReviewer] = useState<ReviewerDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -153,11 +153,7 @@ export default function AdminReviewersPage() {
   const [showOverdueAlert, setShowOverdueAlert] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      router.push('/admin/login');
-    }
-  }, [authLoading, isAuthenticated, router]);
+
 
   const loadReviewers = useCallback(async () => {
   try {

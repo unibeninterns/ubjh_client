@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { useAuth, withAdminAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 import {
   LayoutDashboard,
   Settings,
@@ -118,32 +119,40 @@ function AdminLayoutComponent({ children }: AdminLayoutProps) {
       <div
         id="mobile-sidebar"
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 bg-purple-900 border-r border-purple-800 flex flex-col transition-transform duration-300 ease-in-out lg:hidden",
+          "fixed inset-y-0 left-0 z-50 w-64 bg-[#7A0019] border-r border-[#5A0A1A] flex flex-col transition-transform duration-300 ease-in-out lg:hidden",
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
-        <div className="p-4 border-b border-purple-800 flex items-center justify-between">
+        <div className="p-4 border-b border-[#5A0A1A] flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-purple-700 rounded-lg flex items-center justify-center">
-              <BookOpen className="h-5 w-5 text-white" />
+            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+              <Image
+                src="/uniben-logo.png"
+                alt="UNIBEN Logo"
+                width={32}
+                height={32}
+                className="rounded"
+              />
             </div>
-            <span className="text-lg text-white font-bold">DRID UNIBEN</span>
+            <div>
+              <span className="text-base text-white font-bold">UBJH</span>
+            </div>
           </div>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setIsMobileMenuOpen(false)}
-            className="p-1 h-8 w-8 text-white hover:bg-purple-800"
+            className="p-1 h-8 w-8 text-white hover:bg-[#5A0A1A]"
           >
             <X className="h-5 w-5" />
           </Button>
         </div>
 
         {user && (
-          <div className="p-4 border-b border-purple-800">
+          <div className="p-4 border-b border-[#5A0A1A]">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-purple-700 rounded-full flex items-center justify-center">
-                <span className="text-white font-semibold text-sm">
+              <div className="w-10 h-10 bg-[#FFE9EE] rounded-full flex items-center justify-center">
+                <span className="text-[#7A0019] font-semibold text-sm">
                   {user.name?.charAt(0) || user.email?.charAt(0) || "A"}
                 </span>
               </div>
@@ -151,7 +160,7 @@ function AdminLayoutComponent({ children }: AdminLayoutProps) {
                 <p className="text-sm font-medium text-white truncate">
                   {user.name || user.email}
                 </p>
-                <p className="text-xs text-purple-300 truncate">Admin</p>
+                <p className="text-xs text-[#FFE9EE] truncate">Administrator</p>
               </div>
             </div>
           </div>
@@ -168,8 +177,8 @@ function AdminLayoutComponent({ children }: AdminLayoutProps) {
                   className={cn(
                     "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                     isActive
-                      ? "bg-purple-800 text-white"
-                      : "text-purple-100 hover:bg-purple-800 hover:text-white"
+                      ? "bg-[#5A0A1A] text-white"
+                      : "text-[#FFE9EE] hover:bg-[#5A0A1A] hover:text-white"
                   )}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
@@ -190,8 +199,8 @@ function AdminLayoutComponent({ children }: AdminLayoutProps) {
                   className={cn(
                     "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                     isActive
-                      ? "bg-purple-800 text-white"
-                      : "text-purple-100 hover:bg-purple-800 hover:text-white"
+                      ? "bg-[#5A0A1A] text-white"
+                      : "text-[#FFE9EE] hover:bg-[#5A0A1A] hover:text-white"
                   )}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
@@ -206,7 +215,7 @@ function AdminLayoutComponent({ children }: AdminLayoutProps) {
                 setIsMobileMenuOpen(false);
                 logoutItem.action();
               }}
-              className="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full text-left text-purple-100 hover:bg-purple-800 hover:text-white"
+              className="flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full text-left text-[#FFE9EE] hover:bg-[#5A0A1A] hover:text-white"
             >
               <logoutItem.icon className="h-5 w-5 flex-shrink-0" />
               <span>{logoutItem.name}</span>
@@ -218,24 +227,32 @@ function AdminLayoutComponent({ children }: AdminLayoutProps) {
       {/* Desktop Sidebar */}
       <div
         className={cn(
-          "hidden lg:flex bg-purple-900 border-r border-purple-800 flex-col transition-all duration-300",
+          "hidden lg:flex bg-[#7A0019] border-r border-[#5A0A1A] flex-col transition-all duration-300",
           isCollapsed ? "w-16" : "w-64"
         )}
       >
-        <div className="p-4 border-b border-purple-800 flex items-center justify-between">
+        <div className="p-4 border-b border-[#5A0A1A] flex items-center justify-between">
           {!isCollapsed && (
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-purple-700 rounded-lg flex items-center justify-center">
-                <BookOpen className="h-5 w-5 text-white" />
+              <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
+                <Image
+                  src="/uniben-logo.png"
+                  alt="UNIBEN Logo"
+                  width={32}
+                  height={32}
+                  className="rounded"
+                />
               </div>
-              <span className="text-lg text-white font-bold">DRID UNIBEN</span>
+              <div>
+                <span className="text-base text-white font-bold">UBJH</span>
+              </div>
             </div>
           )}
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-1 h-8 w-8 text-white hover:bg-purple-800"
+            className="p-1 h-8 w-8 text-white hover:bg-[#5A0A1A]"
           >
             {isCollapsed ? (
               <ChevronRight className="h-4 w-4" />
@@ -246,10 +263,10 @@ function AdminLayoutComponent({ children }: AdminLayoutProps) {
         </div>
 
         {!isCollapsed && user && (
-          <div className="p-4 border-b border-purple-800">
+          <div className="p-4 border-b border-[#5A0A1A]">
             <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-purple-700 rounded-full flex items-center justify-center">
-                <span className="text-white font-semibold text-sm">
+              <div className="w-10 h-10 bg-[#FFE9EE] rounded-full flex items-center justify-center">
+                <span className="text-[#7A0019] font-semibold text-sm">
                   {user.name?.charAt(0) || user.email?.charAt(0) || "A"}
                 </span>
               </div>
@@ -257,7 +274,7 @@ function AdminLayoutComponent({ children }: AdminLayoutProps) {
                 <p className="text-sm font-medium text-white truncate">
                   {user.name || user.email}
                 </p>
-                <p className="text-xs text-purple-300 truncate">Admin</p>
+                <p className="text-xs text-[#FFE9EE] truncate">Administrator</p>
               </div>
             </div>
           </div>
@@ -274,8 +291,8 @@ function AdminLayoutComponent({ children }: AdminLayoutProps) {
                   className={cn(
                     "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                     isActive
-                      ? "bg-purple-800 text-white"
-                      : "text-purple-100 hover:bg-purple-800 hover:text-white",
+                      ? "bg-[#5A0A1A] text-white"
+                      : "text-[#FFE9EE] hover:bg-[#5A0A1A] hover:text-white",
                     isCollapsed && "justify-center"
                   )}
                   title={isCollapsed ? item.name : undefined}
@@ -297,8 +314,8 @@ function AdminLayoutComponent({ children }: AdminLayoutProps) {
                   className={cn(
                     "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
                     isActive
-                      ? "bg-purple-800 text-white"
-                      : "text-purple-100 hover:bg-purple-800 hover:text-white",
+                      ? "bg-[#5A0A1A] text-white"
+                      : "text-[#FFE9EE] hover:bg-[#5A0A1A] hover:text-white",
                     isCollapsed && "justify-center"
                   )}
                   title={isCollapsed ? item.name : undefined}
@@ -313,7 +330,7 @@ function AdminLayoutComponent({ children }: AdminLayoutProps) {
               onClick={logoutItem.action}
               className={cn(
                 "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors w-full text-left",
-                "text-purple-100 hover:bg-purple-800 hover:text-white",
+                "text-[#FFE9EE] hover:bg-[#5A0A1A] hover:text-white",
                 isCollapsed && "justify-center"
               )}
               title={isCollapsed ? logoutItem.name : undefined}
@@ -328,28 +345,34 @@ function AdminLayoutComponent({ children }: AdminLayoutProps) {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Mobile Header */}
-        <div className="lg:hidden bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
+        <div className="lg:hidden bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between shadow-sm">
           <button
             id="mobile-menu-button"
             type="button"
-            className="text-gray-500 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-purple-500 p-2 -ml-2"
+            className="text-gray-500 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-[#7A0019] p-2 -ml-2 rounded-md"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label="Toggle mobile menu"
           >
             <Menu className="h-6 w-6" />
           </button>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-purple-700 rounded-lg flex items-center justify-center">
-              <BookOpen className="h-5 w-5 text-white" />
+            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+              <Image
+                src="/uniben-logo.png"
+                alt="UNIBEN Logo"
+                width={28}
+                height={28}
+                className="rounded"
+              />
             </div>
-            <span className="text-lg text-purple-900 font-bold">
-              DRID UNIBEN
-            </span>
+            <div>
+              <span className="text-sm text-[#7A0019] font-bold">UBJH</span>
+            </div>
           </div>
           <div className="w-10 h-8 flex items-center justify-end">
             {user && (
-              <div className="w-8 h-8 bg-purple-700 rounded-full flex items-center justify-center">
-                <span className="text-white font-semibold text-xs">
+              <div className="w-8 h-8 bg-[#FFE9EE] rounded-full flex items-center justify-center">
+                <span className="text-[#7A0019] font-semibold text-xs">
                   {user.name?.charAt(0) || user.email?.charAt(0) || "A"}
                 </span>
               </div>

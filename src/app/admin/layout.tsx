@@ -2,14 +2,12 @@
 
 import { AuthProvider } from '@/contexts/AuthContext';
 
-export default function AdminLayout({
+export default function Layout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <AuthProvider userType="admin">
-      {children}
-    </AuthProvider>
+    <AuthProvider userType="admin">{children}</AuthProvider>
   );
 }
