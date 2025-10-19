@@ -32,6 +32,16 @@ const navigationItems = [
     icon: FileText,
   },
   {
+    name: "Author Invitations",
+    href: "/admin/author-invite",
+    icon: Users,
+  },
+  {
+    name: "Reviewer Invitations",
+    href: "/admin/reviewer-invite",
+    icon: BookOpen,
+  },
+  {
     name: "Authors",
     href: "/admin/authors",
     icon: Users,

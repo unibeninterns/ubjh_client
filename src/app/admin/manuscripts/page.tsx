@@ -42,7 +42,6 @@ export default function AdminManuscriptsPage() {
     faculty: '',
     sort: 'createdAt',
     order: 'desc' as 'asc' | 'desc',
-    isArchived: false,
   });
 
   useEffect(() => {

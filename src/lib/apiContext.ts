@@ -1,3 +1,108 @@
+// Admin endpoints
+export const getProposals = async (
+  params = {},
+  options?: { signal?: AbortSignal }
+) => {
+  try {
+    const response = await api.get("/admin/proposals", {
+      params,
+      signal: options?.signal,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching proposals:", error);
+    throw error;
+  }
+};
+
+export const getProposalById = async (id: string) => {
+  try {
+    const response = await api.get(`/admin/proposals/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching proposal with ID ${id}:`, error);
+    throw error;
+  }
+};
+
+export const getFacultiesWithProposals = async (options?: {
+  signal?: AbortSignal;
+}) => {
+  try {
+    const response = await api.get("/admin/faculties-with-proposals", {
+      signal: options?.signal,
+    });
+    return response.data.data;
+  } catch (error) {
+    console.error("Error fetching faculties with proposals:", error);
+    throw error;
+  }
+};
+
+export const getProposalStatistics = async () => {
+  try {
+    const response = await api.get("/admin/statistics");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching proposal statistics:", error);
+    throw error;
+  }
+};
+
+// Assignment review endpoints for admin use
+export const assignReviewers = async (proposalId: string) => {
+  try {
+    const response = await api.post(`/admin/assign/${proposalId}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error assigning reviewers:", error);
+    throw error;
+  }
+};
+
+export const reassignRegularReview = async (
+  proposalId: string,
+  newReviewerId?: string
+) => {
+  try {
+    const response = await api.put(`/admin/reassign/regular/${proposalId}`, {
+      newReviewerId,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error reassigning regular review:", error);
+    throw error;
+  }
+};
+
+export const reassignReconciliationReview = async (
+  proposalId: string,
+  newReviewerId?: string
+) => {
+  try {
+    const response = await api.put(
+      `/admin/reassign/reconciliation/${proposalId}`,
+      { newReviewerId }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error reassigning reconciliation review:", error);
+    throw error;
+  }
+};
+
+export const getEligibleReviewers = async (proposalId: string) => {
+  try {
+    const response = await api.get(
+      `/admin/reassign/eligible-reviewers/${proposalId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching eligible reviewers:", error);
+    throw error;
+  }
+};
+
 export const checkOverdueReviews = async () => {
   try {
     const response = await api.get("/admin/check-overdue");
@@ -9,56 +114,6 @@ export const checkOverdueReviews = async () => {
 };
 
 // Reviewer management endpoints for admin
-export const inviteReviewer = async (email: string) => {
-  try {
-    const response = await api.post("/reviewer/invite", { email });
-    return response.data;
-  } catch (error) {
-    console.error("Error inviting reviewer:", error);
-    throw error;
-  }
-};
-
-export const completeReviewerProfile = async (
-  token: string,
-  profileData: {
-    name: string;
-    facultyId: string;
-    departmentId: string;
-    phoneNumber: string;
-    academicTitle?: string;
-    alternativeEmail?: string;
-  }
-) => {
-  try {
-    const response = await api.post(
-      `/reviewer/complete-profile/${token}`,
-      profileData
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error completing reviewer profile:", error);
-    throw error;
-  }
-};
-
-export const addReviewerProfile = async (reviewerData: {
-  email: string;
-  name: string;
-  facultyId: string;
-  departmentId: string;
-  phoneNumber: string;
-  academicTitle?: string;
-  alternativeEmail?: string;
-}) => {
-  try {
-    const response = await api.post("/reviewer/add", reviewerData);
-    return response.data;
-  } catch (error) {
-    console.error("Error adding reviewer profile:", error);
-    throw error;
-  }
-};
 
 export const getAllReviewers = async (params = {}) => {
   try {
@@ -80,140 +135,6 @@ export const getReviewerById = async (id: string) => {
   }
 };
 
-export const deleteReviewer = async (id: string) => {
-  try {
-    const response = await api.delete(`/reviewer/${id}`);
-    return response.data;
-  } catch (error) {
-    console.error(`Error deleting reviewer with ID ${id}:`, error);
-    throw error;
-  }
-};
-
-export const getReviewerInvitations = async () => {
-  try {
-    const response = await api.get("/reviewer/invitations");
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching reviewer invitations:", error);
-    throw error;
-  }
-};
-
-export const resendReviewerInvitation = async (id: string) => {
-  try {
-    const response = await api.post(`/reviewer/${id}/resend-invitation`);
-    return response.data;
-  } catch (error) {
-    console.error(
-      `Error resending invitation to reviewer with ID ${id}:`,
-      error
-    );
-    throw error;
-  }
-};
-
-// Reviewer endpoints
-export const getReviewerDashboard = async () => {
-  try {
-    const response = await api.get("/reviewer/dashboard");
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching reviewer dashboard:", error);
-    throw error;
-  }
-};
-
-export const getReviewerAssignments = async () => {
-  try {
-    const response = await api.get("/reviewsys/assignments");
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching reviewer assignments:", error);
-    throw error;
-  }
-};
-
-export const getReviewerStatistics = async () => {
-  try {
-    const response = await api.get("/reviewsys/statistics");
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching reviewer statistics:", error);
-    throw error;
-  }
-};
-
-export const getReviewById = async (reviewId: string) => {
-  try {
-    const response = await api.get(`/reviewsys/${reviewId}`);
-    return response.data;
-  } catch (error) {
-    console.error(`Error fetching review with ID ${reviewId}:`, error);
-    throw error;
-  }
-};
-
-export const submitReview = async (
-  reviewId: string,
-  reviewData: {
-    scores: {
-      relevanceToNationalPriorities: number; // 0-10
-      originalityAndInnovation: number; // 0-15
-      clarityOfResearchProblem: number; // 0-10
-      methodology: number; // 0-15
-      literatureReview: number; // 0-10
-      teamComposition: number; // 0-10
-      feasibilityAndTimeline: number; // 0-10
-      budgetJustification: number; // 0-10
-      expectedOutcomes: number; // 0-5
-      sustainabilityAndScalability: number; // 0-5
-    };
-    comments: string;
-  }
-) => {
-  try {
-    const response = await api.post(
-      `/reviewsys/${reviewId}/submit`,
-      reviewData
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error submitting review:", error);
-    throw error;
-  }
-};
-
-export const saveReviewProgress = async (
-  reviewId: string,
-  progressData: {
-    scores?: {
-      relevanceToNationalPriorities?: number; // 0-10
-      originalityAndInnovation?: number; // 0-15
-      clarityOfResearchProblem?: number; // 0-10
-      methodology?: number; // 0-15
-      literatureReview?: number; // 0-10
-      teamComposition?: number; // 0-10
-      feasibilityAndTimeline?: number; // 0-10
-      budgetJustification?: number; // 0-10
-      expectedOutcomes?: number; // 0-5
-      sustainabilityAndScalability?: number; // 0-5
-    };
-    comments?: string;
-  }
-) => {
-  try {
-    const response = await api.patch(
-      `/reviewsys/${reviewId}/save-progress`,
-      progressData
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error saving review progress:", error);
-    throw error;
-  }
-};
-
 export const getProposalReviews = async (proposalId: string) => {
   try {
     const response = await api.get(`/admin/reviews/proposal/${proposalId}`);
@@ -224,26 +145,50 @@ export const getProposalReviews = async (proposalId: string) => {
   }
 };
 
-// Researcher endpoints
-export const getResearcherDashboard = async () => {
+// get proposal reviews information
+export const getAllProposalReviews = async (params = {}) => {
   try {
-    const response = await api.get("/researcher/dashboard");
+    const response = await api.get("/admin/proposal-reviews", { params });
     return response.data;
   } catch (error) {
-    console.error("Error fetching researcher dashboard:", error);
+    console.error("Error fetching proposal reviews:", error);
     throw error;
   }
 };
 
-export const getResearcherProposalDetails = async (proposalId: string) => {
+export const getProposalReviewStatistics = async () => {
   try {
-    const response = await api.get(`/researcher/proposals/${proposalId}`);
+    const response = await api.get("/admin/proposal-reviews/statistics");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching review statistics:", error);
+    throw error;
+  }
+};
+
+export const getDiscrepancyProposals = async (params = {}) => {
+  try {
+    const response = await api.get("/admin/proposal-reviews/discrepancy", {
+      params,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching discrepancy proposals:", error);
+    throw error;
+  }
+};
+
+export const getProposalReviewDetailsById = async (proposalId: string) => {
+  try {
+    const response = await api.get(`/admin/proposal-reviews/${proposalId}`);
     return response.data;
   } catch (error) {
     console.error(
-      `Error fetching researcher proposal details with ID ${proposalId}:`,
+      `Error fetching proposal review details for ID ${proposalId}:`,
       error
     );
     throw error;
   }
 };
+
+export default api;

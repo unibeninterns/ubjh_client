@@ -522,7 +522,7 @@ export default function ManuscriptSubmissionPage() {
               {/* Keywords */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Keywords * (4-6 keywords, separated by commas)
+                  Keywords * (4-8 keywords, separated by commas)
                 </label>
                 <input
                   type="text"
@@ -587,7 +587,7 @@ export default function ManuscriptSubmissionPage() {
                     className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#7A0019] focus:border-transparent ${
                       formErrors.submitterEmail ? 'border-red-500' : 'border-gray-300'
                     }`}
-                    placeholder="your.email@institution.edu"
+                    placeholder="youremail@institution.edu or youremail@gmail.com"
                   />
                   {formErrors.submitterEmail && (
                     <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
@@ -609,7 +609,7 @@ export default function ManuscriptSubmissionPage() {
                     className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#7A0019] focus:border-transparent ${
                       formErrors.submitterFaculty ? 'border-red-500' : 'border-gray-300'
                     }`}
-                    placeholder="e.g., Arts, English Department"
+                    placeholder="e.g., Faculty of Arts, Department of English and Literature"
                   />
                   {formErrors.submitterFaculty && (
                     <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
@@ -621,7 +621,7 @@ export default function ManuscriptSubmissionPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Institutional Affiliation *
+                    Affiliation *
                   </label>
                   <input
                     type="text"
@@ -758,7 +758,7 @@ export default function ManuscriptSubmissionPage() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Email *
+                        Email Address*
                       </label>
                       <input
                         type="email"
@@ -766,7 +766,7 @@ export default function ManuscriptSubmissionPage() {
                         value={currentCoAuthor.email}
                         onChange={handleCoAuthorInputChange}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#7A0019] focus:border-transparent"
-                        placeholder="email@institution.edu"
+                        placeholder="email@institution.edu or email@gmail.com"
                       />
                     </div>
 
@@ -780,7 +780,7 @@ export default function ManuscriptSubmissionPage() {
                         value={currentCoAuthor.faculty}
                         onChange={handleCoAuthorInputChange}
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#7A0019] focus:border-transparent"
-                        placeholder="Faculty or department"
+                        placeholder="e.g., Faculty of Arts, Department of English and Literature"
                       />
                     </div>
 
@@ -800,7 +800,7 @@ export default function ManuscriptSubmissionPage() {
 
                     <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        ORCID iD *
+                        ORCID iD * (Required)
                       </label>
                       <input
                         type="text"

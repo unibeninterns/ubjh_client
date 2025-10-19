@@ -104,7 +104,7 @@ export interface Manuscript {
   pdfFile: string;
   createdAt: string;
   updatedAt: string;
-  isArchived: boolean;
+  authorRole?: string;
 }
 
 export interface ManuscriptListResponse {
@@ -201,6 +201,76 @@ export interface ReassignReviewResponse {
   success: boolean;
   message: string;
   data?: any;
+}
+
+export interface ReviewerInvitation {
+  id: string;
+  email: string;
+  status: "pending" | "accepted" | "expired" | "added";
+  created: string;
+  expires: string | null;
+}
+
+export interface ReviewerInvitationsResponse {
+  success: boolean;
+  data: ReviewerInvitation[];
+}
+
+export interface AddReviewerData {
+  email: string;
+  name: string;
+  faculty: string;
+  affiliation: string;
+}
+
+export interface AuthorInvitation {
+  id: string;
+  email: string;
+  status: "pending" | "accepted" | "expired" | "added";
+  created: string;
+  expires: string | null;
+}
+
+export interface AuthorInvitationsResponse {
+  success: boolean;
+  data: AuthorInvitation[];
+}
+
+export interface Author {
+  _id: string;
+  name: string;
+  email: string;
+  faculty?: string;
+  assignedFaculty?: string;
+  affiliation?: string;
+  orcid?: string;
+  credentialsSent: boolean;
+  credentialsSentAt?: string;
+  lastLogin?: string;
+  manuscriptCount?: number;
+  isActive: boolean;
+}
+
+export interface AuthorsResponse {
+  success: boolean;
+  count: number;
+  data: Author[];
+}
+
+export interface AuthorDetailsResponse {
+  success: boolean;
+  data: {
+    author: Author;
+    manuscripts: Manuscript[];
+  };
+}
+
+export interface AddAuthorData {
+  email: string;
+  name: string;
+  faculty: string;
+  affiliation: string;
+  orcid?: string;
 }
 
 // Create API instance
@@ -473,7 +543,6 @@ export const manuscriptAdminApi = {
     faculty?: string;
     sort?: string;
     order?: "asc" | "desc";
-    isArchived?: boolean;
   }): Promise<ManuscriptListResponse> => {
     try {
       const response = await api.get("/admin/manuscripts", { params });
@@ -619,6 +688,234 @@ export const manuscriptAdminApi = {
       throw error;
     }
   },
+};
+
+// Get all reviewer invitations
+export const getReviewerInvitations =
+  async (): Promise<ReviewerInvitationsResponse> => {
+    try {
+      const response = await api.get("/reviewer/invitations");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching reviewer invitations:", error);
+      throw error;
+    }
+  };
+
+// Invite a reviewer
+export const inviteReviewer = async (email: string) => {
+  try {
+    const response = await api.post("/reviewer/invite", { email });
+    return response.data;
+  } catch (error) {
+    console.error("Error inviting reviewer:", error);
+    throw error;
+  }
+};
+
+// Add reviewer profile directly
+export const addReviewerProfile = async (reviewerData: AddReviewerData) => {
+  try {
+    const response = await api.post("/reviewer/add", reviewerData);
+    return response.data;
+  } catch (error) {
+    console.error("Error adding reviewer profile:", error);
+    throw error;
+  }
+};
+
+// Delete a reviewer
+export const deleteReviewer = async (id: string) => {
+  try {
+    const response = await api.delete(`/reviewer/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error deleting reviewer with ID ${id}:`, error);
+    throw error;
+  }
+};
+
+// Resend reviewer invitation
+export const resendReviewerInvitation = async (id: string) => {
+  try {
+    const response = await api.post(`/reviewer/${id}/resend-invitation`);
+    return response.data;
+  } catch (error) {
+    console.error(
+      `Error resending invitation to reviewer with ID ${id}:`,
+      error
+    );
+    throw error;
+  }
+};
+
+// Assign faculty to user (reviewer or author)
+export const assignFacultyToUser = async (userId: string, faculty: string) => {
+  try {
+    const response = await api.post("/admin/faculties/assign", {
+      faculty,
+      userId,
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Failed to assign faculty:", error);
+    throw error;
+  }
+};
+
+// ==================== AUTHOR API FUNCTIONS ====================
+
+// Get all author invitations
+export const getAuthorInvitations =
+  async (): Promise<AuthorInvitationsResponse> => {
+    try {
+      const response = await api.get("/author/invitations");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching author invitations:", error);
+      throw error;
+    }
+  };
+
+// Invite an author
+export const inviteAuthor = async (email: string) => {
+  try {
+    const response = await api.post("/author/invite", { email });
+    return response.data;
+  } catch (error) {
+    console.error("Error inviting author:", error);
+    throw error;
+  }
+};
+
+// Add author profile directly
+export const addAuthorProfile = async (authorData: AddAuthorData) => {
+  try {
+    const response = await api.post("/author/add", authorData);
+    return response.data;
+  } catch (error) {
+    console.error("Error adding author profile:", error);
+    throw error;
+  }
+};
+
+// Delete an author
+export const deleteAuthor = async (id: string) => {
+  try {
+    const response = await api.delete(`/author/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error deleting author with ID ${id}:`, error);
+    throw error;
+  }
+};
+
+// Resend author invitation
+export const resendAuthorInvitation = async (id: string) => {
+  try {
+    const response = await api.post(`/author/${id}/resend-invitation`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error resending invitation to author with ID ${id}:`, error);
+    throw error;
+  }
+};
+
+// Get all authors
+export const getAuthors = async (): Promise<AuthorsResponse> => {
+  try {
+    const response = await api.get("/admin/author-management/authors");
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching authors:", error);
+    throw error;
+  }
+};
+
+// Get author details
+export const getAuthorDetails = async (
+  authorId: string
+): Promise<AuthorDetailsResponse> => {
+  try {
+    const response = await api.get(
+      `/admin/author-management/authors/${authorId}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching author details for ID ${authorId}:`, error);
+    throw error;
+  }
+};
+
+// Send author credentials
+export const sendAuthorCredentials = async (authorId: string) => {
+  try {
+    const response = await api.post(
+      `/admin/author-management/authors/${authorId}/send-credentials`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error sending author credentials:", error);
+    throw error;
+  }
+};
+
+// Resend author credentials
+export const resendAuthorCredentials = async (authorId: string) => {
+  try {
+    const response = await api.post(
+      `/admin/author-management/authors/${authorId}/resend-credentials`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error resending author credentials:", error);
+    throw error;
+  }
+};
+
+export interface CompleteReviewerProfileData {
+  name: string;
+  faculty: string;
+  affiliation: string;
+}
+
+export const completeReviewerProfile = async (
+  token: string,
+  profileData: CompleteReviewerProfileData
+) => {
+  try {
+    const response = await api.post(
+      `/reviewer/complete-profile/${token}`,
+      profileData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error completing reviewer profile:", error);
+    throw error;
+  }
+};
+
+export interface CompleteAuthorProfileData {
+  name: string;
+  faculty: string;
+  affiliation: string;
+  orcid: string;
+}
+
+export const completeAuthorProfile = async (
+  token: string,
+  profileData: CompleteAuthorProfileData
+) => {
+  try {
+    const response = await api.post(
+      `/author/complete-profile/${token}`,
+      profileData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error completing author profile:", error);
+    throw error;
+  }
 };
 
 export default api;
