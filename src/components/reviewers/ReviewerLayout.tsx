@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useAuth, withAdminAuth } from "@/contexts/AuthContext";
+import { useAuth, withReviewerAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
@@ -14,88 +14,54 @@ import {
   ChevronLeft,
   ChevronRight,
   FileText,
-  Users,
-  BookOpen,
   Menu,
   X,
-  BookUser,
-  LinkIcon,
-  UserCheck,
+  BookOpen,
+  CheckSquare,
 } from "lucide-react";
 
 const navigationItems = [
   {
     name: "Dashboard",
-    href: "/admin/dashboard",
+    href: "/reviewer/dashboard",
     icon: LayoutDashboard,
   },
   {
-    name: "Manuscripts",
-    href: "/admin/manuscripts",
+    name: "My Assignments",
+    href: "/reviewer/assignments",
     icon: FileText,
   },
   {
-    name: "Author Invitations",
-    href: "/admin/author-invite",
-    icon: LinkIcon,
+    name: "Completed Reviews",
+    href: "/reviewer/completed",
+    icon: CheckSquare,
   },
   {
-    name: "Reviewer Invitations",
-    href: "/admin/reviewer-invite",
-    icon: LinkIcon,
+    name: "Review Guideline",
+    href: "/reviewer/review-guideline",
+    icon: BookOpen,
   },
-  {
-    name: "Authors",
-    href: "/admin/authors",
-    icon: Users,
-  },
-  {
-    name: "Reviewers",
-    href: "/admin/reviewers",
-    icon: UserCheck,
-  },
-  { 
-    name: 'All Reviews',
-    href: '/admin/reviews',
-    icon: FileText 
-  },
-  { 
-    name: 'Admin Assignments', 
-    href: '/admin/assignments', 
-    icon: FileText 
-  },
-  { 
-    name: 'Final Decision', 
-    href: '/admin/decisions', 
-    icon: BookUser 
-  },
-
 ];
 
 const bottomItems = [
   {
     name: "Settings",
-    href: "/admin/settings",
+    href: "/reviewer/settings",
     icon: Settings,
   },
 ];
 
-interface AdminLayoutProps {
+interface ReviewerLayoutProps {
   children: React.ReactNode;
 }
 
-function AdminLayoutComponent({ children }: AdminLayoutProps) {
+function ReviewerLayoutComponent({ children }: ReviewerLayoutProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const pathname = usePathname();
   const { user, logout } = useAuth();
 
-  const dynamicRoutes = [
-    "/admin/manuscripts",
-    "/admin/reviews",
-    "/admin/assignments",
-    "/admin/decisions",
-  ];
+  const dynamicRoutes = ["/reviewer/assignments"];
 
   const handleLogout = async () => {
     try {
@@ -189,14 +155,14 @@ function AdminLayoutComponent({ children }: AdminLayoutProps) {
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-[#FFE9EE] rounded-full flex items-center justify-center">
                 <span className="text-[#7A0019] font-semibold text-sm">
-                  {user.name?.charAt(0) || user.email?.charAt(0) || "A"}
+                  {user.name?.charAt(0) || user.email?.charAt(0) || "R"}
                 </span>
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-white truncate">
                   {user.name || user.email}
                 </p>
-                <p className="text-xs text-[#FFE9EE] truncate">Administrator</p>
+                <p className="text-xs text-[#FFE9EE] truncate">Reviewer</p>
               </div>
             </div>
           </div>
@@ -305,14 +271,14 @@ function AdminLayoutComponent({ children }: AdminLayoutProps) {
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-[#FFE9EE] rounded-full flex items-center justify-center">
                 <span className="text-[#7A0019] font-semibold text-sm">
-                  {user.name?.charAt(0) || user.email?.charAt(0) || "A"}
+                  {user.name?.charAt(0) || user.email?.charAt(0) || "R"}
                 </span>
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-white truncate">
                   {user.name || user.email}
                 </p>
-                <p className="text-xs text-[#FFE9EE] truncate">Administrator</p>
+                <p className="text-xs text-[#FFE9EE] truncate">Reviewer</p>
               </div>
             </div>
           </div>
@@ -413,7 +379,7 @@ function AdminLayoutComponent({ children }: AdminLayoutProps) {
             {user && (
               <div className="w-8 h-8 bg-[#FFE9EE] rounded-full flex items-center justify-center">
                 <span className="text-[#7A0019] font-semibold text-xs">
-                  {user.name?.charAt(0) || user.email?.charAt(0) || "A"}
+                  {user.name?.charAt(0) || user.email?.charAt(0) || "R"}
                 </span>
               </div>
             )}
@@ -427,4 +393,4 @@ function AdminLayoutComponent({ children }: AdminLayoutProps) {
   );
 }
 
-export const AdminLayout = withAdminAuth(AdminLayoutComponent);
+export const ReviewerLayout = withReviewerAuth(ReviewerLayoutComponent);
