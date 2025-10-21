@@ -3,7 +3,6 @@
 import { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import * as api from "@/services/api";
 import { AdminLayout } from '@/components/admin/AdminLayout';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -54,7 +53,6 @@ export default function AuthorInvitationsPage() {
   const [showAssignFacultyDialog, setShowAssignFacultyDialog] = useState<boolean>(false);
   const [email, setEmail] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const [success, setSuccess] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [selectedAuthor, setSelectedAuthor] = useState<Invitation | null>(null);
   const [selectedFacultyForAssign, setSelectedFacultyForAssign] = useState<string>("");
@@ -71,8 +69,6 @@ export default function AuthorInvitationsPage() {
   const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
   const [deletingInvitation, setDeletingInvitation] = useState<Invitation | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
-
-  const router = useRouter();
 
   useEffect(() => {
     const fetchInvitations = async () => {
@@ -97,12 +93,7 @@ export default function AuthorInvitationsPage() {
       
       try {
         const response = await api.manuscriptAdminApi.getFacultiesWithData();
-        const facultiesData = response.data;
-        const facultiesArray = Object.keys(facultiesData).map(facultyName => ({
-          faculty: facultyName,
-          departments: facultiesData[facultyName]
-        }));
-        setFacultiesForAssign(facultiesArray);
+        setFacultiesForAssign(response.data);
       } catch (err) {
         console.error('Failed to fetch faculties:', err);
       }
@@ -114,7 +105,6 @@ export default function AuthorInvitationsPage() {
   const handleSendInvite = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
-    setSuccess("");
     setIsSubmitting(true);
   
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
@@ -133,7 +123,7 @@ export default function AuthorInvitationsPage() {
       setEmail("");
       setTimeout(() => setShowInviteDialog(false), 1500);
     } catch (error: unknown) {
-      const errorMsg = (error as any)?.response?.data?.message || "Failed to send invitation";
+      const errorMsg = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Failed to send invitation";
       setError(errorMsg);
       toast.error(errorMsg);
     } finally {
@@ -169,7 +159,7 @@ export default function AuthorInvitationsPage() {
         toast.success("Invitation deleted successfully");
       } catch (error: unknown) {
         console.error("Error deleting invitation:", error);
-        const errorMsg = (error as any)?.response?.data?.message || "Failed to delete invitation";
+        const errorMsg = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Failed to delete invitation";
         toast.error(errorMsg);
       } finally {
         setShowDeleteDialog(false);
@@ -207,7 +197,6 @@ export default function AuthorInvitationsPage() {
       return;
     }
     setError("");
-    setSuccess("");
     setIsSubmitting(true);
 
     try {
@@ -227,7 +216,7 @@ export default function AuthorInvitationsPage() {
 
       setTimeout(() => setShowAddAuthorDialog(false), 1500);
     } catch (error: unknown) {
-      const errorMsg = (error as any)?.response?.data?.message || "Failed to create author profile";
+      const errorMsg = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Failed to create author profile";
       setError(errorMsg);
       toast.error(errorMsg);
     } finally {

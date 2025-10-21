@@ -200,7 +200,7 @@ export interface ReassignReviewRequest {
 export interface ReassignReviewResponse {
   success: boolean;
   message: string;
-  data?: any;
+  data?: unknown;
 }
 
 export interface ReviewerInvitation {
@@ -271,6 +271,208 @@ export interface AddAuthorData {
   faculty: string;
   affiliation: string;
   orcid?: string;
+}
+
+export interface ManuscriptReview {
+  _id: string;
+  title: string;
+  status: string;
+  totalReviews: number;
+  completedReviews: number;
+  hasDiscrepancy: boolean;
+  createdAt: string;
+  updatedAt: string;
+  submitter: {
+    name: string;
+    email: string;
+  };
+}
+
+export interface ManuscriptReviewListResponse {
+  success: boolean;
+  count: number;
+  data: ManuscriptReview[];
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
+}
+
+export interface ReviewDetail {
+  _id: string;
+  reviewType: 'human' | 'reconciliation';
+  reviewer: {
+    _id: string;
+    name: string;
+  };
+  scores: ReviewScores;
+  totalScore: number;
+  reviewDecision: string;
+  status: 'in_progress' | 'completed' | 'overdue';
+  dueDate: string;
+  completedAt?: string;
+  createdAt: string;
+  comments: {
+    commentsForAuthor?: string;
+    confidentialCommentsToEditor?: string;
+  };
+}
+
+export interface ManuscriptReviewDetails {
+  manuscript: {
+    _id: string;
+    title: string;
+    abstract: string;
+    status: string;
+    createdAt: string;
+    updatedAt: string;
+    submitter: {
+      name: string;
+      email: string;
+    };
+  };
+  reviewSummary: {
+    totalReviews: number;
+    completedReviews: number;
+    pendingReviews: number;
+    hasHuman: boolean;
+    hasReconciliation: boolean;
+  };
+  reviews: {
+    human: ReviewDetail[];
+    reconciliation: ReviewDetail[];
+  };
+}
+
+export interface ManuscriptReviewStatistics {
+  success: boolean;
+  data: {
+    totalWithReviews: number;
+    underReview: number;
+    reviewed: number;
+    inReconciliation: number;
+    withDiscrepancy: number;
+    completionRate: number;
+  };
+}
+
+export interface ReviewDecision {
+  PUBLISHABLE: "publishable";
+  NOT_PUBLISHABLE: "not_publishable";
+  PUBLISHABLE_WITH_MINOR_REVISION: "publishable_with_minor_revision";
+  PUBLISHABLE_WITH_MAJOR_REVISION: "publishable_with_major_revision";
+}
+
+export interface ReviewScores {
+  originality: number; // 0-20
+  methodology: number; // 0-20
+  clarity: number; // 0-15
+  relevance: number; // 0-15
+  literature: number; // 0-10
+  results: number; // 0-10
+  contribution: number; // 0-10
+}
+
+export interface ManuscriptReviewWithDetails {
+  _id: string;
+  manuscript: {
+    _id: string;
+    title: string;
+    abstract: string;
+    keywords: string[];
+    status: string;
+    createdAt: string;
+    submitter: {
+      name: string;
+      email: string;
+      faculty: string;
+      affiliation: string;
+    };
+    pdfFile: string;
+  };
+  reviewType: "human" | "reconciliation";
+  scores: ReviewScores;
+  totalScore: number;
+  comments: {
+    commentsForAuthor?: string;
+    confidentialCommentsToEditor?: string;
+  };
+  reviewDecision?: string;
+  status: "in_progress" | "completed" | "overdue";
+  dueDate: string;
+  completedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ReviewerDashboardData {
+  reviewer: {
+    name: string;
+    email: string;
+    faculty: string;
+  };
+  statistics: {
+    totalAssigned: number;
+    completed: number;
+    pending: number;
+    overdue: number;
+  };
+  assignedJournals: Array<{
+    _id: string;
+    title: string;
+    status: string;
+    submitter: {
+      name: string;
+      email: string;
+    };
+  }>;
+  completedReviews: ManuscriptReviewWithDetails[];
+  inProgressReviews: ManuscriptReviewWithDetails[];
+  overdueReviews: ManuscriptReviewWithDetails[];
+}
+
+export interface ReviewerAssignmentsResponse {
+  success: boolean;
+  count: number;
+  data: ManuscriptReviewWithDetails[];
+}
+
+export interface ReviewerStatisticsResponse {
+  success: boolean;
+  data: {
+    statistics: {
+      totalAssigned: number;
+      completed: number;
+      pending: number;
+      overdue: number;
+    };
+    recentActivity: ManuscriptReviewWithDetails[];
+  };
+}
+
+export interface ReviewByIdResponse {
+  success: boolean;
+  data: ManuscriptReviewWithDetails;
+}
+
+export interface SubmitReviewRequest {
+  scores: ReviewScores;
+  comments: {
+    commentsForAuthor?: string;
+    confidentialCommentsToEditor?: string;
+  };
+  reviewDecision: string;
+}
+
+export interface SaveReviewProgressRequest {
+  scores?: Partial<ReviewScores>;
+  comments?: {
+    commentsForAuthor?: string;
+    confidentialCommentsToEditor?: string;
+  };
+  reviewDecision?: string;
 }
 
 // Create API instance
@@ -916,6 +1118,167 @@ export const completeAuthorProfile = async (
     console.error("Error completing author profile:", error);
     throw error;
   }
+};
+
+export const getAllReviewers = async (params = {}) => {
+  try {
+    const response = await api.get("/reviewer", { params });
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching all reviewers:", error);
+    throw error;
+  }
+};
+
+export const getReviewerById = async (id: string) => {
+  try {
+    const response = await api.get(`/reviewer/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching reviewer with ID ${id}:`, error);
+    throw error;
+  }
+};
+
+export const checkOverdueReviews = async () => {
+  try {
+    const response = await api.get("/admin/check-overdue");
+    return response.data;
+  } catch (error) {
+    console.error("Error checking overdue reviews:", error);
+    throw error;
+  }
+};
+
+// Manuscript Review API methods
+export const manuscriptReviewApi = {
+  // Get all manuscript reviews with pagination and filters
+  getAllReviews: async (params: {
+    page?: number;
+    limit?: number;
+    status?: string;
+    discrepancy?: string;
+  }): Promise<ManuscriptReviewListResponse> => {
+    try {
+      const response = await api.get("/admin/manuscript-reviews", { params });
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch manuscript reviews:", error);
+      throw error;
+    }
+  },
+
+  // Get review details for a specific manuscript
+  getReviewDetails: async (
+    manuscriptId: string
+  ): Promise<{ success: boolean; data: ManuscriptReviewDetails }> => {
+    try {
+      const response = await api.get(
+        `/admin/manuscript-reviews/${manuscriptId}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error(
+        `Failed to fetch review details for manuscript ${manuscriptId}:`,
+        error
+      );
+      throw error;
+    }
+  },
+
+  // Get review statistics
+  getStatistics: async (): Promise<ManuscriptReviewStatistics> => {
+    try {
+      const response = await api.get("/admin/manuscript-reviews/statistics");
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch review statistics:", error);
+      throw error;
+    }
+  },
+};
+
+export const manuscriptReviewerApi = {
+  // Get reviewer dashboard
+  getReviewerDashboard: async (): Promise<{
+    success: boolean;
+    data: ReviewerDashboardData;
+  }> => {
+    try {
+      const response = await api.get("/reviewer/dashboard");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching reviewer dashboard:", error);
+      throw error;
+    }
+  },
+
+  // Get reviewer assignments
+  getReviewerAssignments: async (): Promise<ReviewerAssignmentsResponse> => {
+    try {
+      const response = await api.get("/reviews/assignments");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching reviewer assignments:", error);
+      throw error;
+    }
+  },
+
+  // Get reviewer statistics
+  getReviewerStatistics: async (): Promise<ReviewerStatisticsResponse> => {
+    try {
+      const response = await api.get("/reviews/statistics");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching reviewer statistics:", error);
+      throw error;
+    }
+  },
+
+  // Get review by ID
+  getReviewById: async (reviewId: string): Promise<ReviewByIdResponse> => {
+    try {
+      const response = await api.get(`/reviews/${reviewId}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching review with ID ${reviewId}:`, error);
+      throw error;
+    }
+  },
+
+  // Submit review
+  submitReview: async (
+    reviewId: string,
+    reviewData: SubmitReviewRequest
+  ): Promise<{ success: boolean; message: string; data: ManuscriptReviewWithDetails }> => {
+    try {
+      const response = await api.post(
+        `/reviews/${reviewId}/submit`,
+        reviewData
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error submitting review:", error);
+      throw error;
+    }
+  },
+
+  // Save review progress
+  saveReviewProgress: async (
+    reviewId: string,
+    progressData: SaveReviewProgressRequest
+  ): Promise<{ success: boolean; message: string; data: ManuscriptReviewWithDetails }> => {
+    try {
+      const response = await api.patch(
+        `/reviews/${reviewId}/save-progress`,
+        progressData
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error saving review progress:", error);
+      throw error;
+    }
+  },
 };
 
 export default api;

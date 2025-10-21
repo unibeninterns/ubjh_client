@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, use } from "react";
+import { useState, use } from "react";
 import { useRouter } from "next/navigation";
 import { completeReviewerProfile } from '@/services/api';
 import {
@@ -55,7 +55,7 @@ export default function ReviewerRegisterPage({ params }: ReviewerRegisterPagePro
     } catch (error) {
       if (error instanceof z.ZodError) {
         const formattedErrors: Record<string, string> = {};
-        error.errors.forEach((err) => {
+        error.issues.forEach((err) => {
           if (err.path[0]) {
             formattedErrors[err.path[0] as string] = err.message;
           }

@@ -58,12 +58,7 @@ export default function ManuscriptDetailPage() {
       
       try {
         const response = await manuscriptAdminApi.getFacultiesWithData();
-        const facultiesData = response.data;
-        const facultiesArray = Object.keys(facultiesData).map(facultyName => ({
-          faculty: facultyName,
-          departments: facultiesData[facultyName]
-        }));
-        setFaculties(facultiesArray);
+        setFaculties(response.data);
       } catch (err) {
         console.error('Failed to fetch faculties:', err);
       }

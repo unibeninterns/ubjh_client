@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { manuscriptAdminApi, type Manuscript } from '@/services/api';
@@ -21,7 +21,7 @@ interface PaginationData {
   currentPage: number;
 }
 
-export default function AdminManuscriptsPage() {
+function AdminManuscriptsPage() {
   const { isAuthenticated } = useAuth();
   const [manuscripts, setManuscripts] = useState<Manuscript[]>([]);
   const [faculties, setFaculties] = useState<Faculty[]>([]);
@@ -418,5 +418,13 @@ export default function AdminManuscriptsPage() {
 
       <Toaster />
     </AdminLayout>
+  );
+}
+
+export default function AdminManuscriptsPageWrapper() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AdminManuscriptsPage />
+    </Suspense>
   );
 }

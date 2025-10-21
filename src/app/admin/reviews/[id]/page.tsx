@@ -2,12 +2,9 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import AdminLayout from '@/components/admin/AdminLayout';
+import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import { 
+import {
   ArrowLeft, 
   AlertTriangle, 
   Clock, 
@@ -15,258 +12,188 @@ import {
   RefreshCw,
   Loader2,
   User,
-  Bot,
   FileText,
   Calendar,
   MessageSquare,
   BarChart3,
   Mail,
-  Building,
-  GraduationCap
 } from 'lucide-react';
-import { getProposalReviewDetailsById } from '@/services/api';
+import { manuscriptReviewApi, type ReviewDetail } from '@/services/api';
 import { useAuth } from '@/contexts/AuthContext';
 
 interface ReviewScore {
-  relevanceToNationalPriorities: number;
-  originalityAndInnovation: number;
-  clarityOfResearchProblem: number;
-  methodology: number;
-  literatureReview: number;
-  teamComposition: number;
-  feasibilityAndTimeline: number;
-  budgetJustification: number;
-  expectedOutcomes: number;
-  sustainabilityAndScalability: number;
+  originality?: number;
+  methodology?: number;
+  clarity?: number;
+  relevance?: number;
+  literature?: number;
+  results?: number;
+  contribution?: number;
 }
 
-interface Review {
-  id: string;
-  reviewType: 'ai' | 'human' | 'reconciliation';
+interface ReviewComponentProps {
+  _id: string;
+  reviewType: 'human' | 'reconciliation';
   status: string;
   scores: ReviewScore;
   totalScore: number;
-  comments: string;
+  comments: {
+    commentsForAuthor?: string;
+    confidentialCommentsToEditor?: string;
+  };
   dueDate: string;
   completedAt?: string;
   createdAt: string;
+  reviewDecision: string;
   reviewer?: {
     name: string;
     email: string;
-    academicTitle?: string;
-    faculty?: { title: string; code: string };
-    department?: { title: string; code: string };
   };
 }
 
-interface DiscrepancyInfo {
-  hasDiscrepancy: boolean;
-  overallScores: {
-    scores: number[];
-    max: number;
-    min: number;
-    avg: number;
-    percentDifference: number;
-  };
-  criteriaDiscrepancies: {
-    criterion: string;
-    scores: number[];
-    max: number;
-    min: number;
-    avg: number;
-    percentDifference: number;
-  }[];
-  threshold: number;
-}
-
-interface ProposalReviewDetails {
-  proposal: {
-    id: string;
-    projectTitle: string;
-    submitterType: string;
+interface ManuscriptReviewDetails {
+  manuscript: {
+    _id: string;
+    title: string;
+    abstract: string;
     status: string;
-    reviewStatus: string;
     createdAt: string;
     updatedAt: string;
     submitter: {
       name: string;
       email: string;
-      academicTitle?: string;
-      faculty?: { title: string; code: string };
-      department?: { title: string; code: string };
     };
   };
   reviewSummary: {
     totalReviews: number;
     completedReviews: number;
     pendingReviews: number;
-    hasAI: boolean;
     hasHuman: boolean;
     hasReconciliation: boolean;
   };
   reviews: {
-    ai: Review[];
-    human: Review[];
-    reconciliation: Review[];
+    human: ReviewDetail[];
+    reconciliation: ReviewDetail[];
   };
-  discrepancyInfo?: DiscrepancyInfo;
 }
 
 const criteriaLabels: { [key: string]: string } = {
-  relevanceToNationalPriorities: 'Relevance to National Priorities',
-  originalityAndInnovation: 'Originality and Innovation',
-  clarityOfResearchProblem: 'Clarity of Research Problem',
+  originality: 'Originality',
   methodology: 'Methodology',
-  literatureReview: 'Literature Review',
-  teamComposition: 'Team Composition',
-  feasibilityAndTimeline: 'Feasibility and Timeline',
-  budgetJustification: 'Budget Justification',
-  expectedOutcomes: 'Expected Outcomes',
-  sustainabilityAndScalability: 'Sustainability and Scalability'
+  clarity: 'Clarity',
+  relevance: 'Relevance',
+  literature: 'Literature Review',
+  results: 'Results',
+  contribution: 'Contribution',
 };
 
 const criteriaMaxScores: { [key: string]: number } = {
-  relevanceToNationalPriorities: 10,
-  originalityAndInnovation: 15,
-  clarityOfResearchProblem: 10,
-  methodology: 15,
-  literatureReview: 10,
-  teamComposition: 10,
-  feasibilityAndTimeline: 10,
-  budgetJustification: 10,
-  expectedOutcomes: 5,
-  sustainabilityAndScalability: 5
+  originality: 20,
+  methodology: 20,
+  clarity: 15,
+  relevance: 15,
+  literature: 10,
+  results: 10,
+  contribution: 10,
 };
 
-export default function ProposalReviewDetailsPage() {
+export default function ManuscriptReviewDetailsPage() {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
   const params = useParams();
-  const proposalId = params.id as string;
+  const manuscriptId = params.id as string;
 
-  const [details, setDetails] = useState<ProposalReviewDetails | null>(null);
+  const [details, setDetails] = useState<ManuscriptReviewDetails | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-
-
-  const loadProposalDetails = useCallback(async () => {
-  try {
-    setIsLoading(true);
-    setError(null);
-    const response = await getProposalReviewDetailsById(proposalId);
-    setDetails(response.data);
-  } catch (err) {
-    console.error('Failed to load proposal details:', err);
-    setError('Failed to load proposal review details');
-  } finally {
-    setIsLoading(false);
-  }
-}, [proposalId, setIsLoading, setError, setDetails]);
+  const loadDetails = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const response = await manuscriptReviewApi.getReviewDetails(manuscriptId);
+      setDetails(response.data);
+    } catch (err) {
+      console.error('Failed to load review details:', err);
+      setError('Failed to load review details');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [manuscriptId]);
 
   useEffect(() => {
-    if (isAuthenticated && proposalId) {
-      loadProposalDetails();
+    if (isAuthenticated && manuscriptId) {
+      loadDetails();
     }
-  }, [isAuthenticated, proposalId, loadProposalDetails]);
-
-
-  const getReviewTypeIcon = (type: string) => {
-    switch (type) {
-      case 'ai':
-        return <Bot size={16} className="text-purple-600" />;
-      case 'human':
-        return <User size={16} className="text-blue-600" />;
-      case 'reconciliation':
-        return <RefreshCw size={16} className="text-orange-600" />;
-      default:
-        return <FileText size={16} className="text-gray-600" />;
-    }
-  };
-
-  const getReviewTypeLabel = (type: string) => {
-    switch (type) {
-      case 'ai':
-        return 'AI Review';
-      case 'human':
-        return 'Human Review';
-      case 'reconciliation':
-        return 'Reconciliation Review';
-      default:
-        return 'Review';
-    }
-  };
-
-  const getReviewTypeBadgeColor = (type: string) => {
-    switch (type) {
-      case 'ai':
-        return 'bg-purple-100 text-purple-800 border-purple-200';
-      case 'human':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'reconciliation':
-        return 'bg-orange-100 text-orange-800 border-orange-200';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
+  }, [isAuthenticated, manuscriptId, loadDetails]);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'completed':
         return (
-          <Badge className="bg-green-100 text-green-800 border-green-200">
-            <CheckCircle size={12} className="mr-1" />
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-green-100 text-green-800">
+            <CheckCircle size={14} />
             Completed
-          </Badge>
+          </span>
         );
       case 'in_progress':
         return (
-          <Badge className="bg-blue-100 text-blue-800 border-blue-200">
-            <Clock size={12} className="mr-1" />
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-blue-100 text-blue-800">
+            <Clock size={14} />
             In Progress
-          </Badge>
+          </span>
         );
       case 'overdue':
         return (
-          <Badge className="bg-red-100 text-red-800 border-red-200">
-            <AlertTriangle size={12} className="mr-1" />
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-red-100 text-red-800">
+            <AlertTriangle size={14} />
             Overdue
-          </Badge>
+          </span>
         );
       default:
         return (
-          <Badge className="bg-gray-100 text-gray-800 border-gray-200">
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-gray-100 text-gray-800">
             {status}
-          </Badge>
+          </span>
         );
     }
   };
 
-  const renderScoreBreakdown = (review: Review) => {
+  const renderScoreBreakdown = (review: ReviewComponentProps) => {
+    const scores = Object.entries(review.scores || {});
+    if (scores.length === 0) {
+      return <p className="text-sm text-gray-500">No scores available</p>;
+    }
+
     return (
       <div className="space-y-3">
-        {Object.entries(review.scores).map(([criterion, score]) => {
+        {scores.map(([criterion, score]) => {
           const maxScore = criteriaMaxScores[criterion] || 10;
-          const percentage = (score / maxScore) * 100;
+          const percentage = score ? (score / maxScore) * 100 : 0;
           
           return (
             <div key={criterion}>
               <div className="flex justify-between items-center mb-1">
-                <span className="text-sm font-medium text-gray-700">
+                <span className="text-xs sm:text-sm font-medium text-gray-700">
                   {criteriaLabels[criterion] || criterion}
                 </span>
-                <span className="text-sm font-bold text-gray-900">
-                  {score}/{maxScore}
+                <span className="text-xs sm:text-sm font-bold text-gray-900">
+                  {score || 0}/{maxScore}
                 </span>
               </div>
-              <Progress value={percentage} className="h-2" />
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div 
+                  className="bg-[#7A0019] h-2 rounded-full transition-all"
+                  style={{ width: `${percentage}%` }}
+                />
+              </div>
             </div>
           );
         })}
-        <div className="pt-2 border-t">
+        <div className="pt-3 border-t">
           <div className="flex justify-between items-center">
-            <span className="text-base font-semibold text-gray-900">Total Score</span>
-            <span className="text-lg font-bold text-purple-600">
+            <span className="text-sm font-semibold text-gray-900">Total Score</span>
+            <span className="text-lg font-bold text-[#7A0019]">
               {review.totalScore}/100
             </span>
           </div>
@@ -275,141 +202,37 @@ export default function ProposalReviewDetailsPage() {
     );
   };
 
-  const renderDiscrepancyAnalysis = () => {
-    if (!details?.discrepancyInfo?.hasDiscrepancy) return null;
-
-    const { discrepancyInfo } = details;
-
+  const renderReviewCard = (review: ReviewComponentProps, index: number) => {
     return (
-      <Card className="border-orange-200 bg-orange-50">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-orange-800">
-            <AlertTriangle size={20} />
-            Discrepancy Analysis
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          {/* Overall Score Discrepancy */}
-          <div>
-            <h4 className="font-semibold text-gray-900 mb-3">Overall Score Variance</h4>
-            <div className="bg-white rounded-lg p-4 border border-orange-200">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-red-600">
-                    {discrepancyInfo.overallScores.max}
+      <div key={review._id} className="bg-white border rounded-lg overflow-hidden">
+        <div className="bg-gray-50 border-b p-4 sm:p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="min-w-0">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900">
+                {review.reviewType === 'human' ? `Reviewer Review #${index + 1}` : 'Reconciliation Review'}
+              </h3>
+              {review.reviewer && (
+                <div className="mt-2 space-y-1 text-xs sm:text-sm text-gray-600">
+                  <div className="flex items-center gap-1 truncate">
+                    <User size={14} className="flex-shrink-0" />
+                    {review.reviewer.name}
                   </div>
-                  <div className="text-xs text-gray-600">Highest</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-blue-600">
-                    {discrepancyInfo.overallScores.avg}
+                  <div className="flex items-center gap-1 truncate">
+                    <Mail size={14} className="flex-shrink-0" />
+                    <span className="truncate">{review.reviewer.email}</span>
                   </div>
-                  <div className="text-xs text-gray-600">Average</div>
                 </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">
-                    {discrepancyInfo.overallScores.min}
-                  </div>
-                  <div className="text-xs text-gray-600">Lowest</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-orange-600">
-                    {discrepancyInfo.overallScores.percentDifference}%
-                  </div>
-                  <div className="text-xs text-gray-600">Variance</div>
-                </div>
-              </div>
-              
-              <div className="text-sm text-gray-600">
-                Individual scores: {discrepancyInfo.overallScores.scores.join(', ')}
-              </div>
+              )}
             </div>
+            {getStatusBadge(review.status)}
           </div>
+        </div>
 
-          {/* Criteria-level Discrepancies */}
-          <div>
-            <h4 className="font-semibold text-gray-900 mb-3">Top Criteria Discrepancies</h4>
-            <div className="space-y-3">
-              {discrepancyInfo.criteriaDiscrepancies.map((item) => (
-                <div key={item.criterion} className="bg-white rounded-lg p-4 border border-orange-200">
-                  <div className="flex justify-between items-start mb-2">
-                    <div className="font-medium text-gray-900">
-                      {criteriaLabels[item.criterion] || item.criterion}
-                    </div>
-                    <Badge className="bg-orange-100 text-orange-800 border-orange-200">
-                      {item.percentDifference}% variance
-                    </Badge>
-                  </div>
-                  <div className="flex items-center gap-4 text-sm text-gray-600">
-                    <span>Scores: {item.scores.join(', ')}</span>
-                    <span>Avg: {item.avg}</span>
-                    <span>Range: {item.min}-{item.max}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    );
-  };
-
-  const renderReviewCard = (review: Review, index: number) => {
-    return (
-      <Card key={review.id} className="mb-6">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              {getReviewTypeIcon(review.reviewType)}
-              <div>
-                <CardTitle className="text-lg">
-                  {getReviewTypeLabel(review.reviewType)}
-                  {review.reviewType === 'human' && ` #${index + 1}`}
-                </CardTitle>
-                {review.reviewer && (
-                  <div className="text-sm text-gray-600 mt-1">
-                    <div className="flex items-center gap-4">
-                      <span className="flex items-center gap-1">
-                        <User size={12} />
-                        {review.reviewer.name}
-                      </span>
-                      {review.reviewer.academicTitle && (
-                        <span className="flex items-center gap-1">
-                          <GraduationCap size={12} />
-                          {review.reviewer.academicTitle}
-                        </span>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-4 mt-1">
-                      <span className="flex items-center gap-1">
-                        <Mail size={12} />
-                        {review.reviewer.email}
-                      </span>
-                      {review.reviewer.faculty && (
-                        <span className="flex items-center gap-1">
-                          <Building size={12} />
-                          {review.reviewer.faculty.title}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Badge className={getReviewTypeBadgeColor(review.reviewType)}>
-                {getReviewTypeIcon(review.reviewType)}
-                <span className="ml-1">{getReviewTypeLabel(review.reviewType)}</span>
-              </Badge>
-              {getStatusBadge(review.status)}
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-2 gap-6">
+        <div className="p-4 sm:p-6 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Score Breakdown */}
             <div>
-              <h4 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <h4 className="font-semibold text-gray-900 mb-4 text-sm sm:text-base flex items-center gap-2">
                 <BarChart3 size={16} />
                 Score Breakdown
               </h4>
@@ -418,41 +241,56 @@ export default function ProposalReviewDetailsPage() {
 
             {/* Comments and Details */}
             <div className="space-y-4">
+              {/* Comments */}
               <div>
-                <h4 className="font-semibold text-gray-900 mb-2 flex items-center gap-2">
+                <h4 className="font-semibold text-gray-900 mb-2 text-sm sm:text-base flex items-center gap-2">
                   <MessageSquare size={16} />
-                  Comments & Feedback
+                  Comments
                 </h4>
-                <div className="bg-gray-50 rounded-lg p-4 min-h-[120px]">
-                  {review.comments ? (
-                    <p className="text-sm text-gray-700 whitespace-pre-wrap">
-                      {review.comments}
-                    </p>
+                <div className="bg-gray-50 rounded-lg p-3 sm:p-4 min-h-[100px] text-xs sm:text-sm">
+                  {review.comments?.commentsForAuthor || review.comments ? (
+                    <div className="space-y-2">
+                      {review.comments?.commentsForAuthor && (
+                        <div>
+                          <p className="font-medium text-gray-700 mb-1">For Author:</p>
+                          <p className="text-gray-600 whitespace-pre-wrap break-words">
+                            {review.comments.commentsForAuthor}
+                          </p>
+                        </div>
+                      )}
+                      {review.comments?.confidentialCommentsToEditor && (
+                        <div className="border-t pt-2 mt-2">
+                          <p className="font-medium text-gray-700 mb-1">Confidential (Editor Only):</p>
+                          <p className="text-gray-600 whitespace-pre-wrap break-words">
+                            {review.comments.confidentialCommentsToEditor}
+                          </p>
+                        </div>
+                      )}
+                    </div>
                   ) : (
-                    <p className="text-sm text-gray-500 italic">
-                      No comments provided
-                    </p>
+                    <p className="text-gray-500 italic">No comments provided</p>
                   )}
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 text-sm">
-                <div>
+              {/* Dates */}
+              <div className="grid grid-cols-2 gap-3 text-xs sm:text-sm">
+                <div className="bg-gray-50 rounded-lg p-3">
                   <div className="flex items-center gap-1 text-gray-600 mb-1">
-                    <Calendar size={12} />
+                    <Calendar size={14} className="flex-shrink-0" />
                     Due Date
                   </div>
-                  <div className="font-medium">
+                  <div className="font-medium text-gray-900">
                     {new Date(review.dueDate).toLocaleDateString()}
                   </div>
                 </div>
                 {review.completedAt && (
-                  <div>
-                    <div className="flex items-center gap-1 text-gray-600 mb-1">
-                      <CheckCircle size={12} />
+                  <div className="bg-green-50 rounded-lg p-3">
+                    <div className="flex items-center gap-1 text-green-700 mb-1">
+                      <CheckCircle size={14} className="flex-shrink-0" />
                       Completed
                     </div>
-                    <div className="font-medium">
+                    <div className="font-medium text-green-900">
                       {new Date(review.completedAt).toLocaleDateString()}
                     </div>
                   </div>
@@ -460,15 +298,15 @@ export default function ProposalReviewDetailsPage() {
               </div>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   };
 
-  if (authLoading || !isAuthenticated) {
+  if (!isAuthenticated) {
     return (
       <div className="min-h-screen flex justify-center items-center bg-gray-50">
-        <Loader2 className="h-8 w-8 animate-spin text-purple-800" />
+        <Loader2 className="h-8 w-8 animate-spin text-[#7A0019]" />
       </div>
     );
   }
@@ -477,8 +315,8 @@ export default function ProposalReviewDetailsPage() {
     return (
       <AdminLayout>
         <div className="flex items-center justify-center py-12">
-          <Loader2 className="h-8 w-8 animate-spin text-purple-600" />
-          <span className="ml-2 text-gray-600">Loading proposal details...</span>
+          <Loader2 className="h-8 w-8 animate-spin text-[#7A0019]" />
+          <span className="ml-3 text-gray-600">Loading details...</span>
         </div>
       </AdminLayout>
     );
@@ -487,247 +325,214 @@ export default function ProposalReviewDetailsPage() {
   if (error || !details) {
     return (
       <AdminLayout>
-        <div className="max-w-7xl mx-auto p-6">
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
-            <p>{error || 'Proposal not found'}</p>
-          </div>
+        <div className="max-w-7xl mx-auto p-4 sm:p-6">
           <Button 
             onClick={() => router.back()} 
             variant="outline" 
-            className="mt-4"
+            size="sm"
+            className="mb-4"
           >
             <ArrowLeft size={16} className="mr-2" />
             Go Back
           </Button>
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+            <p>{error || 'Manuscript not found'}</p>
+          </div>
         </div>
       </AdminLayout>
     );
   }
 
   const allReviews = [
-    ...details.reviews.ai,
     ...details.reviews.human,
-    ...details.reviews.reconciliation
+    ...details.reviews.reconciliation,
   ].sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
 
   return (
     <AdminLayout>
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="max-w-7xl mx-auto p-4 sm:p-6 space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-4">
-            <Button 
-              onClick={() => router.back()} 
-              variant="outline" 
-              size="sm"
-            >
-              <ArrowLeft size={16} className="mr-2" />
-              Back to Reviews
-            </Button>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                Proposal Review Details
-              </h1>
-              <p className="text-gray-600 mt-1">
-                Comprehensive review analysis and scoring breakdown
-              </p>
-            </div>
-          </div>
-          <Button onClick={loadProposalDetails} variant="outline" size="sm">
+        <div className="flex flex-col sm:flex-row items-start gap-3 sm:items-center sm:justify-between">
+          <Button 
+            onClick={() => router.back()} 
+            variant="outline" 
+            size="sm"
+          >
+            <ArrowLeft size={16} className="mr-2" />
+            Back
+          </Button>
+          <Button onClick={loadDetails} variant="outline" size="sm">
             <RefreshCw size={16} className="mr-2" />
             Refresh
           </Button>
         </div>
 
-        {/* Proposal Overview */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText size={20} />
-              Proposal Overview
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div className="space-y-4">
-                <div>
-                  <h3 className="font-semibold text-lg text-gray-900">
-                    {details.proposal.projectTitle || 'Untitled Proposal'}
-                  </h3>
-                  <div className="flex items-center gap-2 mt-2">
-                    <Badge variant="outline">
-                      {details.proposal.submitterType === 'staff' ? 'Staff' : 'Master Student'}
-                    </Badge>
-                    <Badge className="bg-blue-100 text-blue-800 border-blue-200">
-                      {details.proposal.status}
-                    </Badge>
-                  </div>
-                </div>
+        {/* Manuscript Overview */}
+        <div className="bg-white border rounded-lg overflow-hidden">
+          <div className="bg-gradient-to-r from-[#7A0019] to-[#5A0014] text-white p-4 sm:p-6">
+            <h1 className="text-xl sm:text-2xl font-bold mb-2">
+              {details.manuscript.title}
+            </h1>
+            <p className="text-sm sm:text-base opacity-90 line-clamp-2">
+              {details.manuscript.abstract}
+            </p>
+          </div>
 
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-2">Submitter Information</h4>
-                  <div className="space-y-1 text-sm">
-                    <div className="flex items-center gap-2">
-                      <User size={14} className="text-gray-500" />
-                      <span>{details.proposal.submitter.name}</span>
-                      {details.proposal.submitter.academicTitle && (
-                        <Badge variant="outline" className="text-xs">
-                          {details.proposal.submitter.academicTitle}
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Mail size={14} className="text-gray-500" />
-                      <span>{details.proposal.submitter.email}</span>
-                    </div>
-                    {details.proposal.submitter.faculty && (
-                      <div className="flex items-center gap-2">
-                        <Building size={14} className="text-gray-500" />
-                        <span>{details.proposal.submitter.faculty.title}</span>
-                        {details.proposal.submitter.department && (
-                          <span className="text-gray-500">
-                            • {details.proposal.submitter.department.title}
-                          </span>
-                        )}
-                      </div>
-                    )}
+          <div className="p-4 sm:p-6 space-y-4">
+            {/* Submitter Info */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-2">Submitter</h3>
+                <div className="space-y-1">
+                  <p className="font-semibold text-gray-900 text-sm sm:text-base">
+                    {details.manuscript.submitter.name}
+                  </p>
+                  <div className="flex items-center gap-1 text-gray-600 text-xs sm:text-sm truncate">
+                    <Mail size={14} />
+                    <span className="truncate">{details.manuscript.submitter.email}</span>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-4">
+              {/* Dates */}
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h4 className="font-medium text-gray-900 mb-3">Review Summary</h4>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-purple-50 rounded-lg p-3 border border-purple-200">
-                      <div className="text-2xl font-bold text-purple-600">
-                        {details.reviewSummary.totalReviews}
-                      </div>
-                      <div className="text-sm text-purple-700">Total Reviews</div>
-                    </div>
-                    <div className="bg-green-50 rounded-lg p-3 border border-green-200">
-                      <div className="text-2xl font-bold text-green-600">
-                        {details.reviewSummary.completedReviews}
-                      </div>
-                      <div className="text-sm text-green-700">Completed</div>
-                    </div>
-                  </div>
-                  
-                  <div className="mt-4 space-y-2">
-                    <div className="flex justify-between items-center text-sm">
-                      <span>Review Progress</span>
-                      <span>{details.reviewSummary.completedReviews}/{details.reviewSummary.totalReviews}</span>
-                    </div>
-                    <Progress 
-                      value={details.reviewSummary.totalReviews > 0 ? 
-                        (details.reviewSummary.completedReviews / details.reviewSummary.totalReviews) * 100 : 0
-                      } 
-                      className="h-2" 
-                    />
-                  </div>
-
-                  <div className="flex gap-2 mt-4">
-                    {details.reviewSummary.hasAI && (
-                      <Badge className="bg-purple-100 text-purple-800 border-purple-200">
-                        <Bot size={12} className="mr-1" />
-                        AI Review
-                      </Badge>
-                    )}
-                    {details.reviewSummary.hasHuman && (
-                      <Badge className="bg-blue-100 text-blue-800 border-blue-200">
-                        <User size={12} className="mr-1" />
-                        Human Review
-                      </Badge>
-                    )}
-                    {details.reviewSummary.hasReconciliation && (
-                      <Badge className="bg-orange-100 text-orange-800 border-orange-200">
-                        <RefreshCw size={12} className="mr-1" />
-                        Reconciliation
-                      </Badge>
-                    )}
-                  </div>
+                  <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-2">Submitted</h3>
+                  <p className="font-semibold text-gray-900 text-sm sm:text-base">
+                    {new Date(details.manuscript.createdAt).toLocaleDateString()}
+                  </p>
                 </div>
-
-                <div className="text-xs text-gray-500">
-                  <div>Created: {new Date(details.proposal.createdAt).toLocaleString()}</div>
-                  <div>Updated: {new Date(details.proposal.updatedAt).toLocaleString()}</div>
+                <div>
+                  <h3 className="text-xs sm:text-sm font-medium text-gray-600 mb-2">Status</h3>
+                  <span className="inline-block px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    {details.manuscript.status}
+                  </span>
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        {/* Discrepancy Analysis */}
-        {renderDiscrepancyAnalysis()}
-
-        {/* Reviews Section */}
-        <div className="space-y-6">
-          <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-gray-900">
-              All Reviews ({allReviews.length})
-            </h2>
-            <div className="flex gap-2">
-              {details.reviews.ai.length > 0 && (
-                <Badge className="bg-purple-100 text-purple-800 border-purple-200">
-                  {details.reviews.ai.length} AI
-                </Badge>
-              )}
-              {details.reviews.human.length > 0 && (
-                <Badge className="bg-blue-100 text-blue-800 border-blue-200">
-                  {details.reviews.human.length} Human
-                </Badge>
-              )}
-              {details.reviews.reconciliation.length > 0 && (
-                <Badge className="bg-orange-100 text-orange-800 border-orange-200">
-                  {details.reviews.reconciliation.length} Reconciliation
-                </Badge>
-              )}
+        {/* Review Summary */}
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 sm:gap-4">
+          <div className="bg-white border rounded-lg p-4">
+            <div className="flex items-center gap-3">
+              <div className="flex-shrink-0 bg-blue-100 rounded-full p-2">
+                <FileText className="h-5 w-5 text-blue-800" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs text-gray-600">Total Reviews</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">
+                  {details.reviewSummary.totalReviews}
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* AI Reviews */}
-          {details.reviews.ai.length > 0 && (
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                <Bot size={18} className="text-purple-600" />
-                AI Reviews
-              </h3>
-              {details.reviews.ai.map((review, index) => renderReviewCard(review, index))}
+          <div className="bg-white border rounded-lg p-4">
+            <div className="flex items-center gap-3">
+              <div className="flex-shrink-0 bg-green-100 rounded-full p-2">
+                <CheckCircle className="h-5 w-5 text-green-800" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs text-gray-600">Completed</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">
+                  {details.reviewSummary.completedReviews}
+                </p>
+              </div>
             </div>
-          )}
+          </div>
 
-          {/* Human Reviews */}
+          <div className="bg-white border rounded-lg p-4">
+            <div className="flex items-center gap-3">
+              <div className="flex-shrink-0 bg-yellow-100 rounded-full p-2">
+                <Clock className="h-5 w-5 text-yellow-800" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs text-gray-600">Pending</p>
+                <p className="text-lg sm:text-2xl font-bold text-gray-900">
+                  {details.reviewSummary.pendingReviews}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white border rounded-lg p-4">
+            <div className="flex items-center gap-3">
+              <div className="flex-shrink-0 bg-purple-100 rounded-full p-2">
+                <BarChart3 className="h-5 w-5 text-purple-800" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs text-gray-600">Completion</p>
+                <p className="text-lg sm:text-2xl font-bold text-purple-900">
+                  {details.reviewSummary.totalReviews > 0
+                    ? Math.round((details.reviewSummary.completedReviews / details.reviewSummary.totalReviews) * 100)
+                    : 0}%
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Progress Bar */}
+        <div className="bg-white border rounded-lg p-4 sm:p-6">
+          <h3 className="text-sm sm:text-base font-semibold text-gray-900 mb-3">Review Progress</h3>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-xs sm:text-sm">
+              <span className="text-gray-600">Overall Progress</span>
+              <span className="font-semibold text-gray-900">
+                {details.reviewSummary.completedReviews}/{details.reviewSummary.totalReviews} completed
+              </span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-3">
+              <div 
+                className="bg-gradient-to-r from-[#7A0019] to-[#5A0014] h-3 rounded-full transition-all"
+                style={{ 
+                  width: `${details.reviewSummary.totalReviews > 0 ? (details.reviewSummary.completedReviews / details.reviewSummary.totalReviews) * 100 : 0}%` 
+                }}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Reviews */}
+        <div className="space-y-4 sm:space-y-6">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900">
+            All Reviews ({allReviews.length})
+          </h2>
+
           {details.reviews.human.length > 0 && (
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
+            <div className="space-y-4">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 flex items-center gap-2">
                 <User size={18} className="text-blue-600" />
-                Human Reviews
+                Reviewer Reviews ({details.reviews.human.length})
               </h3>
-              {details.reviews.human.map((review, index) => renderReviewCard(review, index))}
+              <div className="space-y-4">
+                {details.reviews.human.map((review, index) => renderReviewCard(review as unknown as ReviewComponentProps, index))}
+              </div>
             </div>
           )}
 
-          {/* Reconciliation Reviews */}
           {details.reviews.reconciliation.length > 0 && (
-            <div>
-              <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center gap-2">
-                <RefreshCw size={18} className="text-orange-600" />
-                Reconciliation Reviews
+            <div className="space-y-4">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 flex items-center gap-2">
+                <RefreshCw size={18} className="text-purple-600" />
+                Reconciliation Review
               </h3>
-              {details.reviews.reconciliation.map((review, index) => renderReviewCard(review, index))}
+              <div className="space-y-4">
+                {details.reviews.reconciliation.map((review, index) => renderReviewCard(review as unknown as ReviewComponentProps, index))}
+              </div>
             </div>
           )}
 
           {allReviews.length === 0 && (
-            <Card>
-              <CardContent className="text-center py-12">
-                <FileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No Reviews Available</h3>
-                <p className="text-gray-600">
-                  This proposal has not been reviewed yet.
-                </p>
-              </CardContent>
-            </Card>
+            <div className="bg-gray-50 rounded-lg p-8 text-center">
+              <FileText className="mx-auto h-12 w-12 text-gray-400 mb-3" />
+              <h3 className="text-sm font-medium text-gray-900">No Reviews Available</h3>
+              <p className="mt-1 text-sm text-gray-600">
+                This manuscript has not been reviewed yet.
+              </p>
+            </div>
           )}
         </div>
       </div>

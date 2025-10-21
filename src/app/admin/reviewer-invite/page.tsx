@@ -3,12 +3,11 @@
 import { useState, useEffect, ChangeEvent, FormEvent } from "react";
 import * as api from "@/services/api";
 import { AdminLayout } from '@/components/admin/AdminLayout';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Mail, Check, AlertCircle, Clock, MoreVertical, Building2, X, Loader2, UserPlus, ExternalLink } from "lucide-react";
+import { RefreshCw, Mail, Check, AlertCircle, Clock, MoreVertical, Building2, X, Loader2, UserPlus } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -43,27 +42,16 @@ interface Faculty {
   departments: string[];
 }
 
-interface Department {
-  _id: string;
-  code: string;
-  title: string;
-  faculty: string;
-}
-
 export default function ReviewerInvitationsPage() {
   const { isAuthenticated } = useAuth();
   const [invitations, setInvitations] = useState<Invitation[]>([]);
-  const [faculties, setFaculties] = useState<Record<string, string[]>>({});
   const [facultiesForAssign, setFacultiesForAssign] = useState<Faculty[]>([]);
-  const [departments, setDepartments] = useState<Department[]>([]);
-  const [selectedFacultyCode, setSelectedFacultyCode] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [showInviteDialog, setShowInviteDialog] = useState<boolean>(false);
   const [showAddReviewerDialog, setShowAddReviewerDialog] = useState<boolean>(false);
   const [showAssignFacultyDialog, setShowAssignFacultyDialog] = useState<boolean>(false);
   const [email, setEmail] = useState<string>("");
   const [error, setError] = useState<string>("");
-  const [success, setSuccess] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
   const [selectedReviewer, setSelectedReviewer] = useState<Invitation | null>(null);
   const [selectedFacultyForAssign, setSelectedFacultyForAssign] = useState<string>("");
@@ -79,8 +67,6 @@ export default function ReviewerInvitationsPage() {
   });
   const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
   const [deletingInvitation, setDeletingInvitation] = useState<Invitation | null>(null);
-
-  const router = useRouter();
 
   useEffect(() => {
     const fetchInvitations = async () => {
@@ -99,19 +85,7 @@ export default function ReviewerInvitationsPage() {
     fetchInvitations();
   }, [isAuthenticated]);
 
-  useEffect(() => {
-    const fetchFaculties = async () => {
-      if (!isAuthenticated) return;
-      try {
-        const response = await api.manuscriptAdminApi.getFacultiesWithData();
-        setFaculties(response);
-      } catch (error) {
-        console.error("Error fetching faculties:", error);
-      }
-    };
-  
-    fetchFaculties();
-  }, [isAuthenticated]);
+
 
   useEffect(() => {
     const fetchFacultiesForAssign = async () => {
@@ -119,12 +93,7 @@ export default function ReviewerInvitationsPage() {
       
       try {
         const response = await api.manuscriptAdminApi.getFacultiesWithData();
-        const facultiesData = response.data;
-        const facultiesArray = Object.keys(facultiesData).map(facultyName => ({
-          faculty: facultyName,
-          departments: facultiesData[facultyName]
-        }));
-        setFacultiesForAssign(facultiesArray);
+        setFacultiesForAssign(response.data);
       } catch (err) {
         console.error('Failed to fetch faculties:', err);
       }
@@ -137,7 +106,6 @@ export default function ReviewerInvitationsPage() {
   const handleSendInvite = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError("");
-    setSuccess("");
     setIsSubmitting(true);
   
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { 
@@ -156,7 +124,7 @@ export default function ReviewerInvitationsPage() {
       setEmail("");
       setTimeout(() => setShowInviteDialog(false), 1500);
     } catch (error: unknown) {
-      const errorMsg = (error as any)?.response?.data?.message || "Failed to send invitation";
+      const errorMsg = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Failed to send invitation";
       setError(errorMsg);
       toast.error(errorMsg);
     } finally {
@@ -192,7 +160,7 @@ export default function ReviewerInvitationsPage() {
         toast.success("Invitation deleted successfully");
       } catch (error: unknown) {
         console.error("Error deleting invitation:", error);
-        const errorMsg = (error as any)?.response?.data?.message || "Failed to delete invitation";
+        const errorMsg = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Failed to delete invitation";
         toast.error(errorMsg);
       } finally {
         setShowDeleteDialog(false);
@@ -227,7 +195,6 @@ export default function ReviewerInvitationsPage() {
       return;
     }
     setError("");
-    setSuccess("");
     setIsSubmitting(true);
 
     try {
@@ -246,7 +213,7 @@ export default function ReviewerInvitationsPage() {
 
       setTimeout(() => setShowAddReviewerDialog(false), 1500);
     } catch (error: unknown) {
-      const errorMsg = (error as any)?.response?.data?.message || "Failed to create reviewer profile";
+      const errorMsg = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Failed to create reviewer profile";
       setError(errorMsg);
       toast.error(errorMsg);
     } finally {

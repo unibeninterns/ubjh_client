@@ -301,10 +301,10 @@ export default function ManuscriptSubmissionPage() {
       } else {
         setSubmitError(response.message || 'Submission failed. Please try again.');
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Submission error:', error);
       setSubmitError(
-        error?.response?.data?.message ||
+        ((error as { response?: { data?: { message?: string } } }).response?.data?.message) ||
         'Failed to submit manuscript. Please try again later.'
       );
     } finally {

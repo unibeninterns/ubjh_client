@@ -58,7 +58,7 @@ export default function AuthorRegisterPage({ params }: AuthorRegisterPageProps) 
     } catch (error) {
       if (error instanceof z.ZodError) {
         const formattedErrors: Record<string, string> = {};
-        error.errors.forEach((err) => {
+        error.issues.forEach((err) => {
           if (err.path[0]) {
             formattedErrors[err.path[0] as string] = err.message;
           }
@@ -218,7 +218,7 @@ export default function AuthorRegisterPage({ params }: AuthorRegisterPageProps) 
 
             <div className="mt-2 bg-amber-50 border border-amber-200 rounded-lg p-3">
               <p className="text-sm text-amber-800 mb-2">
-                <strong>Don't have an ORCID iD?</strong> It's free and takes 2 minutes to register:
+                <strong>Don&apos;t have an ORCID iD?</strong> It&apos;s free and takes 2 minutes to register:
               </p>
               <ol className="text-sm text-amber-700 space-y-1 ml-4 list-decimal">
                 <li>Visit <a href="https://orcid.org/register" target="_blank" rel="noopener noreferrer" className="text-[#7A0019] underline font-medium">https://orcid.org/register</a></li>

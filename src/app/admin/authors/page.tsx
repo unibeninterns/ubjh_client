@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import * as api from "@/services/api";
 import { AdminLayout } from '@/components/admin/AdminLayout';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -59,8 +58,6 @@ export default function AuthorsManagementPage() {
   const [authorManuscripts, setAuthorManuscripts] = useState<Manuscript[]>([]);
   const [loadingDetails, setLoadingDetails] = useState(false);
 
-  const router = useRouter();
-
   const fetchAuthors = useCallback(async () => {
   if (!isAuthenticated) return;
   try {
@@ -90,7 +87,7 @@ useEffect(() => {
       ));
     } catch (error: unknown) {
       console.error("Error sending credentials:", error);
-      const errorMessage = (error as any)?.response?.data?.message || "Failed to send credentials.";
+      const errorMessage = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Failed to send credentials.";
       toast.error(errorMessage);
     } finally {
       setSendingCredentials(null);
@@ -109,7 +106,7 @@ useEffect(() => {
       ));
     } catch (error: unknown) {
       console.error("Error resending credentials:", error);
-      const errorMessage = (error as any)?.response?.data?.message || "Failed to resend credentials.";
+      const errorMessage = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || "Failed to resend credentials.";
       toast.error(errorMessage);
     } finally {
       setResendingCredentials(null);

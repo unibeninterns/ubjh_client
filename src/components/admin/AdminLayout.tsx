@@ -15,7 +15,6 @@ import {
   ChevronRight,
   FileText,
   Users,
-  BookOpen,
   Menu,
   X,
   BookUser,

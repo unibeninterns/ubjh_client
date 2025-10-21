@@ -175,7 +175,7 @@ export const AuthProvider = ({ children, userType }: AuthProviderProps) => {
       } else {
         throw new Error('Invalid login response');
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       let errorMessage = 'An error occurred during login.';
 
       const authErrorMessages = [
@@ -186,12 +186,14 @@ export const AuthProvider = ({ children, userType }: AuthProviderProps) => {
         'Incorrect password',
       ];
 
-      if (err?.response?.data?.message && authErrorMessages.includes(err.response.data.message)) {
+      const error = err as { response?: { data?: { message?: string } }, message?: string };
+
+      if (error?.response?.data?.message && authErrorMessages.includes(error.response.data.message)) {
         errorMessage = 'Invalid credentials';
-      } else if (err?.response?.data?.message) {
-        errorMessage = err.response.data.message;
-      } else if (err.message) {
-        errorMessage = err.message;
+      } else if (error?.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      } else if (error.message) {
+        errorMessage = error.message;
       }
 
       console.error('Login error:', err);

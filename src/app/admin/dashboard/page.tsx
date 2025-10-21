@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { manuscriptAdminApi } from '@/services/api';
 import { AdminLayout } from '@/components/admin/AdminLayout';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, PieLabelRenderProps } from 'recharts';
 import { Loader2, FileText, CheckCircle, Clock, AlertTriangle, TrendingUp } from 'lucide-react';
 
 interface StatisticsData {
@@ -231,7 +231,10 @@ export default function AdminDashboard() {
                           cx="50%"
                           cy="50%"
                           labelLine={false}
-                          label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                          label={(props: PieLabelRenderProps) => {
+                            const { name, percent } = props;
+                            return `${name}: ${( (percent as number) * 100).toFixed(0)}%`;
+                          }}
                           outerRadius={100}
                           fill="#8884d8"
                           dataKey="value"

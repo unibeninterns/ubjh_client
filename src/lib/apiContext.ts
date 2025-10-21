@@ -1,3 +1,5 @@
+import api from '../services/api';
+
 // Reviewer endpoints
 export const getReviewerDashboard = async () => {
   try {
