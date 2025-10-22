@@ -164,7 +164,7 @@ export default function ManuscriptReviewsPage() {
       // Optionally, show an error message to the user here.
       return;
     }
-    router.push(`/admin/manuscript-reviews/${manuscriptId}`);
+    router.push(`/admin/reviews/${manuscriptId}`);
   };
 
   const getStatusBadge = (status: string, hasDiscrepancy: boolean) => {

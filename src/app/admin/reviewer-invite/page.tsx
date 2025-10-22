@@ -7,7 +7,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Mail, Check, AlertCircle, Clock, MoreVertical, Building2, X, Loader2, UserPlus } from "lucide-react";
+import { RefreshCw, Mail, Check, AlertCircle, Clock, MoreVertical, Building2, X, Loader2, UserPlus, ChevronRight, ChevronDown } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -28,6 +28,7 @@ interface Invitation {
   status: "pending" | "accepted" | "expired" | "added";
   created: string;
   expires: string | null;
+  assignedFaculty?: string; // Add this line
 }
 
 interface ReviewerFormState {
@@ -93,7 +94,12 @@ export default function ReviewerInvitationsPage() {
       
       try {
         const response = await api.manuscriptAdminApi.getFacultiesWithData();
-        setFacultiesForAssign(response.data);
+        const facultiesData = response.data;
+        const facultiesArray = Object.entries(facultiesData).map(([faculty, departments]) => ({
+          faculty,
+          departments: departments as string[],
+        }));
+        setFacultiesForAssign(facultiesArray);
       } catch (err) {
         console.error('Failed to fetch faculties:', err);
       }
@@ -229,14 +235,14 @@ export default function ReviewerInvitationsPage() {
     });
   };
 
-  const handleAssignFaculty = async () => {
-    if (!selectedReviewer || !selectedFacultyForAssign) return;
+  const handleAssignFaculty = async (facultyName: string) => {
+    if (!selectedReviewer) return;
     
     setAssigningFaculty(true);
     toast.info("Assigning faculty...");
     
     try {
-      const response = await api.assignFacultyToUser(selectedReviewer.id, selectedFacultyForAssign);
+      const response = await api.assignFacultyToUser(selectedReviewer.id, facultyName);
       
       if (response.success) {
         toast.success("Faculty assigned successfully!");
@@ -345,13 +351,14 @@ export default function ReviewerInvitationsPage() {
                     <th className="px-4 py-3 text-left font-medium text-gray-700">Status</th>
                     <th className="px-4 py-3 text-left font-medium text-gray-700 hidden sm:table-cell">Created</th>
                     <th className="px-4 py-3 text-left font-medium text-gray-700 hidden sm:table-cell">Expires</th>
+                    <th className="px-4 py-3 text-left font-medium text-gray-700">Faculty</th>
                     <th className="px-4 py-3 text-left font-medium text-gray-700">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {!Array.isArray(invitations) || invitations.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="px-4 py-8 text-center text-gray-500">
+                      <td colSpan={6} className="px-4 py-8 text-center text-gray-500">
                         No invitations found.
                       </td>
                     </tr>
@@ -370,6 +377,17 @@ export default function ReviewerInvitationsPage() {
                         <td className="px-4 py-3 text-gray-600 hidden sm:table-cell">{invitation?.created || 'N/A'}</td>
                         <td className="px-4 py-3 text-gray-600 hidden sm:table-cell">{invitation?.expires || 'N/A'}</td>
                         <td className="px-4 py-3">
+                          {invitation?.assignedFaculty ? (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#FFE9EE] text-[#7A0019]">
+                              {invitation.assignedFaculty}
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                              Not Assigned
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
                           <DropdownMenu>
                             <DropdownMenuTrigger asChild>
                               <Button variant="ghost" className="h-8 w-8 p-0">
@@ -380,11 +398,11 @@ export default function ReviewerInvitationsPage() {
                               {(invitation?.status === "accepted" || invitation?.status === "added") && (
                                 <DropdownMenuItem onSelect={() => {
                                   setSelectedReviewer(invitation);
-                                  setSelectedFacultyForAssign("");
+                                  setSelectedFacultyForAssign(invitation.assignedFaculty || "");
                                   setTimeout(() => setShowAssignFacultyDialog(true), 50);
                                 }}>
                                   <Building2 className="h-4 w-4 mr-2" />
-                                  Assign Faculty
+                                  {invitation.assignedFaculty ? "Change Faculty" : "Assign Faculty"}
                                 </DropdownMenuItem>
                               )}
                               {(invitation?.status === "expired") && (
@@ -589,7 +607,7 @@ export default function ReviewerInvitationsPage() {
                         <Button
                           onClick={() => {
                             setSelectedFacultyForAssign(faculty.faculty);
-                            handleAssignFaculty();
+                            handleAssignFaculty(faculty.faculty);
                           }}
                           disabled={assigningFaculty}
                           className="bg-[#7A0019] hover:bg-[#5A0A1A] text-white text-sm"
@@ -613,9 +631,9 @@ export default function ReviewerInvitationsPage() {
                           className="text-gray-600 hover:text-[#7A0019]"
                         >
                           {expandedFaculty === faculty.faculty ? (
-                            <X className="h-4 w-4" />
+                            <ChevronDown className="h-4 w-4" />
                           ) : (
-                            <Mail className="h-4 w-4" />
+                            <ChevronRight className="h-4 w-4" />
                           )}
                         </Button>
                       </div>

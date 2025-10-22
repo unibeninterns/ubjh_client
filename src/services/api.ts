@@ -105,6 +105,7 @@ export interface Manuscript {
   createdAt: string;
   updatedAt: string;
   authorRole?: string;
+  assignedReviewerCount?: number; // Added assignedReviewerCount
 }
 
 export interface ManuscriptListResponse {
@@ -137,7 +138,7 @@ export interface Faculty {
 
 export interface FacultiesResponse {
   success: boolean;
-  data: Faculty[];
+  data: Record<string, string[]>;
 }
 
 export interface AssignFacultyRequest {
@@ -165,13 +166,7 @@ export interface EligibleReviewer {
 
 export interface EligibleReviewersResponse {
   success: boolean;
-  data: {
-    eligibleReviewers: EligibleReviewer[];
-    proposalInfo: {
-      title: string;
-      submitterFaculty: string;
-    };
-  };
+  data: EligibleReviewer[];
 }
 
 export interface AssignReviewerRequest {

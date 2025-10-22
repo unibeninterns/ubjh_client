@@ -7,28 +7,17 @@ import { manuscriptAdminApi, type Manuscript } from '@/services/api';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { 
   Loader2, ArrowLeft, Calendar, User, Mail, BookOpen, 
-  FileText, Clock, ChevronDown, ChevronRight, Building2,
-  UserPlus, CheckCircle, AlertCircle
+  FileText, Clock,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
-import { toast, Toaster } from "sonner";
-
-interface Faculty {
-  faculty: string;
-  departments: string[];
-}
+import { Toaster } from "sonner";
 
 export default function ManuscriptDetailPage() {
   const { id } = useParams();
   const { isAuthenticated } = useAuth();
   const [manuscript, setManuscript] = useState<Manuscript | null>(null);
-  const [faculties, setFaculties] = useState<Faculty[]>([]);
-  const [expandedFaculty, setExpandedFaculty] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showFacultyModal, setShowFacultyModal] = useState(false);
-  const [assigningFaculty, setAssigningFaculty] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -51,21 +40,6 @@ export default function ManuscriptDetailPage() {
 
     fetchManuscript();
   }, [isAuthenticated, id]);
-
-  useEffect(() => {
-    const fetchFaculties = async () => {
-      if (!isAuthenticated) return;
-      
-      try {
-        const response = await manuscriptAdminApi.getFacultiesWithData();
-        setFaculties(response.data);
-      } catch (err) {
-        console.error('Failed to fetch faculties:', err);
-      }
-    };
-
-    fetchFaculties();
-  }, [isAuthenticated]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -115,65 +89,7 @@ export default function ManuscriptDetailPage() {
     return statusMap[status] || status;
   };
 
-  const handleAssignFaculty = async (facultyName: string) => {
-    if (!manuscript) return;
-    
-    setAssigningFaculty(true);
-    toast.info("Assigning faculty...");
-    
-    try {
-      const response = await manuscriptAdminApi.assignFaculty({
-        faculty: facultyName,
-        manuscriptId: manuscript._id,
-      });
-      
-      if (response.success) {
-        toast.success("Faculty assigned successfully!");
-        setShowFacultyModal(false);
-        
-        // Refresh manuscript data
-        const updatedManuscript = await manuscriptAdminApi.getManuscriptById(manuscript._id);
-        setManuscript(updatedManuscript.data);
-      } else {
-        toast.error("Failed to assign faculty");
-      }
-    } catch (error) {
-      console.error("Failed to assign faculty:", error);
-      toast.error("Error while assigning faculty");
-    } finally {
-      setAssigningFaculty(false);
-    }
-  };
 
-  const handleAssignReviewer = async () => {
-    if (!manuscript) return;
-    
-    if (!manuscript.submitter.assignedFaculty) {
-      toast.error("Please assign a faculty first before assigning reviewers");
-      return;
-    }
-    
-    toast.info("Assigning reviewer...");
-    
-    try {
-      const response = await manuscriptAdminApi.assignReviewer(manuscript._id, {
-        assignmentType: 'automatic',
-      });
-      
-      if (response.success) {
-        toast.success("Reviewer assigned successfully!");
-        
-        // Refresh manuscript data
-        const updatedManuscript = await manuscriptAdminApi.getManuscriptById(manuscript._id);
-        setManuscript(updatedManuscript.data);
-      } else {
-        toast.error("Failed to assign reviewer");
-      }
-    } catch (error) {
-      console.error("Failed to assign reviewer:", error);
-      toast.error("Error while assigning reviewer");
-    }
-  };
 
   return (
     <AdminLayout>
@@ -230,56 +146,10 @@ export default function ManuscriptDetailPage() {
 
                 {/* Content Section */}
                 <div className="px-4 py-5 sm:p-6">
-                  {/* Faculty Assignment Section */}
-                  <div className="mb-8 p-4 bg-[#FFE9EE] border-l-4 border-[#7A0019] rounded-r-lg">
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-start gap-3">
-                        <Building2 className="h-6 w-6 text-[#7A0019] mt-0.5" />
-                        <div>
-                          <h4 className="text-lg font-semibold text-[#7A0019] mb-2">
-                            Faculty Assignment
-                          </h4>
-                          {manuscript.submitter.assignedFaculty ? (
-                            <div className="flex items-center gap-2">
-                              <CheckCircle className="h-5 w-5 text-green-600" />
-                              <span className="text-sm font-medium text-gray-900">
-                                Assigned to: {manuscript.submitter.assignedFaculty}
-                              </span>
-                            </div>
-                          ) : (
-                            <div className="flex items-center gap-2">
-                              <AlertCircle className="h-5 w-5 text-orange-600" />
-                              <span className="text-sm text-gray-700">
-                                No faculty assigned yet. Please assign a faculty before assigning reviewers.
-                              </span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      <Button
-                        onClick={() => setShowFacultyModal(true)}
-                        className="bg-[#7A0019] hover:bg-[#5A0A1A] text-white"
-                      >
-                        <Building2 className="h-4 w-4 mr-2" />
-                        {manuscript.submitter.assignedFaculty ? 'Change' : 'Assign'} Faculty
-                      </Button>
-                    </div>
-                  </div>
+                  {/* Action Buttons */}
 
                   {/* Action Buttons */}
-                  {manuscript.submitter.assignedFaculty && (
-                    <div className="mb-8 flex gap-3">
-                      {manuscript.status === 'submitted' && (
-                        <Button
-                          onClick={handleAssignReviewer}
-                          className="bg-blue-600 hover:bg-blue-700 text-white"
-                        >
-                          <UserPlus className="h-4 w-4 mr-2" />
-                          Assign Reviewer
-                        </Button>
-                      )}
-                    </div>
-                  )}
+
 
                   {/* Submitter Information */}
                   <div className="mb-8">
@@ -433,111 +303,6 @@ export default function ManuscriptDetailPage() {
                 </div>
               </div>
 
-              {/* Faculty Assignment Modal */}
-              <Dialog open={showFacultyModal} onOpenChange={setShowFacultyModal}>
-                <DialogContent className="sm:max-w-2xl max-h-[80vh] overflow-y-auto">
-                  <DialogHeader>
-                    <DialogTitle className="flex items-center gap-2">
-                      <Building2 className="h-5 w-5 text-[#7A0019]" />
-                      Assign Faculty
-                    </DialogTitle>
-                    <DialogDescription>
-                      Select a faculty to assign this manuscript. You can view departments within each faculty for additional information.
-                    </DialogDescription>
-                  </DialogHeader>
-
-                  <div className="py-4">
-                    {manuscript.submitter.assignedFaculty && (
-                      <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                        <p className="text-sm text-blue-800">
-                          <strong>Currently assigned:</strong> {manuscript.submitter.assignedFaculty}
-                        </p>
-                      </div>
-                    )}
-
-                    <div className="space-y-3">
-                      {faculties.map((faculty) => (
-                        <div
-                          key={faculty.faculty}
-                          className="border border-gray-200 rounded-lg overflow-hidden hover:border-[#7A0019] transition-colors"
-                        >
-                          <div className="flex items-center justify-between p-4 bg-white">
-                            <div className="flex-1">
-                              <h3 className="text-sm font-semibold text-gray-900">
-                                {faculty.faculty}
-                              </h3>
-                              <p className="text-xs text-gray-500 mt-1">
-                                {faculty.departments.length} departments
-                              </p>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <Button
-                                onClick={() => handleAssignFaculty(faculty.faculty)}
-                                disabled={assigningFaculty}
-                                className="bg-[#7A0019] hover:bg-[#5A0A1A] text-white text-sm"
-                                size="sm"
-                              >
-                                {assigningFaculty ? (
-                                  <Loader2 className="h-4 w-4 animate-spin" />
-                                ) : (
-                                  <>
-                                    <CheckCircle className="h-4 w-4 mr-1" />
-                                    Assign
-                                  </>
-                                )}
-                              </Button>
-                              <Button
-                                onClick={() => setExpandedFaculty(
-                                  expandedFaculty === faculty.faculty ? null : faculty.faculty
-                                )}
-                                variant="outline"
-                                size="sm"
-                                className="text-gray-600 hover:text-[#7A0019]"
-                              >
-                                {expandedFaculty === faculty.faculty ? (
-                                  <ChevronDown className="h-4 w-4" />
-                                ) : (
-                                  <ChevronRight className="h-4 w-4" />
-                                )}
-                              </Button>
-                            </div>
-                          </div>
-                          
-                          {expandedFaculty === faculty.faculty && (
-                            <div className="px-4 py-3 bg-gray-50 border-t border-gray-200">
-                              <h4 className="text-xs font-semibold text-gray-700 mb-2">
-                                Departments:
-                              </h4>
-                              <ul className="space-y-1">
-                                {faculty.departments.map((dept, idx) => (
-                                  <li
-                                    key={idx}
-                                    className="text-xs text-gray-600 flex items-center gap-2"
-                                  >
-                                    <span className="w-1.5 h-1.5 bg-[#7A0019] rounded-full"></span>
-                                    {dept}
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <DialogFooter>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => setShowFacultyModal(false)}
-                      disabled={assigningFaculty}
-                    >
-                      Cancel
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
             </>
           ) : (
             <div className="bg-white shadow overflow-hidden rounded-lg p-6 text-center border border-gray-200">
@@ -560,4 +325,4 @@ export default function ManuscriptDetailPage() {
       <Toaster />
     </AdminLayout>
   );
-}
+};
