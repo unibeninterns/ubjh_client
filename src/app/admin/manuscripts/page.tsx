@@ -482,234 +482,150 @@ function AdminManuscriptsPage() {
                 </p>
               </div>
             ) : (
-              <>
-                {/* Desktop View */}
-                <div className="hidden md:block overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th
-                          scope="col"
-                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                          onClick={() => toggleSortOrder('title')}
-                        >
-                          <div className="flex items-center">
-                            Title
-                            {filters.sort === 'title' && (
-                              <ArrowUpDown className="ml-1 h-4 w-4" />
-                            )}
-                          </div>
-                        </th>
-                        <th
-                          scope="col"
-                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                        >
-                          Submitter
-                        </th>
-                        <th
-                          scope="col"
-                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                        >
-                          Faculty
-                        </th>
-                        <th
-                          scope="col"
-                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                          onClick={() => toggleSortOrder('status')}
-                        >
-                          <div className="flex items-center">
-                            Status
-                            {filters.sort === 'status' && (
-                              <ArrowUpDown className="ml-1 h-4 w-4" />
-                            )}
-                          </div>
-                        </th>
-                        <th
-                          scope="col"
-                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
-                          onClick={() => toggleSortOrder('createdAt')}
-                        >
-                          <div className="flex items-center">
-                            Submitted
-                            {filters.sort === 'createdAt' && (
-                              <ArrowUpDown className="ml-1 h-4 w-4" />
-                            )}
-                          </div>
-                        </th>
-                        <th
-                          scope="col"
-                          className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                        >
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {manuscripts.map((manuscript) => {
-                        return (
-                          <tr key={manuscript._id} className="hover:bg-gray-50">
-                            <td className="px-6 py-4 text-sm font-medium text-gray-900">
-                              <div className="max-w-xs truncate" title={manuscript.title}>
-                                {manuscript.title}
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              <div className="flex flex-col">
-                                <span className="font-medium">{manuscript.submitter.name}</span>
-                                <span className="text-xs text-gray-400">{manuscript.submitter.email}</span>
-                              </div>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {manuscript.submitter.assignedFaculty ? (
-                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#FFE9EE] text-[#7A0019]">
-                                  {manuscript.submitter.assignedFaculty}
-                                </span>
-                              ) : (
-                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-                                  Not Assigned
-                                </span>
-                              )}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap">
-                              <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(manuscript.status)}`}>
-                                {getStatusLabel(manuscript.status)}
+              <div className="overflow-x-auto">
+                <table className="min-w-full divide-y divide-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                        onClick={() => toggleSortOrder('title')}
+                      >
+                        <div className="flex items-center">
+                          Title
+                          {filters.sort === 'title' && (
+                            <ArrowUpDown className="ml-1 h-4 w-4" />
+                          )}
+                        </div>
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Submitter
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Faculty
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                        onClick={() => toggleSortOrder('status')}
+                      >
+                        <div className="flex items-center">
+                          Status
+                          {filters.sort === 'status' && (
+                            <ArrowUpDown className="ml-1 h-4 w-4" />
+                          )}
+                        </div>
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                        onClick={() => toggleSortOrder('createdAt')}
+                      >
+                        <div className="flex items-center">
+                          Submitted
+                          {filters.sort === 'createdAt' && (
+                            <ArrowUpDown className="ml-1 h-4 w-4" />
+                          )}
+                        </div>
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                      >
+                        Actions
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="bg-white divide-y divide-gray-200">
+                    {manuscripts.map((manuscript) => {
+                      return (
+                        <tr key={manuscript._id} className="hover:bg-gray-50">
+                          <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                            <div className="max-w-xs truncate" title={manuscript.title}>
+                              {manuscript.title}
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            <div className="flex flex-col">
+                              <span className="font-medium">{manuscript.submitter.name}</span>
+                              <span className="text-xs text-gray-400">{manuscript.submitter.email}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {manuscript.submitter.assignedFaculty ? (
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#FFE9EE] text-[#7A0019]">
+                                {manuscript.submitter.assignedFaculty}
                               </span>
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                              {formatDate(manuscript.createdAt)}
-                            </td>
-                            <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" className="h-8 w-8 p-0">
-                                    <span className="sr-only">Open menu</span>
-                                    <MoreVertical className="h-4 w-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onSelect={() => router.push(`/admin/manuscripts/${manuscript._id}`)}>
-                                    <Eye className="h-4 w-4 mr-2" /> View Details
-                                  </DropdownMenuItem>
-                                  
-                                  {((manuscript.status === 'submitted' && !manuscript.submitter.assignedFaculty) || (manuscript.submitter.assignedFaculty && manuscript.assignedReviewerCount === 0)) && (
-                                    <DropdownMenuItem onSelect={() => { setCurrentManuscriptForFaculty(manuscript); setShowAssignFacultyModal(true); }}>
-                                      <Building2 className="h-4 w-4 mr-2" /> 
-                                      {!manuscript.submitter.assignedFaculty ? 'Assign Faculty' : 'Change Faculty'}
-                                    </DropdownMenuItem>
-                                  )}
-
-                                  {manuscript.submitter.assignedFaculty && manuscript.assignedReviewerCount === 0 && (
-                                    <DropdownMenuItem onSelect={() => handleAssignReviewerClick(manuscript)}>
-                                      <UserPlus className="h-4 w-4 mr-2" /> Assign First Reviewer
-                                    </DropdownMenuItem>
-                                  )}
-
-                                  {manuscript.submitter.assignedFaculty && manuscript.assignedReviewerCount === 1 && (
-                                    <DropdownMenuItem onSelect={() => handleAssignReviewerClick(manuscript)}>
-                                      <UserPlus className="h-4 w-4 mr-2" /> Assign Second Reviewer
-                                    </DropdownMenuItem>
-                                  )}
-
-                                  {(() => {
-                                    const { canReassign, isReconciliation } = canReassignReview(manuscript);
-                                    return canReassign && (
-                                      <DropdownMenuItem onSelect={() => handleReassignReviewerClick(manuscript)}>
-                                        <RefreshCw className="h-4 w-4 mr-2" /> 
-                                        {isReconciliation ? 'Reassign Reconciliation' : 'Reassign Review'}
-                                      </DropdownMenuItem>
-                                    );
-                                  })()}
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
-                </div>
-                {/* Mobile View */}
-                <div className="md:hidden divide-y divide-gray-200">
-                  {manuscripts.map((manuscript) => (
-                    <div key={manuscript._id} className="p-4 hover:bg-gray-50 transition-colors">
-                      <div className="space-y-3">
-                        <div>
-                          <h3 className="font-medium text-gray-900 text-sm line-clamp-2">
-                            {manuscript.title}
-                          </h3>
-                          <div className="mt-2">
+                            ) : (
+                              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                                Not Assigned
+                              </span>
+                            )}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap">
                             <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusBadgeClass(manuscript.status)}`}>
                               {getStatusLabel(manuscript.status)}
                             </span>
-                          </div>
-                        </div>
-                        <div className="text-sm">
-                          <p className="text-gray-900 font-medium">{manuscript.submitter.name}</p>
-                          <p className="text-gray-500 text-xs truncate">{manuscript.submitter.email}</p>
-                        </div>
-                        <div>
-                          {manuscript.submitter.assignedFaculty ? (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#FFE9EE] text-[#7A0019]">
-                              {manuscript.submitter.assignedFaculty}
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
-                              Not Assigned
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex items-center justify-between pt-2 border-t">
-                          <span className="text-xs text-gray-500">
-                            Submitted {formatDate(manuscript.createdAt)}
-                          </span>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreVertical className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                              <DropdownMenuItem onSelect={() => router.push(`/admin/manuscripts/${manuscript._id}`)}>
-                                <Eye className="h-4 w-4 mr-2" /> View Details
-                              </DropdownMenuItem>
-                              
-                              {((manuscript.status === 'submitted' && !manuscript.submitter.assignedFaculty) || (manuscript.submitter.assignedFaculty && manuscript.assignedReviewerCount === 0)) && (
-                                <DropdownMenuItem onSelect={() => { setCurrentManuscriptForFaculty(manuscript); setShowAssignFacultyModal(true); }}>
-                                  <Building2 className="h-4 w-4 mr-2" /> 
-                                  {!manuscript.submitter.assignedFaculty ? 'Assign Faculty' : 'Change Faculty'}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            {formatDate(manuscript.createdAt)}
+                          </td>
+                          <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                  <span className="sr-only">Open menu</span>
+                                  <MoreVertical className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem onSelect={() => router.push(`/admin/manuscripts/${manuscript._id}`)}>
+                                  <Eye className="h-4 w-4 mr-2" /> View Details
                                 </DropdownMenuItem>
-                              )}
-
-                              {manuscript.submitter.assignedFaculty && manuscript.assignedReviewerCount === 0 && (
-                                <DropdownMenuItem onSelect={() => handleAssignReviewerClick(manuscript)}>
-                                  <UserPlus className="h-4 w-4 mr-2" /> Assign First Reviewer
-                                </DropdownMenuItem>
-                              )}
-
-                              {manuscript.submitter.assignedFaculty && manuscript.assignedReviewerCount === 1 && (
-                                <DropdownMenuItem onSelect={() => handleAssignReviewerClick(manuscript)}>
-                                  <UserPlus className="h-4 w-4 mr-2" /> Assign Second Reviewer
-                                </DropdownMenuItem>
-                              )}
-
-                              {(() => {
-                                const { canReassign, isReconciliation } = canReassignReview(manuscript);
-                                return canReassign && (
-                                  <DropdownMenuItem onSelect={() => handleReassignReviewerClick(manuscript)}>
-                                    <RefreshCw className="h-4 w-4 mr-2" /> 
-                                    {isReconciliation ? 'Reassign Reconciliation' : 'Reassign Review'}
+                                
+                                {((manuscript.status === 'submitted' && !manuscript.submitter.assignedFaculty) || (manuscript.submitter.assignedFaculty && manuscript.assignedReviewerCount === 0)) && (
+                                  <DropdownMenuItem onSelect={() => { setCurrentManuscriptForFaculty(manuscript); setShowAssignFacultyModal(true); }}>
+                                    <Building2 className="h-4 w-4 mr-2" /> 
+                                    {!manuscript.submitter.assignedFaculty ? 'Assign Faculty' : 'Change Faculty'}
                                   </DropdownMenuItem>
-                                );
-                              })()}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </>
+                                )}
+
+                                {manuscript.submitter.assignedFaculty && manuscript.assignedReviewerCount === 0 && (
+                                  <DropdownMenuItem onSelect={() => handleAssignReviewerClick(manuscript)}>
+                                    <UserPlus className="h-4 w-4 mr-2" /> Assign First Reviewer
+                                  </DropdownMenuItem>
+                                )}
+
+                                {manuscript.submitter.assignedFaculty && manuscript.assignedReviewerCount === 1 && (
+                                  <DropdownMenuItem onSelect={() => handleAssignReviewerClick(manuscript)}>
+                                    <UserPlus className="h-4 w-4 mr-2" /> Assign Second Reviewer
+                                  </DropdownMenuItem>
+                                )}
+
+                                {(() => {
+                                  const { canReassign, isReconciliation } = canReassignReview(manuscript);
+                                  return canReassign && (
+                                    <DropdownMenuItem onSelect={() => handleReassignReviewerClick(manuscript)}>
+                                      <RefreshCw className="h-4 w-4 mr-2" /> 
+                                      {isReconciliation ? 'Reassign Reconciliation' : 'Reassign Review'}
+                                    </DropdownMenuItem>
+                                  );
+                                })()}
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             )}
             
             {/* Pagination */}
