@@ -28,7 +28,8 @@ interface Invitation {
   status: "pending" | "accepted" | "expired" | "added";
   created: string;
   expires: string | null;
-  assignedFaculty?: string; // Add this line
+  assignedFaculty?: string;
+  assignedReviews?: string[];
 }
 
 interface ReviewerFormState {
@@ -395,7 +396,7 @@ export default function ReviewerInvitationsPage() {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              {(invitation?.status === "accepted" || invitation?.status === "added") && (
+                              {(invitation?.status === "accepted" || invitation?.status === "added") && (!invitation.assignedReviews || invitation.assignedReviews.length === 0) && (
                                 <DropdownMenuItem onSelect={() => {
                                   setSelectedReviewer(invitation);
                                   setSelectedFacultyForAssign(invitation.assignedFaculty || "");

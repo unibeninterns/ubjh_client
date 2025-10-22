@@ -1,11 +1,11 @@
-import mongoose, { Document, Schema, Types } from 'mongoose';
-import bcrypt from 'bcryptjs';
+import mongoose, { Document, Schema, Types } from "mongoose";
+import bcrypt from "bcryptjs";
 
 // User roles in the system
 export enum UserRole {
-  ADMIN = 'admin',
-  AUTHOR = 'author',
-  REVIEWER = 'reviewer',
+  ADMIN = "admin",
+  AUTHOR = "author",
+  REVIEWER = "reviewer",
 }
 
 // User interface extending Mongoose Document
@@ -19,13 +19,13 @@ export interface IUser extends Document {
   affiliation: string;
   orcid?: string;
   manuscripts?: Types.ObjectId[];
-  assignedJournals?: Types.ObjectId[]; // For reviewers
+  assignedReviews?: Types.ObjectId[]; // For reviewers
   completedReviews?: Types.ObjectId[]; // For reviewers
   isActive: boolean;
   refreshToken?: string;
   inviteToken?: string;
   inviteTokenExpires?: Date;
-  invitationStatus: 'pending' | 'accepted' | 'added' | 'expired';
+  invitationStatus: "pending" | "accepted" | "added" | "expired";
   credentialsSent: boolean;
   credentialsSentAt?: Date;
   lastLogin?: Date;
@@ -43,12 +43,12 @@ const UserSchema: Schema<IUser> = new Schema(
     },
     email: {
       type: String,
-      required: [true, 'Email is required'],
+      required: [true, "Email is required"],
       lowercase: true,
       trim: true,
       match: [
         /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-        'Please provide a valid email address',
+        "Please provide a valid email address",
       ],
     },
     password: {
@@ -79,7 +79,7 @@ const UserSchema: Schema<IUser> = new Schema(
       trim: true,
       match: [
         /^\d{4}-\d{4}-\d{4}-\d{3}[0-9X]$/,
-        'Please provide a valid ORCID (format: 0000-0000-0000-0000)',
+        "Please provide a valid ORCID (format: 0000-0000-0000-0000)",
       ],
     },
     isActive: {
@@ -89,19 +89,19 @@ const UserSchema: Schema<IUser> = new Schema(
     manuscripts: [
       {
         type: Schema.Types.ObjectId,
-        ref: 'Manuscript',
+        ref: "Manuscript",
       },
     ],
-    assignedJournals: [
+    assignedReviews: [
       {
         type: Schema.Types.ObjectId,
-        ref: 'Manuscript',
+        ref: "Manuscript",
       },
     ],
     completedReviews: [
       {
         type: Schema.Types.ObjectId,
-        ref: 'Review',
+        ref: "Review",
       },
     ],
     refreshToken: {
@@ -116,8 +116,8 @@ const UserSchema: Schema<IUser> = new Schema(
     },
     invitationStatus: {
       type: String,
-      enum: ['pending', 'accepted', 'added', 'expired'],
-      default: 'pending',
+      enum: ["pending", "accepted", "added", "expired"],
+      default: "pending",
     },
     lastLogin: {
       type: Date,
@@ -137,8 +137,8 @@ UserSchema.index({ email: 1 }, { unique: true });
 UserSchema.index({ role: 1, isActive: 1 });
 UserSchema.index({ role: 1, faculty: 1, isActive: 1 }); // For reviewer assignment
 
-UserSchema.pre<IUser>('save', async function (next) {
-  if (this.password && this.isModified('password')) {
+UserSchema.pre<IUser>("save", async function (next) {
+  if (this.password && this.isModified("password")) {
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
   }
@@ -152,4 +152,4 @@ UserSchema.methods.comparePassword = async function (
   return await bcrypt.compare(candidatePassword, this.password);
 };
 
-export default mongoose.model<IUser>('User', UserSchema, 'Users');
+export default mongoose.model<IUser>("User", UserSchema, "Users");

@@ -51,7 +51,7 @@ interface Review {
 
 interface ReviewerDetails extends Reviewer {
   affiliation: string;
-  assignedJournals?: Review[];
+  assignedReviews?: Review[];
   completedReviews?: Review[];
   inProgressReviews?: Review[];
   overdueReviews?: Review[];
@@ -349,7 +349,7 @@ export default function ManuscriptReviewersPage() {
                                 <span className="sm:hidden capitalize">{reviewer.invitationStatus.substring(0, 3)}</span>
                               </span>
                             </div>
-                            <div className="mt-1 flex flex-col gap-1 text-xs sm:text-sm text-gray-500">
+                            <div className="mt-1 flex flex-col sm:flex-row gap-1 sm:gap-4 text-xs sm:text-sm text-gray-500">
                               <div className="flex items-center gap-1 truncate">
                                 <Mail className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                                 <span className="truncate">{reviewer.email}</span>
@@ -374,6 +374,10 @@ export default function ManuscriptReviewersPage() {
                                 <BarChart3 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 flex-shrink-0" />
                                 <span className="font-medium">{reviewer.statistics.completionRate}%</span>
                               </div>
+                              <div className="hidden items-center text-gray-500 sm:flex">
+                                                                                              <Calendar className="h-3 w-3 sm:h-4 sm:w-4 mr-1 flex-shrink-0" />
+                                                                                              <span>Joined {new Date(reviewer.createdAt).toLocaleDateString()}</span>
+                                                                                          </div>
                             </div>
                           </div>
                         </div>

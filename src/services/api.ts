@@ -204,6 +204,8 @@ export interface ReviewerInvitation {
   status: "pending" | "accepted" | "expired" | "added";
   created: string;
   expires: string | null;
+  assignedFaculty?: string;
+  assignedReviews?: string[];
 }
 
 export interface ReviewerInvitationsResponse {
@@ -297,7 +299,7 @@ export interface ManuscriptReviewListResponse {
 
 export interface ReviewDetail {
   _id: string;
-  reviewType: 'human' | 'reconciliation';
+  reviewType: "human" | "reconciliation";
   reviewer: {
     _id: string;
     name: string;
@@ -305,7 +307,7 @@ export interface ReviewDetail {
   scores: ReviewScores;
   totalScore: number;
   reviewDecision: string;
-  status: 'in_progress' | 'completed' | 'overdue';
+  status: "in_progress" | "completed" | "overdue";
   dueDate: string;
   completedAt?: string;
   createdAt: string;
@@ -414,7 +416,7 @@ export interface ReviewerDashboardData {
     pending: number;
     overdue: number;
   };
-  assignedJournals: Array<{
+  assignedReviews: Array<{
     _id: string;
     title: string;
     status: string;
@@ -1245,7 +1247,11 @@ export const manuscriptReviewerApi = {
   submitReview: async (
     reviewId: string,
     reviewData: SubmitReviewRequest
-  ): Promise<{ success: boolean; message: string; data: ManuscriptReviewWithDetails }> => {
+  ): Promise<{
+    success: boolean;
+    message: string;
+    data: ManuscriptReviewWithDetails;
+  }> => {
     try {
       const response = await api.post(
         `/reviews/${reviewId}/submit`,
@@ -1262,7 +1268,11 @@ export const manuscriptReviewerApi = {
   saveReviewProgress: async (
     reviewId: string,
     progressData: SaveReviewProgressRequest
-  ): Promise<{ success: boolean; message: string; data: ManuscriptReviewWithDetails }> => {
+  ): Promise<{
+    success: boolean;
+    message: string;
+    data: ManuscriptReviewWithDetails;
+  }> => {
     try {
       const response = await api.patch(
         `/reviews/${reviewId}/save-progress`,
