@@ -192,8 +192,8 @@ export default function SubmissionPortalPage() {
 
           <div className="grid md:grid-cols-4 gap-8">
             <div className="text-center">
-              <div className="w-16 h-16 bg-[#7A0019] rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="h-8 w-8 text-[#EAD3D9]" />
+              <div className="w-16 h-16 bg-[#FFE9EE] rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle className="h-8 w-8 text-[#7A0019]" />
               </div>
               <h3 className="text-xl font-bold text-[#212121] mb-2">
                 No Fees
@@ -204,8 +204,8 @@ export default function SubmissionPortalPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-[#7A0019] rounded-full flex items-center justify-center mx-auto mb-4">
-                <Clock className="h-8 w-8 text-[#EAD3D9]" />
+              <div className="w-16 h-16 bg-[#FFE9EE] rounded-full flex items-center justify-center mx-auto mb-4">
+                <Clock className="h-8 w-8 text-[#7A0019]" />
               </div>
               <h3 className="text-xl font-bold text-[#212121] mb-2">
                 Fast Review
@@ -217,8 +217,8 @@ export default function SubmissionPortalPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-[#7A0019] rounded-full flex items-center justify-center mx-auto mb-4">
-                <Globe className="h-8 w-8 text-[#EAD3D9]" />
+              <div className="w-16 h-16 bg-[#FFE9EE] rounded-full flex items-center justify-center mx-auto mb-4">
+                <Globe className="h-8 w-8 text-[#7A0019]" />
               </div>
               <h3 className="text-xl font-bold text-[#212121] mb-2">
                 Global Reach
@@ -230,8 +230,8 @@ export default function SubmissionPortalPage() {
             </div>
 
             <div className="text-center">
-              <div className="w-16 h-16 bg-[#7A0019] rounded-full flex items-center justify-center mx-auto mb-4">
-                <Shield className="h-8 w-8 text-[#EAD3D9]" />
+              <div className="w-16 h-16 bg-[#FFE9EE] rounded-full flex items-center justify-center mx-auto mb-4">
+                <Shield className="h-8 w-8 text-[#7A0019]" />
               </div>
               <h3 className="text-xl font-bold text-[#212121] mb-2">
                 You Keep Rights
@@ -456,7 +456,7 @@ export default function SubmissionPortalPage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-8">
             {/* Technical Support */}
-            <div className="border-2 border-[#EAD3D9] rounded-xl p-8">
+            <div className="border-2 bg-[#FFE9EE] border-[#EAD3D9] rounded-xl p-8">
               <div className="flex items-start gap-4">
                 <div className="w-12 h-12 bg-[#7A0019] rounded-full flex items-center justify-center flex-shrink-0">
                   <HelpCircle className="h-6 w-6 text-[#EAD3D9]" />
@@ -482,22 +482,22 @@ export default function SubmissionPortalPage() {
             </div>
 
             {/* Editorial Office */}
-            <div className="border-2 border-[#EAD3D9] rounded-xl p-8">
+            <div className="border-4 bg-[#7A0019] border-[#EAD3D9] rounded-lg p-8">
               <div className="flex items-start gap-4">
-                <div className="w-12 h-12 bg-[#7A0019] rounded-full flex items-center justify-center flex-shrink-0">
-                  <Mail className="h-6 w-6 text-[#EAD3D9]" />
+                <div className="w-12 h-12 bg-[#EAD3D9] rounded-full flex items-center justify-center flex-shrink-0">
+                  <Mail className="h-6 w-6 text-[#7A0019]" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-[#7A0019] mb-3">
+                  <h3 className="text-xl font-bold text-[#EAD3D9] mb-3">
                     Editorial Office
                   </h3>
-                  <p className="text-gray-700 mb-4">
+                  <p className="text-white mb-4">
                     Questions about manuscript preparation, journal scope, or
                     editorial policies? Contact our editorial team.
                   </p>
                   <a
                     href="mailto:journalhumanities@uniben.edu"
-                    className="inline-flex items-center gap-2 text-[#7A0019] hover:text-purple-900 font-semibold"
+                    className="inline-flex items-center gap-2 text-[#EAD3D9] hover:text-purple-900 font-semibold"
                   >
                     <Mail className="h-4 w-4" />
                     journalhumanities@uniben.edu
