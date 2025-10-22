@@ -17,6 +17,7 @@ import {
   Award,
   Search,
 } from "lucide-react";
+import Footer from "@/components/Footer";
 
 export default function HumanitiesJournalHome() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -570,6 +571,7 @@ export default function HumanitiesJournalHome() {
       </section>
 
       {/* Footer */}
+      <Footer/>
       
     </div>
   );

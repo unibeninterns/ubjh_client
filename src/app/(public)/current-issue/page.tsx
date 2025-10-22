@@ -18,6 +18,7 @@ import {
   Quote,
 } from "lucide-react";
 import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 interface Article {
   id: string;
@@ -536,36 +537,7 @@ export default function CurrentIssuePage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-[#FAF7F8] border-t border-[#EAD3D9] py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-600">
-            <p>
-              © {new Date().getFullYear()} University of Benin — UNIBEN Journal
-              of Humanities
-            </p>
-            <div className="flex gap-4 mt-4 md:mt-0">
-              <Link
-                href="/about"
-                className="hover:text-[#7A0019]"
-              >
-                About
-              </Link>
-              <Link
-                href="/policies"
-                className="hover:text-[#7A0019]"
-              >
-                Policies
-              </Link>
-              <Link
-                href="/contact"
-                className="hover:text-[#7A0019]"
-              >
-                Contact
-              </Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer/>
     </div>
   );
 }

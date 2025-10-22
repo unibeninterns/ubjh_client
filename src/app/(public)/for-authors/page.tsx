@@ -19,6 +19,7 @@ import {
   Globe,
 } from "lucide-react";
 import Header from "@/components/Header"
+import Footer from "@/components/Footer";
 
 export default function ForAuthorsPage() {
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
@@ -809,6 +810,7 @@ export default function ForAuthorsPage() {
       </div>
 
       {/* Footer - Simplified */}
+      <Footer/>
          </div>
   );
 }

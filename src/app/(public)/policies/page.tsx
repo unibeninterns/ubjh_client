@@ -16,6 +16,7 @@ import {
   ChevronDown,
   ExternalLink,
 } from "lucide-react";
+import Footer from "@/components/Footer";
 
 export default function PoliciesPage() {
   const [expandedSection, setExpandedSection] = useState<string | null>("open-access");
@@ -825,39 +826,7 @@ export default function PoliciesPage() {
       </div>
 
       {/* Footer */}
-      <footer className="bg-[#FAF7F8] border-t border-[#EAD3D9] py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-600">
-            <p>
-              © {new Date().getFullYear()} University of Benin — UNIBEN Journal
-              of Humanities
-            </p>
-            <div className="flex gap-4 mt-4 md:mt-0">
-              <Link
-                href="/about"
-                className="hover:text-[#7A0019]"
-              >
-                About
-              </Link>
-              <Link
-                href="/contact"
-                className="hover:text-[#7A0019]"
-              >
-                Contact
-              </Link>
-              <a
-                href="https://publicationethics.org/"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="hover:text-[#7A0019] flex items-center gap-1"
-              >
-                COPE
-                <ExternalLink className="h-3 w-3" />
-              </a>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer/>
     </div>
   );
 }

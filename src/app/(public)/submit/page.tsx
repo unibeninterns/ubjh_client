@@ -17,6 +17,7 @@ import {
   ExternalLink,
 } from 'lucide-react';
 import { manuscriptApi } from '@/services/api';
+import Footer from '@/components/Footer';
 
 interface CoAuthor {
   id: string;
@@ -996,30 +997,7 @@ export default function ManuscriptSubmissionPage() {
       </main>
 
       {/* Footer */}
-      <footer className="bg-gray-100 border-t border-gray-200 py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-600">
-            <p>
-              © {new Date().getFullYear()} University of Benin — UNIBEN Journal
-              of Humanities
-            </p>
-            <div className="flex gap-4 mt-4 md:mt-0">
-              <Link href="/about" className="hover:text-[#7A0019]">
-                About
-              </Link>
-              <Link href="/policies" className="hover:text-[#7A0019]">
-                Policies
-              </Link>
-              <Link href="/for-authors" className="hover:text-[#7A0019]">
-                Author Guidelines
-              </Link>
-              <Link href="/contact" className="hover:text-[#7A0019]">
-                Contact
-              </Link>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <Footer/>
     </div>
   );
 }
