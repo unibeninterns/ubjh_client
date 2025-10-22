@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import {
   FileText,
@@ -416,13 +417,13 @@ export default function ForAuthorsPage() {
             </section>
 
             {/* Article Processing Charges */}
-            <section id="apcs" className="to-emerald-50 border-2 border-[#EAD3D9] rounded-xl p-8">
+            <section id="apcs" className="to-emerald-50 border-2 border-green-200 rounded-xl p-8">
               <div className="flex items-start gap-4">
-                <div className="flex-shrink-0 w-16 h-16 bg-green-600 rounded-full flex items-center justify-center">
-                  <CheckCircle className="h-8 w-8 text-white" />
+                <div className="flex-shrink-0 w-16 h-16 bg-green-100 rounded-full flex items-center justify-center">
+                  <CheckCircle className="h-8 w-8 text-green-800" />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-green-900 mb-3">
+                  <h2 className="text-2xl font-bold text-green-800 mb-3">
                     No Article Processing Charges (APCs)
                   </h2>
                   <p className="text-gray-700 mb-4 leading-relaxed">
@@ -642,7 +643,7 @@ export default function ForAuthorsPage() {
               {/* Quick Start CTA */}
               <div className="bg-gradient-to-br from-[#7A0019] to-[#5A0A1A] text-white rounded-xl p-6 shadow-xl">
                 <h3 className="text-xl font-bold mb-4">Ready to Submit?</h3>
-                <p className="text-[#FFE9EE] text-sm mb-6">
+                <p className="text-[#FFE9EE] font-semibold text-sm mb-6">
                   Start your submission now through our online platform
                 </p>
                 <Link
@@ -652,8 +653,8 @@ export default function ForAuthorsPage() {
                   Submit Manuscript
                 </Link>
                 <div className="mt-4 pt-4 border-t border-white/20">
-                  <p className="text-xs text-[#FFE9EE]">
-                    New to the platform? Create a free account in minutes
+                  <p className="text-xs font-semibold text-[#FFE9EE]">
+                    No registration required. Submit to get started.
                   </p>
                 </div>
               </div>
@@ -808,30 +809,6 @@ export default function ForAuthorsPage() {
       </div>
 
       {/* Footer - Simplified */}
-      <footer className="bg-[#FAF7F8] border-t border-[#EAD3D9] py-8 mt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center text-sm text-gray-600">
-            <p>
-              © {new Date().getFullYear()} University of Benin — UNIBEN Journal
-              of Humanities
-            </p>
-            <div className="flex gap-4 mt-4 md:mt-0">
-              <Link
-                href="/policies"
-                className="hover:text-[#7A0019]"
-              >
-                Editorial Policies
-              </Link>
-              <Link
-                href="/contact"
-                className="hover:text-[#7A0019]"
-              >
-                Contact
-              </Link>
-            </div>
-          </div>
-        </div>
-      </footer>
-    </div>
+         </div>
   );
 }

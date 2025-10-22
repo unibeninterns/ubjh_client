@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Merriweather, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import Footer from '@/components/Footer'
 
 const inter = Inter({
   subsets: ["latin"],
@@ -64,6 +65,7 @@ export default function RootLayout({
         className={`${inter.variable} ${merriweather.variable} ${jetbrainsMono.variable} antialiased`}
       >
         {children}
+        <Footer/>
       </body>
     </html>
   );
