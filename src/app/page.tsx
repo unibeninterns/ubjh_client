@@ -17,120 +17,93 @@ import {
   Award,
   Search,
 } from "lucide-react";
+import Header from "@/components/Header"
 import Footer from "@/components/Footer";
 
 export default function HumanitiesJournalHome() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [showSearch, setShowSearch] = useState(false);
 
   return (
     <div className="min-h-screen bg-white">
       {/* Header/Navigation */}
       <header className="bg-[#7A0019] text-white shadow-lg sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            {/* Logo and Title */}
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-white rounded-lg flex items-center justify-center">
-                {/* Placeholder for UNIBEN logo */}
-                <Image
-                  src="/uniben-logo.png"
-                  alt="UNIBEN Logo"
-                  width={48}
-                  height={48}
-                  className="rounded"
-                />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold tracking-tight">
-                  UNIBEN Journal of Humanities
-                </h1>
-                <p className="text-sm text-[#FFE9EE] font-medium">
-                  Diamond Open Access
-                </p>
-              </div>
-            </div>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden lg:flex items-center gap-6">
-              <Link
-                href=""
-                className="text-white hover:text-[#FFE9EE] font-semibold transition-colors"
-              >
-                Home
-              </Link>
-              <Link
-                href="/current-issue"
-                className="text-white hover:text-[#FFE9EE] font-medium transition-colors"
-              >
-                Current Issue
-              </Link>
-              <Link
-                href="/archives"
-                className="text-white hover:text-[#FFE9EE] font-medium transition-colors"
-              >
-                Archives
-              </Link>
-              <Link
-                href="/for-authors"
-                className="text-white hover:text-[#FFE9EE] font-medium transition-colors"
-              >
-                For Authors
-              </Link>
-              <Link
-                href="/about"
-                className="text-white hover:text-[#FFE9EE] font-medium transition-colors"
-              >
-                About
-              </Link>
-              <Link
-                href="/submission"
-                className="bg-white text-[#7A0019] px-6 py-2 rounded-full font-semibold hover:bg-[#FFE9EE] transition-all shadow-lg hover:shadow-xl"
-              >
-                Submit Manuscript
-              </Link>
-            </nav>
-          </div>
-        </div>
+        <Header/>
 
         {/* Secondary Navigation */}
         <div className="bg-[#F2E9EC] border-b border-[#EAD3D9]">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between py-3">
-              <div className="flex items-center gap-6 text-sm">
-                <Link
-                  href="/editorial-board"
-                  className="text-[#7A0019] hover:text-[#5A0A1A] font-medium transition-colors"
-                >
-                  Editorial Board
-                </Link>
-                <Link
-                  href="/policies"
-                  className="text-[#7A0019] hover:text-[#5A0A1A] font-medium transition-colors"
-                >
-                  Policies
-                </Link>
-                <Link
-                  href="/contact"
-                  className="text-[#7A0019] hover:text-[#5A0A1A] font-medium transition-colors"
-                >
-                  Contact
-                </Link>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Search articles..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-64 px-4 py-2 pl-10 rounded-full border border-[#5A0A1A] focus:outline-none focus:ring-2 focus:ring-[#7A0019] text-black text-sm"
-                  />
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
-                </div>
-              </div>
-            </div>
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="flex items-center justify-between py-3">
+      {!showSearch && (
+        <div className="flex items-center gap-6 text-sm">
+          <Link
+            href="/editorial-board"
+            className="text-[#7A0019] hover:text-[#5A0A1A] font-medium transition-colors"
+          >
+            Editorial Board
+          </Link>
+          <Link
+            href="/policies"
+            className="text-[#7A0019] hover:text-[#5A0A1A] font-medium transition-colors"
+          >
+            Policies
+          </Link>
+          <Link
+            href="/contact"
+            className="text-[#7A0019] hover:text-[#5A0A1A] font-medium transition-colors"
+          >
+            Contact
+          </Link>
+        </div>
+      )}
+      <div className="flex items-center gap-2">
+        <div className="hidden md:flex items-center gap-2">
+          <div className="relative">
+            <input
+              type="text"
+              placeholder="Search articles..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-64 px-4 py-2 pl-10 rounded-full border border-[#5A0A1A] focus:outline-none focus:ring-2 focus:ring-[#7A0019] text-black text-sm"
+            />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
           </div>
         </div>
+        <div className="md:hidden">
+          {!showSearch ? (
+            <button
+              onClick={() => setShowSearch(true)}
+              className="p-2 text-[#7A0019]"
+            >
+              <Search className="h-5 w-5" />
+            </button>
+          ) : (
+            <div className="flex items-center gap-2 w-full">
+              <div className="relative flex-1">
+                <input
+                  type="text"
+                  placeholder="Search articles..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full px-4 py-2 pl-10 rounded-full border border-[#5A0A1A] focus:outline-none focus:ring-2 focus:ring-[#7A0019] text-black text-sm"
+                  autoFocus
+                />
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+              </div>
+              <button
+                onClick={() => setShowSearch(false)}
+                className="p-2 text-[#7A0019]"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
       </header>
 
       {/* Hero Section */}
@@ -174,10 +147,10 @@ export default function HumanitiesJournalHome() {
                 <span className="font-semibold">Crossref DOIs</span>
               </div>
             </div>
-            <div className="flex gap-4">
+            <div className="block md:flex  gap-4">
               <Link
                 href="/submission"
-                className="inline-flex items-center gap-2 bg-white text-[#7A0019] px-8 py-4 rounded-full font-bold hover:bg-[#FFE9EE] transition-all shadow-xl hover:shadow-2xl hover:scale-105"
+                className="inline-flex mb-4 md:mb-0 items-center gap-2 text-sm md:text-md bg-white text-[#7A0019] px-4 py-4 md:px-8 md:py-4 rounded-full font-bold hover:bg-[#FFE9EE] transition-all shadow-xl hover:shadow-2xl hover:scale-105"
               >
                 <FileText className="h-5 w-5" />
                 Submit Your Manuscript
@@ -398,12 +371,12 @@ export default function HumanitiesJournalHome() {
       {/* Editorial Board Preview */}
       <section className="py-16 bg-[#FAF7F8]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-10">
+          <div className="block md:flex items-center justify-between mb-10">
             <div>
               <h2 className="text-3xl font-bold text-[#7A0019] mb-2 font-serif">
                 Editorial Leadership
               </h2>
-              <p className="text-gray-600">
+              <p className="text-gray-600 mb-4">
                 Distinguished scholars committed to excellence
               </p>
             </div>
