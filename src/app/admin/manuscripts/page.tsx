@@ -23,6 +23,15 @@ interface PaginationData {
   currentPage: number;
 }
 
+interface ExistingReviewForReassignment {
+  reviewId: string;
+  reviewer: {
+    name: string;
+  };
+  reviewType: "human" | "reconciliation";
+  status: string;
+}
+
 function AdminManuscriptsPage() {
   const { isAuthenticated } = useAuth();    
   const [manuscripts, setManuscripts] = useState<Manuscript[]>([]);
@@ -58,7 +67,7 @@ function AdminManuscriptsPage() {
   const [searchTermForReassignment, setSearchTermForReassignment] = useState('');
   const [reassignReviewerLoading, setReassignReviewerLoading] = useState(false);
   const [reassignReviewerSuccess, setReassignReviewerSuccess] = useState(false);
-  const [existingReviewsForReassignment, setExistingReviewsForReassignment] = useState<any[]>([]); // To store existing reviews for selection
+  const [existingReviewsForReassignment, setExistingReviewsForReassignment] = useState<ExistingReviewForReassignment[]>([]); // To store existing reviews for selection
   const [selectedReviewToReassign, setSelectedReviewToReassign] = useState<string | null>(null); // The ID of the review to reassign
 
   const [assigningFaculty, setAssigningFaculty] = useState(false);

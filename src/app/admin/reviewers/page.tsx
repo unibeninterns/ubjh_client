@@ -35,6 +35,7 @@ interface Reviewer {
   name: string;
   email: string;
   faculty: string;
+  assignedFaculty: string;
   isActive: boolean;
   invitationStatus: 'pending' | 'accepted' | 'added' | 'expired';
   statistics: ReviewerStatistics;
@@ -140,7 +141,7 @@ export default function ManuscriptReviewersPage() {
     try {
       setIsCheckingOverdue(true);
       const response = await checkOverdueReviews();
-      setOverdueCheckResult(response.data);
+      setOverdueCheckResult(response.message);
       setShowOverdueAlert(true);
 
       setTimeout(() => {
@@ -354,9 +355,13 @@ export default function ManuscriptReviewersPage() {
                                 <Mail className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                                 <span className="truncate">{reviewer.email}</span>
                               </div>
-                              <div className="flex items-center gap-1 truncate">
+                              <div className="hidden lg:flex items-center gap-1 truncate">
                                 <Building className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
                                 <span className="truncate">{reviewer.faculty}</span>
+                              </div>
+                              <div className="flex items-center gap-1 truncate">
+                                <Building className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                                <span className="truncate">{reviewer.assignedFaculty}</span>
                               </div>
                             </div>
                             <div className="mt-3 flex flex-wrap gap-4 text-xs sm:text-sm">

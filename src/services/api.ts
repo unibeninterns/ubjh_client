@@ -1139,7 +1139,7 @@ export const getReviewerById = async (id: string) => {
 
 export const checkOverdueReviews = async () => {
   try {
-    const response = await api.get("/admin/check-overdue");
+    const response = await api.get("/admin/assign-review/check-overdue");
     return response.data;
   } catch (error) {
     console.error("Error checking overdue reviews:", error);
