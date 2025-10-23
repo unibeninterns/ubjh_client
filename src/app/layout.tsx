@@ -63,7 +63,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${merriweather.variable} ${jetbrainsMono.variable} antialiased w-full`}
       >
-        <div className="max-w-[100vw]">{children}</div>
+        <div className="max-w-screen">{children}</div>
       </body>
     </html>
   );
