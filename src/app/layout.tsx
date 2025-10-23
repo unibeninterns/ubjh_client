@@ -59,11 +59,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="w-full">
+    <html lang="en">
       <body
-        className={`${inter.variable} ${merriweather.variable} ${jetbrainsMono.variable} antialiased w-full`}
+        className={`${inter.variable} ${merriweather.variable} ${jetbrainsMono.variable} antialiased`}
       >
-        <div className="max-w-screen">{children}</div>
+        <div>{children}</div>
       </body>
     </html>
   );
