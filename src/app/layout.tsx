@@ -59,11 +59,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="w-full overflow-x-hidden">
+    <html lang="en">
       <body
-        className={`${inter.variable} ${merriweather.variable} ${jetbrainsMono.variable} antialiased w-full overflow-x-hidden`}
+        className={`${inter.variable} ${merriweather.variable} ${jetbrainsMono.variable} antialiased`}
       >
-        <div className="max-w-[100vw] overflow-x-hidden">{children}</div>
+        {children}
       </body>
     </html>
   );
