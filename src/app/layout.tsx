@@ -63,7 +63,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${merriweather.variable} ${jetbrainsMono.variable} antialiased`}
       >
-        <div>{children}</div>
+        {children}
       </body>
     </html>
   );
