@@ -306,7 +306,7 @@ export default function ReviewGuideline() {
 
                         {/* Footer */}
                         <div className="mt-8 pt-6 border-t border-gray-200 text-center text-sm text-gray-600">
-                            <p>© 2024 University of Benin Journal of Humanities. All rights reserved.</p>
+                            <p>© {new Date().getFullYear()} University of Benin Journal of Humanities. All rights reserved.</p>
                             <p className="mt-2">Thank you for your valuable contribution to scholarly publishing.</p>
                         </div>
                     </div>

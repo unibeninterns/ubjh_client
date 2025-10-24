@@ -4,10 +4,11 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Eye, Clock, AlertCircle, Save, Send, FileText, Award } from 'lucide-react';
+import { toast, Toaster } from "sonner";
 import { ReviewerLayout } from '@/components/reviewers/ReviewerLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { manuscriptReviewerApi } from '@/services/api';
-import type { ManuscriptReview, ReviewScores } from '@/services/api';
+import type { ReviewScores } from '@/services/api';
 
 interface ReviewCriteria {
   id: keyof ReviewScores;
@@ -17,13 +18,37 @@ interface ReviewCriteria {
   scoreGiven?: number;
 }
 
+interface ManuscriptReviewDetails {
+  _id: string;
+  manuscript: {
+    _id: string;
+    title: string;
+    abstract: string;
+    keywords: string[];
+    pdfFile?: string;
+    status: string;
+  };
+  reviewType: 'human' | 'reconciliation';
+  status: 'in_progress' | 'completed' | 'overdue';
+  dueDate: string;
+  completedAt?: string;
+  createdAt: string;
+  totalScore: number;
+  scores: ReviewScores;
+  comments?: {
+    commentsForAuthor?: string;
+    confidentialCommentsToEditor?: string;
+  };
+  reviewDecision?: string;
+}
+
 const ManuscriptReviewForm: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
   const params = useParams();
   const reviewId = params.id as string;
 
-  const [reviewData, setReviewData] = useState<ManuscriptReview | null>(null);
+  const [reviewData, setReviewData] = useState<ManuscriptReviewDetails | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -77,6 +102,17 @@ const ManuscriptReviewForm: React.FC = () => {
   const [commentsForAuthor, setCommentsForAuthor] = useState('');
   const [confidentialComments, setConfidentialComments] = useState('');
   const [reviewDecision, setReviewDecision] = useState<string>('');
+  const [isSubmitDisabled, setIsSubmitDisabled] = useState(true);
+  const [isSaveDisabled, setIsSaveDisabled] = useState(true);
+
+  useEffect(() => {
+    const allScoresEntered = reviewCriteria.every(criteria => criteria.scoreGiven !== undefined);
+    const anyScoreEntered = reviewCriteria.some(criteria => criteria.scoreGiven !== undefined);
+    const anyFieldFilled = anyScoreEntered || commentsForAuthor.trim() !== '' || confidentialComments.trim() !== '' || reviewDecision !== '';
+
+    setIsSaveDisabled(!anyFieldFilled);
+    setIsSubmitDisabled(!(allScoresEntered && commentsForAuthor.trim() !== '' && confidentialComments.trim() !== '' && reviewDecision !== ''));
+  }, [reviewCriteria, commentsForAuthor, confidentialComments, reviewDecision]);
 
   useEffect(() => {
     const fetchReviewData = async () => {
@@ -87,7 +123,7 @@ const ManuscriptReviewForm: React.FC = () => {
         const response = await manuscriptReviewerApi.getReviewById(reviewId);
         
         if (response.success) {
-          const review = response.data;
+          const review = response.data as ManuscriptReviewDetails;
           setReviewData(review);
           setCommentsForAuthor(review.comments?.commentsForAuthor || '');
           setConfidentialComments(review.comments?.confidentialCommentsToEditor || '');
@@ -102,8 +138,8 @@ const ManuscriptReviewForm: React.FC = () => {
         } else {
           setError('Failed to load review data');
         }
-      } catch (err: any) {
-        setError(err?.message || 'An error occurred');
+      } catch (err: unknown) {
+        setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
         setLoading(false);
       }
@@ -147,8 +183,8 @@ const ManuscriptReviewForm: React.FC = () => {
         }
       });
 
-      const progressData: any = {};
-      if (Object.keys(scores).length > 0) progressData.scores = scores;
+      const progressData: Partial<ManuscriptReviewDetails> = {};
+      if (Object.keys(scores).length > 0) progressData.scores = scores as ReviewScores;
       if (commentsForAuthor || confidentialComments) {
         progressData.comments = {
           commentsForAuthor: commentsForAuthor || undefined,
@@ -160,11 +196,11 @@ const ManuscriptReviewForm: React.FC = () => {
       const response = await manuscriptReviewerApi.saveReviewProgress(reviewData._id, progressData);
       
       if (response.success) {
-        // Success feedback
-        alert('Progress saved successfully');
+        toast.success('Progress saved successfully');
       }
-    } catch (err: any) {
-      setError(err?.message || 'Failed to save progress');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to save progress');
+      toast.error(err instanceof Error ? err.message : 'Failed to save progress');
     } finally {
       setSaving(false);
     }
@@ -182,8 +218,8 @@ const ManuscriptReviewForm: React.FC = () => {
       return;
     }
 
-    if (!commentsForAuthor.trim()) {
-      setError('Please provide comments for the author');
+    if (!commentsForAuthor.trim() || !confidentialComments.trim()) {
+      setError('Please provide comments for the author and confidential comments for the editor');
       return;
     }
 
@@ -219,10 +255,12 @@ const ManuscriptReviewForm: React.FC = () => {
       });
 
       if (response.success) {
+        toast.success('Review submitted successfully');
         router.push('/reviewer/assignments');
       }
-    } catch (err: any) {
-      setError(err?.message || 'Failed to submit review');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to submit review');
+      toast.error(err instanceof Error ? err.message : 'Failed to submit review');
     } finally {
       setSubmitting(false);
     }
@@ -296,6 +334,7 @@ const ManuscriptReviewForm: React.FC = () => {
 
   return (
     <ReviewerLayout>
+      <Toaster />
       <div className="min-h-screen bg-gray-50 p-4 md:p-6">
         <div className="max-w-6xl mx-auto">
           {/* Header */}
@@ -354,30 +393,6 @@ const ManuscriptReviewForm: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mb-6">
-              <div className="bg-gray-50 rounded-lg p-4">
-                <div className="flex items-center gap-2 mb-3">
-                  <FileText className="w-5 h-5 text-[#7A0019]" />
-                  <h4 className="font-semibold text-gray-700">Author Information</h4>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Name:</span>
-                    <span className="font-medium">{reviewData.manuscript.submitter.name}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Email:</span>
-                    <span className="font-medium truncate ml-2">{reviewData.manuscript.submitter.email}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Faculty:</span>
-                    <span className="font-medium">{reviewData.manuscript.submitter.faculty || 'N/A'}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-gray-600">Affiliation:</span>
-                    <span className="font-medium">{reviewData.manuscript.submitter.affiliation || 'N/A'}</span>
-                  </div>
-                </div>
-              </div>
 
               <div className="bg-gray-50 rounded-lg p-4">
                 <div className="flex items-center gap-2 mb-3">
@@ -387,11 +402,11 @@ const ManuscriptReviewForm: React.FC = () => {
                 <div className="space-y-2">
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Status:</span>
-                    <span className="font-medium capitalize">{reviewData.manuscript.status.replace('_', ' ')}</span>
+                    <span className="font-medium capitalize">{reviewData.status.replace('_', ' ')}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Submitted:</span>
-                    <span className="font-medium">{formatDate(reviewData.manuscript.createdAt)}</span>
+                    <span className="font-medium">{formatDate(reviewData.createdAt)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-gray-600">Keywords:</span>
@@ -410,7 +425,7 @@ const ManuscriptReviewForm: React.FC = () => {
               <div>
                 <h4 className="font-semibold text-gray-700 mb-2">Keywords</h4>
                 <div className="flex flex-wrap gap-2">
-                  {reviewData.manuscript.keywords.map((keyword, index) => (
+                  {reviewData.manuscript.keywords.map((keyword: string, index: number) => (
                     <span key={index} className="px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm">
                       {keyword}
                     </span>
@@ -419,16 +434,18 @@ const ManuscriptReviewForm: React.FC = () => {
               </div>
 
               {reviewData.manuscript.pdfFile && (
-                <div>
-                  <h4 className="font-semibold text-gray-700 mb-2">Manuscript PDF</h4>
-                  <a
-                    href={reviewData.manuscript.pdfFile}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center px-4 py-2 bg-[#7A0019] text-white rounded-lg hover:bg-[#5A0A1A] transition-colors text-sm"
-                  >
-                    <FileText className="w-4 h-4 mr-2" />
-                    View Manuscript PDF
+                <div className="bg-gray-50 rounded-lg p-4">
+                    <a
+                        href={reviewData.manuscript.pdfFile}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full"
+                    >
+                        <h4 className="font-semibold text-gray-700 mb-2">Manuscript to be Reviewed</h4>
+                        <div className="inline-flex items-center px-4 py-2 bg-[#7A0019] text-white rounded-lg hover:bg-[#5A0A1A] transition-colors text-sm">
+                            <FileText className="w-4 h-4 mr-2" />
+                            Click here to View Manuscript PDF
+                        </div>
                   </a>
                 </div>
               )}
@@ -586,7 +603,7 @@ const ManuscriptReviewForm: React.FC = () => {
                 htmlFor="comments-editor" 
                 className="block text-base md:text-lg font-semibold text-gray-700 mb-2"
               >
-                Confidential Comments to Editor (Optional)
+                Confidential Comments to Editor
               </label>
               {isCompleted ? (
                 <div className="bg-gray-50 rounded-lg p-4 min-h-[120px]">
@@ -607,10 +624,15 @@ const ManuscriptReviewForm: React.FC = () => {
 
             {/* Action Buttons */}
             {!isCompleted && (
+              <div className="bg-blue-50 border border-[#7A0019] rounded-lg p-4 mb-6 text-sm text-[#7A0019]">
+                <p><strong>Note:</strong> You can only submit the review after filling all the fields. However, you can save your progress at any time and come back later to continue.</p>
+              </div>
+            )}
+            {!isCompleted && (
               <div className="flex flex-col sm:flex-row gap-3">
                 <button 
                   onClick={handleSaveProgress}
-                  disabled={saving}
+                  disabled={saving || isSaveDisabled}
                   className="flex-1 bg-gray-600 text-white py-3 px-4 rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm md:text-base"
                 >
                   {saving ? (
@@ -627,7 +649,7 @@ const ManuscriptReviewForm: React.FC = () => {
                 </button>
                 <button 
                   onClick={handleSubmit}
-                  disabled={submitting}
+                  disabled={submitting || isSubmitDisabled}
                   className="flex-1 bg-[#7A0019] text-white py-3 px-4 rounded-lg hover:bg-[#5A0A1A] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-sm md:text-base"
                 >
                   {submitting ? (
