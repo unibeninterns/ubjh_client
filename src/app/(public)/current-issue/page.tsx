@@ -38,7 +38,7 @@ interface Article {
 
 export default function CurrentIssuePage() {
   const [filterType, setFilterType] = useState<string>("all");
-  // Mock data for current issue
+
   const issueData = {
     volume: 1,
     issue: 1,
@@ -56,10 +56,7 @@ export default function CurrentIssuePage() {
       title:
         "Decolonizing Legal Education in West Africa: A Critical Analysis of Pedagogical Approaches",
       authors: ["Afolabi O. Johnson", "Chinwe M. Okeke"],
-      affiliations: [
-        "University of Benin",
-        "University of Lagos"
-      ],
+      affiliations: ["University of Benin", "University of Lagos"],
       abstract:
         "This study examines the persistence of colonial frameworks in contemporary legal education across West African universities and proposes context-driven pedagogical reforms that center African jurisprudence, customary law, and indigenous legal systems. Through comparative analysis of curricula in Nigeria, Ghana, and Senegal, we demonstrate how Eurocentric approaches continue to marginalize local legal traditions.",
       keywords: [
@@ -84,7 +81,7 @@ export default function CurrentIssuePage() {
       affiliations: [
         "University of Benin",
         "University of Port Harcourt",
-        "Delta State University"
+        "Delta State University",
       ],
       abstract:
         "Drawing on interdisciplinary scholarship, this review explores the intersection of environmental degradation, cultural memory, and climate justice advocacy in Nigeria's Niger Delta region. We analyze how local communities employ storytelling, visual arts, and cultural practices to document ecological harm and demand accountability from extractive industries.",
@@ -171,8 +168,7 @@ export default function CurrentIssuePage() {
     },
     {
       id: "006",
-      title:
-        "Performance Art and Social Protest in Contemporary Lagos",
+      title: "Performance Art and Social Protest in Contemporary Lagos",
       authors: ["Funmilayo R. Adeyemi"],
       affiliations: ["University of Lagos"],
       abstract:
@@ -193,8 +189,7 @@ export default function CurrentIssuePage() {
     },
     {
       id: "007",
-      title:
-        "Gender and Land Rights in Customary Law: A Case Study of Edo State",
+      title: "Gender and Land Rights in Customary Law: A Case Study of Edo State",
       authors: ["Blessing O. Igbinovia", "Grace N. Ekhator"],
       affiliations: ["University of Benin", "University of Benin"],
       abstract:
@@ -215,8 +210,7 @@ export default function CurrentIssuePage() {
     },
     {
       id: "008",
-      title:
-        "Book Review: 'African Literatures and the CIA' by Caroline Davis",
+      title: "Book Review: 'African Literatures and the CIA' by Caroline Davis",
       authors: ["Obinna J. Okechukwu"],
       affiliations: ["University of Ibadan"],
       abstract:
@@ -242,22 +236,24 @@ export default function CurrentIssuePage() {
       ? articles
       : articles.filter((article) => article.articleType === filterType);
 
-  const articleTypes = [
-    "all",
-    "Research Article",
-    "Review Article",
-    "Book Review",
-  ];
+  const articleTypes = ["all", "Research Article", "Review Article", "Book Review"];
+
+  const truncateAbstract = (text: string, wordLimit: number) => {
+    const words = text.split(" ");
+    if (words.length <= wordLimit) return text;
+    const partial = words.slice(0, wordLimit).join(" ");
+    const rest = text.slice(partial.length);
+    const periodIndex = rest.indexOf(".");
+    if (periodIndex === -1) return partial + "...";
+    return partial + rest.slice(0, periodIndex + 1);
+  };
 
   return (
     <div className="min-h-screen bg-white overflow-x-hidden">
-      {/* Header */}
-     <Header/>
-      {/* Issue Header */}
+      <Header />
       <section className="bg-gradient-to-br from-[#7A0019] to-[#5A0A1A] text-white py-12">
         <div className=" mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-3 gap-8 items-start">
-            {/* Issue Cover */}
             <div className="md:col-span-1">
               <div className="bg-white rounded-xl shadow-2xl overflow-hidden">
                 <Image
@@ -269,8 +265,6 @@ export default function CurrentIssuePage() {
                 />
               </div>
             </div>
-
-            {/* Issue Information */}
             <div className="md:col-span-2">
               <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-4">
                 <BookOpen className="h-4 w-4" />
@@ -282,18 +276,13 @@ export default function CurrentIssuePage() {
               <p className="text-xl text-[#FFE9EE] mb-6">
                 Published: {issueData.publishDate}
               </p>
-
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                  <div className="text-3xl font-bold mb-1">
-                    {issueData.totalArticles}
-                  </div>
+                  <div className="text-3xl font-bold mb-1">{issueData.totalArticles}</div>
                   <div className="text-sm text-[#FFE9EE]">Articles</div>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                  <div className="text-3xl font-bold mb-1">
-                    {issueData.totalPages}
-                  </div>
+                  <div className="text-3xl font-bold mb-1">{issueData.totalPages}</div>
                   <div className="text-sm text-[#FFE9EE]">Pages</div>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
@@ -307,7 +296,6 @@ export default function CurrentIssuePage() {
                   <div className="text-sm text-[#FFE9EE]">Total Views</div>
                 </div>
               </div>
-
               <div className="flex flex-wrap gap-3">
                 <button className="inline-flex items-center gap-2 bg-transparent border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-[#7A0019] transition-all">
                   <Share2 className="h-5 w-5" />
@@ -318,7 +306,6 @@ export default function CurrentIssuePage() {
                   Cite Issue
                 </button>
               </div>
-
               <div className="mt-6 pt-6 border-t border-white/20">
                 <p className="text-sm text-[#FFE9EE] mb-2">
                   <strong>Issue DOI:</strong> {issueData.doi}
@@ -331,15 +318,11 @@ export default function CurrentIssuePage() {
           </div>
         </div>
       </section>
-
-      {/* Filter Section */}
       <section className="bg-[#FAF7F8] border-b-2 border-[#EAD3D9] py-6">
         <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div>
-              <h2 className="text-lg font-bold text-[#212121] mb-1">
-                Table of Contents
-              </h2>
+              <h2 className="text-lg font-bold text-[#212121] mb-1">Table of Contents</h2>
               <p className="text-sm text-gray-600">
                 Showing {filteredArticles.length} of {articles.length} articles
               </p>
@@ -361,126 +344,46 @@ export default function CurrentIssuePage() {
           </div>
         </div>
       </section>
-
-      {/* Articles List */}
       <section className="py-12">
-        <div className="mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="space-y-8">
-            {filteredArticles.map((article, index) => (
-              <article
-                key={article.id}
-                className="bg-white border-2 border-[#EAD3D9] rounded-xl overflow-hidden hover:shadow-xl hover:border-[#7A0019] transition-all group"
-              >
-                <div className="p-8">
-                  {/* Article Header */}
-                  <div className="flex flex-wrap items-center gap-3 mb-4">
-                    <span className="inline-flex items-center px-3 py-1 bg-[#FFE9EE] border border-[#E6B6C2] text-[#5A0A1A] rounded-full text-xs font-bold uppercase">
-                      {article.articleType}
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+          {filteredArticles.map((article, index) => (
+            <Link
+              href={`/articles/${article.id}`}
+              key={article.id}
+              className="block bg-white border-2 border-[#EAD3D9] rounded-xl overflow-hidden hover:shadow-xl hover:border-[#7A0019] transition-all transform hover:scale-[1.02]"
+            >
+              <div className="p-8">
+                <div className="flex flex-wrap items-center gap-3 mb-4">
+                  <span className="inline-flex items-center px-3 py-1 bg-[#FFE9EE] border border-[#E6B6C2] text-[#5A0A1A] rounded-full text-xs font-bold uppercase">
+                    {article.articleType}
+                  </span>
+                  <span className="text-sm text-gray-500">Pages {article.pages}</span>
+                </div>
+                <h3 className="text-2xl font-bold text-[#212121] mb-4 group-hover:text-[#7A0019] transition-colors font-serif leading-tight">
+                  {index + 1}. {article.title}
+                </h3>
+                <div className="mb-4">
+                  <div className="flex items-center gap-2 text-gray-700 mb-2">
+                    <Users className="h-4 w-4" />
+                    <span className="font-semibold">
+                      {article.authors.join(", ")}
                     </span>
-                    <span className="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-bold">
-                      OPEN ACCESS
-                    </span>
-                    <span className="text-sm text-gray-500">
-                      Pages {article.pages}
-                    </span>
                   </div>
-
-                  {/* Title */}
-                  <h3 className="text-2xl font-bold text-[#212121] mb-4 group-hover:text-[#7A0019] transition-colors font-serif leading-tight">
-                    {index + 1}. {article.title}
-                  </h3>
-
-                  {/* Authors */}
-                  <div className="mb-4">
-                    <div className="flex items-center gap-2 text-gray-700 mb-2">
-                      <Users className="h-4 w-4" />
-                      <span className="font-semibold">
-                        {article.authors.join(", ")}
-                      </span>
-                    </div>
-                    <div className="text-sm text-gray-600 ml-6">
-                      {article.affiliations.join(" • ")}
-                    </div>
-                  </div>
-
-                  {/* Abstract */}
-                  <div className="mb-4">
-                    <h4 className="font-semibold text-[#212121] mb-2">
-                      Abstract
-                    </h4>
-                    <p className="text-gray-700 leading-relaxed">
-                      {article.abstract}
-                    </p>
-                  </div>
-
-                  {/* Keywords */}
-                  <div className="mb-6">
-                    <h4 className="font-semibold text-[#212121] mb-2 text-sm">
-                      Keywords
-                    </h4>
-                    <div className="flex flex-wrap gap-2">
-                      {article.keywords.map((keyword, idx) => (
-                        <span
-                          key={idx}
-                          className="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm"
-                        >
-                          {keyword}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Metadata */}
-                  <div className="flex flex-wrap items-center justify-between gap-4 pt-6 border-t border-[#EAD3D9]">
-                    <div className="flex flex-wrap items-center gap-6 text-sm text-gray-600">
-                      <div className="flex items-center gap-2">
-                        <Calendar className="h-4 w-4" />
-                        <span>Published: {article.publishDate}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Eye className="h-4 w-4" />
-                        <span>{article.views} views</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Download className="h-4 w-4" />
-                        <span>{article.downloads} downloads</span>
-                      </div>
-                    </div>
-                    <div className="text-sm font-mono text-gray-600">
-                      DOI: {article.doi}
-                    </div>
-                  </div>
-
-                  {/* Action Buttons */}
-                  <div className="flex flex-wrap gap-3 mt-6">
-                    <Link
-                      href={`/articles/${article.id}`}
-                      className="inline-flex items-center gap-2 bg-[#7A0019] text-white px-6 py-2 rounded-lg hover:bg-[#5A0A1A] transition-colors font-semibold"
-                    >
-                      <BookOpen className="h-4 w-4" />
-                      Read Full Article
-                    </Link>
-                    <button className="inline-flex items-center gap-2 border-2 border-[#7A0019] text-[#7A0019] px-6 py-2 rounded-lg hover:bg-[#FFE9EE] transition-colors font-semibold">
-                      <FileText className="h-4 w-4" />
-                      PDF
-                    </button>
-                    <button className="inline-flex items-center gap-2 border-2 border-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors font-semibold">
-                      <Quote className="h-4 w-4" />
-                      Cite
-                    </button>
-                    <button className="inline-flex items-center gap-2 border-2 border-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-50 transition-colors font-semibold">
-                      <Share2 className="h-4 w-4" />
-                      Share
-                    </button>
+                  <div className="text-sm text-gray-600 ml-6">
+                    {article.affiliations.join(" • ")}
                   </div>
                 </div>
-              </article>
-            ))}
-          </div>
+                <div className="mb-4">
+                  <h4 className="font-semibold text-[#212121] mb-2">Abstract</h4>
+                  <p className="text-gray-700 leading-relaxed">
+                    {truncateAbstract(article.abstract, 20)}
+                  </p>
+                </div>
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
-
-      {/* Issue Information Section */}
       <section className="bg-[#FAF7F8] py-12 border-t-2 border-[#EAD3D9]">
         <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-8">
@@ -489,31 +392,25 @@ export default function CurrentIssuePage() {
                 <Mail className="h-6 w-6" />
                 Subscribe to Alerts
               </h3>
-              <p className="text-gray-700 mb-4">
-                Get notified when new issues are published
-              </p>
-              <div className="flex gap-2">
+              <p className="text-gray-700 mb-4">Get notified when new issues are published</p>
+              <div className="block md:flex gap-2">
                 <input
                   type="email"
                   placeholder="Enter your email"
-                  className="flex-1 px-4 py-2 border-2 border-[#EAD3D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7A0019]"
+                  className="flex-1 mb-2 w-full md:mb-0 px-4 py-2 border-2 border-[#EAD3D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7A0019]"
                 />
                 <button className="bg-[#7A0019] text-white px-6 py-2 rounded-lg hover:bg-[#5A0A1A] transition-colors font-semibold">
                   Subscribe
                 </button>
               </div>
             </div>
-
             <div className="bg-white border-2 border-[#EAD3D9] rounded-xl p-6">
-              <h3 className="text-xl font-bold text-[#7A0019] mb-4">
-                Citation Information
-              </h3>
+              <h3 className="text-xl font-bold text-[#7A0019] mb-4">Citation Information</h3>
               <p className="text-sm text-gray-700 mb-2">
                 <strong>Journal Title:</strong> UNIBEN Journal of Humanities
               </p>
               <p className="text-sm text-gray-700 mb-2">
-                <strong>Volume/Issue:</strong> {issueData.volume}(
-                {issueData.issue})
+                <strong>Volume/Issue:</strong> {issueData.volume}({issueData.issue})
               </p>
               <p className="text-sm text-gray-700 mb-2">
                 <strong>Year:</strong> {issueData.year}
@@ -523,7 +420,6 @@ export default function CurrentIssuePage() {
               </p>
             </div>
           </div>
-
           <div className="mt-8 text-center">
             <Link
               href="/archives"
@@ -535,9 +431,7 @@ export default function CurrentIssuePage() {
           </div>
         </div>
       </section>
-
-      {/* Footer */}
-      <Footer/>
+      <Footer />
     </div>
   );
 }

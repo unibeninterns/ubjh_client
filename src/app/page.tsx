@@ -192,9 +192,6 @@ export default function HumanitiesJournalHome() {
             {/* Article Card 1 */}
             <article className="bg-white border-2 border-[#EAD3D9] rounded-xl p-6 hover:shadow-xl hover:border-[#7A0019] transition-all group">
               <div className="flex gap-2 mb-4">
-                <span className="inline-flex items-center px-3 py-1 bg-[#FFE9EE] border border-[#E6B6C2] text-[#5A0A1A] rounded-full text-xs font-bold">
-                  RESEARCH ARTICLE
-                </span>
               </div>
               <h3 className="text-xl font-bold text-[#212121] mb-3 group-hover:text-[#7A0019] transition-colors font-serif">
                 Decolonizing Legal Education in West Africa: A Critical
@@ -208,28 +205,11 @@ export default function HumanitiesJournalHome() {
                 contemporary legal education across West African universities
                 and proposes context-driven pedagogical reforms...
               </p>
-              <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                <span>DOI: 10.1234/ubjh.2025.0001</span>
-                <span>Vol 1 • 2025</span>
-              </div>
-              <div className="flex gap-3">
-                <button className="flex items-center gap-2 px-4 py-2 bg-[#7A0019] text-white rounded-lg hover:bg-[#5A0A1A] transition-colors text-sm font-semibold">
-                  <FileText className="h-4 w-4" />
-                  PDF
-                </button>
-                <button className="flex items-center gap-2 px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-semibold">
-                  <Download className="h-4 w-4" />
-                  Cite
-                </button>
-              </div>
             </article>
 
             {/* Article Card 2 */}
             <article className="bg-white border-2 border-[#EAD3D9] rounded-xl p-6 hover:shadow-xl hover:border-[#7A0019] transition-all group">
               <div className="flex gap-2 mb-4">
-                <span className="inline-flex items-center px-3 py-1 bg-[#FFE9EE] border border-[#E6B6C2] text-[#5A0A1A] rounded-full text-xs font-bold">
-                  REVIEW ARTICLE
-                </span>
               </div>
               <h3 className="text-xl font-bold text-[#212121] mb-3 group-hover:text-[#7A0019] transition-colors font-serif">
                 Environmental Humanities and Climate Justice: Perspectives from
@@ -243,20 +223,6 @@ export default function HumanitiesJournalHome() {
                 the intersection of environmental degradation, cultural memory,
                 and climate justice advocacy in Nigeria&apos;s Niger Delta...
               </p>
-              <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
-                <span>DOI: 10.1234/ubjh.2025.0002</span>
-                <span>Vol 1 • 2025</span>
-              </div>
-              <div className="flex gap-3">
-                <button className="flex items-center gap-2 px-4 py-2 bg-[#7A0019] text-white rounded-lg hover:bg-[#5A0A1A] transition-colors text-sm font-semibold">
-                  <FileText className="h-4 w-4" />
-                  PDF
-                </button>
-                <button className="flex items-center gap-2 px-4 py-2 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-semibold">
-                  <Download className="h-4 w-4" />
-                  Cite
-                </button>
-              </div>
             </article>
           </div>
         </div>

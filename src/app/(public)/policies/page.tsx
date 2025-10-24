@@ -30,57 +30,58 @@ export default function PoliciesPage() {
       id: "open-access",
       title: "Open Access & Licensing",
       icon: Globe,
-      color: "green",
+      color: "#7A0019",
     },
     {
       id: "peer-review",
       title: "Peer Review",
       icon: Users,
-      color: "blue",
+      color: "#7A0019",
     },
     {
       id: "ethics",
       title: "Publication Ethics",
       icon: Shield,
-      color: "red",
+      color: "#7A0019",
     },
     {
       id: "data",
       title: "Data & Materials",
       icon: Database,
-      color: "purple",
+      color: "#7A0019",
     },
     {
       id: "copyright",
       title: "Copyright & Self-Archiving",
       icon: Lock,
-      color: "orange",
+      color: "#7A0019",
     },
     {
       id: "plagiarism",
       title: "Plagiarism & Similarity Screening",
       icon: AlertCircle,
-      color: "yellow",
+      color: "#7A0019",
     },
     {
       id: "apcs",
       title: "Article Processing Charges",
       icon: CheckCircle,
-      color: "green",
+      color: "#7A0019",
     },
     {
       id: "indexing",
       title: "Indexing & Persistent Identifiers",
       icon: BookOpen,
-      color: "indigo",
+      color: "#7A0019",
     },
     {
       id: "archiving",
       title: "Archiving & Preservation",
       icon: FileText,
-      color: "gray",
+      color: "#7A0019",
     },
   ];
+  
 
   return (
     <div className="min-h-screen bg-white">
@@ -195,7 +196,7 @@ export default function PoliciesPage() {
               id="open-access"
               className={`bg-white border-2 rounded-xl overflow-hidden transition-all ${
                 expandedSection === "open-access"
-                  ? "border-green-500"
+                  ? "border-[#7A0019]"
                   : "border-[#EAD3D9]"
               }`}
             >
@@ -204,8 +205,8 @@ export default function PoliciesPage() {
                 className="w-full flex items-center justify-between p-6 text-left hover:bg-[#FAF7F8] transition-colors"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                    <Globe className="h-6 w-6 text-green-600" />
+                  <div className="w-12 h-12 bg-[#FFE9EE] rounded-full flex items-center justify-center">
+                    <Globe className="h-6 w-6 text-[#7A0019]" />
                   </div>
                   <h2 className="text-2xl font-bold text-[#212121]">
                     Open Access & Licensing
@@ -227,7 +228,7 @@ export default function PoliciesPage() {
                     licence. No embargoes. Readers may read, share, and reuse with
                     attribution.
                   </p>
-                  <div className="bg-green-50 border-l-4 border-green-500 p-4 rounded-r-lg">
+                  <div className="bg-green-50 border-l-4 border-[#7A0019] p-4 rounded-r-lg">
                     <p className="text-sm text-gray-700">
                       <strong>Aligned with Plan S/open-access best practice:</strong>{" "}
                       We support the global movement toward immediate, unrestricted
@@ -252,7 +253,7 @@ export default function PoliciesPage() {
               id="peer-review"
               className={`bg-white border-2 rounded-xl overflow-hidden transition-all ${
                 expandedSection === "peer-review"
-                  ? "border-blue-500"
+                  ? "border-[#7A0019]"
                   : "border-[#EAD3D9]"
               }`}
             >
@@ -261,8 +262,8 @@ export default function PoliciesPage() {
                 className="w-full flex items-center justify-between p-6 text-left hover:bg-[#FAF7F8] transition-colors"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                    <Users className="h-6 w-6 text-blue-600" />
+                  <div className="w-12 h-12 bg-[#FFE9EE] rounded-full flex items-center justify-center">
+                    <Users className="h-6 w-6 text-[#7A0019]" />
                   </div>
                   <h2 className="text-2xl font-bold text-[#212121]">
                     Peer Review
@@ -288,8 +289,8 @@ export default function PoliciesPage() {
                     labelled.
                   </p>
                   <div className="grid md:grid-cols-2 gap-4">
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                      <h3 className="font-bold text-blue-900 mb-2">
+                    <div className="bg-[#FFE9EE] border border-blue-200 rounded-lg p-4">
+                      <h3 className="font-bold text-[#7A0019] mb-2">
                         Review Criteria
                       </h3>
                       <ul className="text-sm text-gray-700 space-y-1">
@@ -300,8 +301,8 @@ export default function PoliciesPage() {
                         <li>• Quality of sources/evidence</li>
                       </ul>
                     </div>
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                      <h3 className="font-bold text-blue-900 mb-2">
+                    <div className="bg-[#FFE9EE] border border-blue-200 rounded-lg p-4">
+                      <h3 className="font-bold text-[#7A0019] mb-2">
                         Possible Outcomes
                       </h3>
                       <ul className="text-sm text-gray-700 space-y-1">
@@ -321,7 +322,7 @@ export default function PoliciesPage() {
               id="ethics"
               className={`bg-white border-2 rounded-xl overflow-hidden transition-all ${
                 expandedSection === "ethics"
-                  ? "border-red-500"
+                  ? "border-[#7A0019]"
                   : "border-[#EAD3D9]"
               }`}
             >
@@ -330,8 +331,8 @@ export default function PoliciesPage() {
                 className="w-full flex items-center justify-between p-6 text-left hover:bg-[#FAF7F8] transition-colors"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                    <Shield className="h-6 w-6 text-red-600" />
+                  <div className="w-12 h-12 bg-[#FFE9EE] rounded-full flex items-center justify-center">
+                    <Shield className="h-6 w-6 text-[#7A0019]" />
                   </div>
                   <h2 className="text-2xl font-bold text-[#212121]">
                     Publication Ethics
@@ -361,7 +362,7 @@ export default function PoliciesPage() {
                     and corrections/retractions.
                   </p>
 
-                  <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-lg">
+                  <div className="bg-[#FFE9EE] border-l-4 border-[#7A0019] p-4 rounded-r-lg">
                     <h3 className="font-bold text-red-900 mb-2">
                       Research Misconduct
                     </h3>
@@ -419,7 +420,7 @@ export default function PoliciesPage() {
               id="data"
               className={`bg-white border-2 rounded-xl overflow-hidden transition-all ${
                 expandedSection === "data"
-                  ? "border-purple-500"
+                  ? "border-[#7A0019]"
                   : "border-[#EAD3D9]"
               }`}
             >
@@ -428,8 +429,8 @@ export default function PoliciesPage() {
                 className="w-full flex items-center justify-between p-6 text-left hover:bg-[#FAF7F8] transition-colors"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
-                    <Database className="h-6 w-6 text-purple-600" />
+                  <div className="w-12 h-12 bg-[#FFE9EE] rounded-full flex items-center justify-center">
+                    <Database className="h-6 w-6 text-[#7A0019]" />
                   </div>
                   <h2 className="text-2xl font-bold text-[#212121]">
                     Data & Materials
@@ -456,8 +457,8 @@ export default function PoliciesPage() {
                     identifier (e.g., Zenodo, Figshare, GitHub).
                   </p>
                   <div className="grid md:grid-cols-2 gap-4">
-                    <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                      <h3 className="font-bold text-purple-900 mb-2 flex items-center gap-2">
+                    <div className="bg-[#FFE9EE] border border-purple-200 rounded-lg p-4">
+                      <h3 className="font-bold text-[#7A0019] mb-2 flex items-center gap-2">
                         <CheckCircle className="h-5 w-5" />
                         Best Practice
                       </h3>
@@ -466,8 +467,8 @@ export default function PoliciesPage() {
                         to promote reproducibility and transparency.
                       </p>
                     </div>
-                    <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
-                      <h3 className="font-bold text-purple-900 mb-2 flex items-center gap-2">
+                    <div className="bg-[#FFE9EE] border border-purple-200 rounded-lg p-4">
+                      <h3 className="font-bold text-[#7A0019] mb-2 flex items-center gap-2">
                         <AlertCircle className="h-5 w-5" />
                         Restrictions
                       </h3>
@@ -486,7 +487,7 @@ export default function PoliciesPage() {
               id="copyright"
               className={`bg-white border-2 rounded-xl overflow-hidden transition-all ${
                 expandedSection === "copyright"
-                  ? "border-orange-500"
+                  ? "border-[#7A0019]"
                   : "border-[#EAD3D9]"
               }`}
             >
@@ -495,8 +496,8 @@ export default function PoliciesPage() {
                 className="w-full flex items-center justify-between p-6 text-left hover:bg-[#FAF7F8] transition-colors"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center">
-                    <Lock className="h-6 w-6 text-orange-600" />
+                  <div className="w-12 h-12 bg-[#FFE9EE] rounded-full flex items-center justify-center">
+                    <Lock className="h-6 w-6 text-[#7A0019]" />
                   </div>
                   <h2 className="text-2xl font-bold text-[#212121]">
                     Copyright & Self-Archiving
@@ -516,8 +517,8 @@ export default function PoliciesPage() {
                     Accepted Manuscripts (AAMs) is permitted, provided the final
                     published version is linked via its DOI.
                   </p>
-                  <div className="bg-orange-50 border-l-4 border-orange-500 p-4 rounded-r-lg">
-                    <h3 className="font-bold text-orange-900 mb-2">
+                  <div className="bg-[#FFE9EE] border-l-4 border-[#7A0019] p-4 rounded-r-lg">
+                    <h3 className="font-bold text-[#7A0019] mb-2">
                       Self-Archiving Rights
                     </h3>
                     <ul className="text-sm text-gray-700 space-y-2">
@@ -553,7 +554,7 @@ export default function PoliciesPage() {
               id="plagiarism"
               className={`bg-white border-2 rounded-xl overflow-hidden transition-all ${
                 expandedSection === "plagiarism"
-                  ? "border-yellow-500"
+                  ? "border-[#7A0019]"
                   : "border-[#EAD3D9]"
               }`}
             >
@@ -562,8 +563,8 @@ export default function PoliciesPage() {
                 className="w-full flex items-center justify-between p-6 text-left hover:bg-[#FAF7F8] transition-colors"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-yellow-100 rounded-full flex items-center justify-center">
-                    <AlertCircle className="h-6 w-6 text-yellow-600" />
+                  <div className="w-12 h-12 bg-[#FFE9EE] rounded-full flex items-center justify-center">
+                    <AlertCircle className="h-6 w-6 text-[#7A0019]" />
                   </div>
                   <h2 className="text-2xl font-bold text-[#212121]">
                     Plagiarism & Similarity Screening
@@ -583,7 +584,7 @@ export default function PoliciesPage() {
                     Similarity Check/Turnitin). Manuscripts with significant,
                     unexplained textual overlap may be rejected or retracted.
                   </p>
-                  <div className="bg-yellow-50 border-l-4 border-yellow-500 p-4 rounded-r-lg">
+                  <div className="bg-[#FFE9EE] border-l-4 border-[#7A0019] p-4 rounded-r-lg">
                     <h3 className="font-bold text-yellow-900 mb-2">
                       What Constitutes Plagiarism?
                     </h3>
@@ -608,7 +609,7 @@ export default function PoliciesPage() {
               id="apcs"
               className={`bg-white border-2 rounded-xl overflow-hidden transition-all ${
                 expandedSection === "apcs"
-                  ? "border-green-500"
+                  ? "border-[#7A0019]"
                   : "border-[#EAD3D9]"
               }`}
             >
@@ -617,8 +618,8 @@ export default function PoliciesPage() {
                 className="w-full flex items-center justify-between p-6 text-left hover:bg-[#FAF7F8] transition-colors"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
-                    <CheckCircle className="h-6 w-6 text-green-600" />
+                  <div className="w-12 h-12 bg-[#FFE9EE] rounded-full flex items-center justify-center">
+                    <CheckCircle className="h-6 w-6 text-[#7A0019]" />
                   </div>
                   <h2 className="text-2xl font-bold text-[#212121]">
                     Article Processing Charges (APCs) / Fees
@@ -663,7 +664,7 @@ export default function PoliciesPage() {
               id="indexing"
               className={`bg-white border-2 rounded-xl overflow-hidden transition-all ${
                 expandedSection === "indexing"
-                  ? "border-indigo-500"
+                  ? "border-[#7A0019]"
                   : "border-[#EAD3D9]"
               }`}
             >
@@ -672,8 +673,8 @@ export default function PoliciesPage() {
                 className="w-full flex items-center justify-between p-6 text-left hover:bg-[#FAF7F8] transition-colors"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-indigo-100 rounded-full flex items-center justify-center">
-                    <BookOpen className="h-6 w-6 text-indigo-600" />
+                  <div className="w-12 h-12 bg-[#FFE9EE] rounded-full flex items-center justify-center">
+                    <BookOpen className="h-6 w-6 text-[#7A0019]" />
                   </div>
                   <h2 className="text-2xl font-bold text-[#212121]">
                     Indexing & Persistent Identifiers
@@ -696,34 +697,34 @@ export default function PoliciesPage() {
                     once eligibility thresholds are met.
                   </p>
                   <div className="grid md:grid-cols-2 gap-4">
-                    <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
-                      <h3 className="font-bold text-indigo-900 mb-3 flex items-center gap-2">
+                    <div className="bg-[#FFE9EE] border border-indigo-200 rounded-lg p-4">
+                      <h3 className="font-bold text-[#7A0019] mb-3 flex items-center gap-2">
                         <CheckCircle className="h-5 w-5" />
                         Currently Indexed
                       </h3>
                       <ul className="text-sm text-gray-700 space-y-2">
                         <li className="flex items-center gap-2">
-                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                          <div className="w-2 h-2 bg-[#7A0019] rounded-full"></div>
                           Google Scholar
                         </li>
                         <li className="flex items-center gap-2">
-                          <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                          <div className="w-2 h-2 bg-[#7A0019] rounded-full"></div>
                           Crossref
                         </li>
                       </ul>
                     </div>
-                    <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-4">
-                      <h3 className="font-bold text-indigo-900 mb-3 flex items-center gap-2">
+                    <div className="bg-[#FFE9EE] border border-indigo-200 rounded-lg p-4">
+                      <h3 className="font-bold text-[#7A0019] mb-3 flex items-center gap-2">
                         <AlertCircle className="h-5 w-5" />
                         Application Pending
                       </h3>
                       <ul className="text-sm text-gray-700 space-y-2">
                         <li className="flex items-center gap-2">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          <div className="w-2 h-2 bg-[#7A0019] rounded-full"></div>
                           DOAJ
                         </li>
                         <li className="flex items-center gap-2">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+                          <div className="w-2 h-2 bg-[#7A0019] rounded-full"></div>
                           African Journals Online (AJOL)
                         </li>
                       </ul>
@@ -738,7 +739,7 @@ export default function PoliciesPage() {
               id="archiving"
               className={`bg-white border-2 rounded-xl overflow-hidden transition-all ${
                 expandedSection === "archiving"
-                  ? "border-gray-500"
+                  ? "border-[#7A0019]"
                   : "border-[#EAD3D9]"
               }`}
             >
@@ -747,8 +748,8 @@ export default function PoliciesPage() {
                 className="w-full flex items-center justify-between p-6 text-left hover:bg-[#FAF7F8] transition-colors"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
-                    <FileText className="h-6 w-6 text-gray-600" />
+                  <div className="w-12 h-12 bg-[#FFE9EE] rounded-full flex items-center justify-center">
+                    <FileText className="h-6 w-6 text-[#7A0019]" />
                   </div>
                   <h2 className="text-2xl font-bold text-[#212121]">
                     Archiving & Preservation

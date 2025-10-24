@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import Header from "@/components/Header"
 import Footer from "@/components/Footer";
+import Image from "next/image"
 
 export default function ForAuthorsPage() {
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
@@ -51,7 +52,7 @@ export default function ForAuthorsPage() {
     {
       question: "Do I need an ORCID iD?",
       answer:
-        "While not mandatory, we strongly recommend that all authors have an ORCID iD. It helps distinguish you from other researchers with similar names and makes your work more discoverable. You can register for free at orcid.org.",
+        "Yes it is mandatory, we require that all authors have an ORCID iD. It helps distinguish you from other researchers with similar names and makes your work more discoverable. You can register for free at orcid.org.",
     },
     {
       question: "What citation style should I use?",
@@ -66,6 +67,15 @@ export default function ForAuthorsPage() {
 
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-[#7A0019] to-[#5A0A1A] text-white py-16">
+         <div className="absolute inset-0 opacity-10">
+                          {/* Placeholder for subtle pattern/texture */}
+                          <Image
+                            src="/academic-pattern.png"
+                            alt=""
+                            fill
+                            className="object-cover"
+                          />
+                        </div>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
@@ -207,7 +217,7 @@ export default function ForAuthorsPage() {
                         Document Format
                       </h4>
                       <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
-                        <li>PDF format preferred (DOC/DOCX also accepted)</li>
+                        <li>PDF format only</li>
                         <li>
                           A4 paper size with 2.5cm (1 inch) margins on all sides
                         </li>
@@ -254,26 +264,28 @@ export default function ForAuthorsPage() {
                     </div>
 
                     <div className="bg-[#FFE9EE] border border-[#E6B6C2] rounded-lg p-4">
-                      <div className="flex items-start gap-3">
-                        <Download className="h-5 w-5 text-[#7A0019] flex-shrink-0 mt-0.5" />
-                        <div>
-                          <h4 className="font-semibold text-[#7A0019] mb-2">
-                            Download Manuscript Template
-                          </h4>
-                          <p className="text-gray-700 text-sm mb-3">
-                            Use our official template to ensure your manuscript
-                            meets all formatting requirements.
-                          </p>
-                          <Link
-                            href="/files/UBJH_Manuscript_Template.docx"
-                            className="inline-flex items-center gap-2 bg-[#7A0019] text-white px-4 py-2 rounded-lg hover:bg-[#5A0A1A] transition-colors text-sm font-semibold"
-                          >
-                            <Download className="h-4 w-4" />
-                            Download Template (DOCX)
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
+  <div className="flex items-start gap-3">
+    <Download className="h-5 w-5 text-[#7A0019] flex-shrink-0 mt-0.5" />
+    <div>
+      <h4 className="font-semibold text-[#7A0019] mb-2">
+        Download Manuscript Template
+      </h4>
+      <p className="text-gray-700 text-sm mb-3">
+        Use our official template to ensure your manuscript
+        meets all formatting requirements.
+      </p>
+      <a
+        href="/files/UNIBEN_Journal_Of_Humanities_Templates.docx"
+        download
+        className="inline-flex items-center gap-2 bg-[#7A0019] text-white px-4 py-2 rounded-lg hover:bg-[#5A0A1A] transition-colors text-sm font-semibold"
+      >
+        <Download className="h-4 w-4" />
+        Download Template (DOCX)
+      </a>
+    </div>
+  </div>
+</div>
+
                   </div>
                 </div>
               </div>
