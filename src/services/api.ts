@@ -413,7 +413,7 @@ export interface ReviewerDashboardData {
   statistics: {
     totalAssigned: number;
     completed: number;
-    pending: number;
+    inProgress: number;
     overdue: number;
   };
   assignedReviews: Array<{
@@ -1213,7 +1213,7 @@ export const manuscriptReviewerApi = {
   // Get reviewer assignments
   getReviewerAssignments: async (): Promise<ReviewerAssignmentsResponse> => {
     try {
-      const response = await api.get("/reviews/assignments");
+      const response = await api.get("/reviewsys/assignments");
       return response.data;
     } catch (error) {
       console.error("Error fetching reviewer assignments:", error);
@@ -1224,7 +1224,7 @@ export const manuscriptReviewerApi = {
   // Get reviewer statistics
   getReviewerStatistics: async (): Promise<ReviewerStatisticsResponse> => {
     try {
-      const response = await api.get("/reviews/statistics");
+      const response = await api.get("/reviewsys/statistics");
       return response.data;
     } catch (error) {
       console.error("Error fetching reviewer statistics:", error);
@@ -1235,7 +1235,7 @@ export const manuscriptReviewerApi = {
   // Get review by ID
   getReviewById: async (reviewId: string): Promise<ReviewByIdResponse> => {
     try {
-      const response = await api.get(`/reviews/${reviewId}`);
+      const response = await api.get(`/reviewsys/${reviewId}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching review with ID ${reviewId}:`, error);
@@ -1254,7 +1254,7 @@ export const manuscriptReviewerApi = {
   }> => {
     try {
       const response = await api.post(
-        `/reviews/${reviewId}/submit`,
+        `/reviewsys/${reviewId}/submit`,
         reviewData
       );
       return response.data;
@@ -1275,7 +1275,7 @@ export const manuscriptReviewerApi = {
   }> => {
     try {
       const response = await api.patch(
-        `/reviews/${reviewId}/save-progress`,
+        `/reviewsys/${reviewId}/save-progress`,
         progressData
       );
       return response.data;
