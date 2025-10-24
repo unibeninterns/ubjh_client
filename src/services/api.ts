@@ -472,6 +472,65 @@ export interface SaveReviewProgressRequest {
   reviewDecision?: string;
 }
 
+export interface AdminReviewAssignment {
+  _id: string;
+  manuscript: {
+    _id: string;
+    title: string;
+    status: string;
+    createdAt: string;
+  };
+  reviewType: "human" | "reconciliation";
+  status: "in_progress" | "completed" | "overdue";
+  dueDate: string;
+  completedAt?: string;
+  totalScore: number;
+}
+
+export interface AdminReviewStatistics {
+  totalAssigned: number;
+  completed: number;
+  pending: number;
+  overdue: number;
+}
+
+export interface AdminReviewAssignmentsResponse {
+  success: boolean;
+  count: number;
+  data: AdminReviewAssignment[];
+}
+
+export interface AdminReviewStatisticsResponse {
+  success: boolean;
+  data: {
+    statistics: AdminReviewStatistics;
+    recentActivity: AdminReviewAssignment[];
+  };
+}
+
+export interface AdminReviewByIdResponse {
+  success: boolean;
+  data: ManuscriptReviewWithDetails;
+}
+
+export interface AdminSubmitReviewRequest {
+  scores: ReviewScores;
+  comments: {
+    commentsForAuthor?: string;
+    confidentialCommentsToEditor?: string;
+  };
+  reviewDecision: string;
+}
+
+export interface AdminSaveReviewProgressRequest {
+  scores?: Partial<ReviewScores>;
+  comments?: {
+    commentsForAuthor?: string;
+    confidentialCommentsToEditor?: string;
+  };
+  reviewDecision?: string;
+}
+
 // Create API instance
 const createApi = (baseURL: string): AxiosInstance => {
   const api = axios.create({
@@ -1281,6 +1340,86 @@ export const manuscriptReviewerApi = {
       return response.data;
     } catch (error) {
       console.error("Error saving review progress:", error);
+      throw error;
+    }
+  },
+};
+
+// Admin Review API methods
+export const adminReviewApi = {
+  // Get admin review assignments
+  getAdminAssignments: async (): Promise<AdminReviewAssignmentsResponse> => {
+    try {
+      const response = await api.get("/admin/reviews/reviews");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching admin assignments:", error);
+      throw error;
+    }
+  },
+
+  // Get admin review statistics
+  getAdminStatistics: async (): Promise<AdminReviewStatisticsResponse> => {
+    try {
+      const response = await api.get("/admin/reviews/reviews/statistics");
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching admin statistics:", error);
+      throw error;
+    }
+  },
+
+  // Get admin review by ID
+  getAdminReviewById: async (
+    reviewId: string
+  ): Promise<AdminReviewByIdResponse> => {
+    try {
+      const response = await api.get(`/admin/reviews/reviews/${reviewId}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching admin review with ID ${reviewId}:`, error);
+      throw error;
+    }
+  },
+
+  // Submit admin review
+  submitAdminReview: async (
+    reviewId: string,
+    reviewData: AdminSubmitReviewRequest
+  ): Promise<{
+    success: boolean;
+    message: string;
+    data: ManuscriptReviewWithDetails;
+  }> => {
+    try {
+      const response = await api.post(
+        `/admin/reviews/reviews/${reviewId}/submit`,
+        reviewData
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error submitting admin review:", error);
+      throw error;
+    }
+  },
+
+  // Save admin review progress
+  saveAdminReviewProgress: async (
+    reviewId: string,
+    progressData: AdminSaveReviewProgressRequest
+  ): Promise<{
+    success: boolean;
+    message: string;
+    data: ManuscriptReviewWithDetails;
+  }> => {
+    try {
+      const response = await api.patch(
+        `/admin/reviews/reviews/${reviewId}/save`,
+        progressData
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error saving admin review progress:", error);
       throw error;
     }
   },

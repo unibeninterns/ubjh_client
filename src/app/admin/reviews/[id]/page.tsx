@@ -159,6 +159,45 @@ export default function ManuscriptReviewDetailsPage() {
     }
   };
 
+  const getDecisionBadge = (decision: string) => {
+    switch (decision) {
+      case 'publishable':
+        return (
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-green-100 text-green-800">
+            <CheckCircle size={14} />
+            Publishable
+          </span>
+        );
+      case 'not_publishable':
+        return (
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-red-100 text-red-800">
+            <AlertTriangle size={14} />
+            Not Publishable
+          </span>
+        );
+      case 'publishable_with_minor_revision':
+        return (
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-yellow-100 text-yellow-800">
+            <AlertTriangle size={14} />
+            Minor Revision
+          </span>
+        );
+      case 'publishable_with_major_revision':
+        return (
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-orange-100 text-orange-800">
+            <AlertTriangle size={14} />
+            Major Revision
+          </span>
+        );
+      default:
+        return (
+          <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs sm:text-sm font-medium bg-gray-100 text-gray-800">
+            {decision}
+          </span>
+        );
+    }
+  };
+
   const renderScoreBreakdown = (review: ReviewComponentProps) => {
     const scores = Object.entries(review.scores || {});
     if (scores.length === 0) {
@@ -198,6 +237,14 @@ export default function ManuscriptReviewDetailsPage() {
             </span>
           </div>
         </div>
+        {review.reviewDecision && (
+          <div className="pt-3 border-t">
+            <div className="flex justify-between items-center">
+              <span className="text-sm font-semibold text-gray-900">Decision</span>
+              {getDecisionBadge(review.reviewDecision)}
+            </div>
+          </div>
+        )}
       </div>
     );
   };
