@@ -102,9 +102,12 @@ export interface Manuscript {
     email: string;
   }>;
   pdfFile: string;
+  revisedPdfFile?: string;
   createdAt: string;
   updatedAt: string;
   authorRole?: string;
+  originalReviewer?: any;
+  revisionType?: string;
   assignedReviewerCount?: number; // Added assignedReviewerCount
 }
 
@@ -531,6 +534,13 @@ export interface AdminSaveReviewProgressRequest {
   reviewDecision?: string;
 }
 
+export interface RevisedManuscript extends Manuscript {
+  revisedPdfFile?: string;
+  revisionType?: "minor" | "major";
+  originalReviewer?: string;
+  revisedFrom?: string;
+}
+
 // Create API instance
 const createApi = (baseURL: string): AxiosInstance => {
   const api = axios.create({
@@ -946,6 +956,54 @@ export const manuscriptAdminApi = {
       throw error;
     }
   },
+
+  // Get manuscripts pending decision (reviewed manuscripts)
+  getManuscriptsForDecision: async (params: {
+    page?: number;
+    limit?: number;
+  }): Promise<ManuscriptListResponse> => {
+    try {
+      const response = await api.get("/admin/decisions", { params });
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch manuscripts for decision:", error);
+      throw error;
+    }
+  },
+
+  // Update manuscript status (final decision)
+  updateManuscriptStatus: async (
+    manuscriptId: string,
+    data: { status: string; feedbackComments: string }
+  ): Promise<ManuscriptDetailResponse> => {
+    try {
+      const response = await api.put(
+        `/admin/decisions/${manuscriptId}/status`,
+        data
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to update manuscript status:", error);
+      throw error;
+    }
+  },
+
+  getEligibleReviewersForRevised: async (
+    manuscriptId: string
+  ): Promise<EligibleReviewersResponse> => {
+    try {
+      const response = await api.get(
+        `/admin/reassign-review/eligible-reviewers-revised/${manuscriptId}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error(
+        "Failed to fetch eligible reviewers for revised manuscript:",
+        error
+      );
+      throw error;
+    }
+  },
 };
 
 // Get all reviewer invitations
@@ -1343,6 +1401,51 @@ export const manuscriptReviewerApi = {
       throw error;
     }
   },
+
+  getReviewWithHistory: async (
+    reviewId: string
+  ): Promise<{
+    success: boolean;
+    data: {
+      review: ManuscriptReviewWithDetails;
+      previousReview?: any;
+      isRevised: boolean;
+      revisionType?: string;
+    };
+  }> => {
+    try {
+      const response = await api.get(`/reviewsys/${reviewId}/with-history`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching review with history:", error);
+      throw error;
+    }
+  },
+
+  getReconciliationData: async (
+    reviewId: string
+  ): Promise<{
+    success: boolean;
+    data: {
+      review: ManuscriptReviewWithDetails;
+      conflictingReviews: Array<{
+        reviewerName: string;
+        reviewDecision: string;
+        totalScore: number;
+        completedAt: string;
+      }>;
+    };
+  }> => {
+    try {
+      const response = await api.get(
+        `/reviewsys/${reviewId}/reconciliation-data`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching reconciliation data:", error);
+      throw error;
+    }
+  },
 };
 
 // Admin Review API methods
@@ -1350,7 +1453,7 @@ export const adminReviewApi = {
   // Get admin review assignments
   getAdminAssignments: async (): Promise<AdminReviewAssignmentsResponse> => {
     try {
-      const response = await api.get("/admin/reviews/reviews");
+      const response = await api.get("/admin/reviews");
       return response.data;
     } catch (error) {
       console.error("Error fetching admin assignments:", error);
@@ -1361,7 +1464,7 @@ export const adminReviewApi = {
   // Get admin review statistics
   getAdminStatistics: async (): Promise<AdminReviewStatisticsResponse> => {
     try {
-      const response = await api.get("/admin/reviews/reviews/statistics");
+      const response = await api.get("/admin/reviews/statistics");
       return response.data;
     } catch (error) {
       console.error("Error fetching admin statistics:", error);
@@ -1374,7 +1477,7 @@ export const adminReviewApi = {
     reviewId: string
   ): Promise<AdminReviewByIdResponse> => {
     try {
-      const response = await api.get(`/admin/reviews/reviews/${reviewId}`);
+      const response = await api.get(`/admin/reviews/${reviewId}`);
       return response.data;
     } catch (error) {
       console.error(`Error fetching admin review with ID ${reviewId}:`, error);
@@ -1393,7 +1496,7 @@ export const adminReviewApi = {
   }> => {
     try {
       const response = await api.post(
-        `/admin/reviews/reviews/${reviewId}/submit`,
+        `/admin/reviews/${reviewId}/submit`,
         reviewData
       );
       return response.data;
@@ -1414,12 +1517,57 @@ export const adminReviewApi = {
   }> => {
     try {
       const response = await api.patch(
-        `/admin/reviews/reviews/${reviewId}/save`,
+        `/admin/reviews/${reviewId}/save`,
         progressData
       );
       return response.data;
     } catch (error) {
       console.error("Error saving admin review progress:", error);
+      throw error;
+    }
+  },
+
+  getReviewWithHistory: async (
+    reviewId: string
+  ): Promise<{
+    success: boolean;
+    data: {
+      review: ManuscriptReviewWithDetails;
+      previousReview?: any;
+      isRevised: boolean;
+      revisionType?: string;
+    };
+  }> => {
+    try {
+      const response = await api.get(`/admin/reviews/${reviewId}/with-history`);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching review with history:", error);
+      throw error;
+    }
+  },
+
+  getReconciliationData: async (
+    reviewId: string
+  ): Promise<{
+    success: boolean;
+    data: {
+      review: ManuscriptReviewWithDetails;
+      conflictingReviews: Array<{
+        reviewerName: string;
+        reviewDecision: string;
+        totalScore: number;
+        completedAt: string;
+      }>;
+    };
+  }> => {
+    try {
+      const response = await api.get(
+        `/admin/reviews/${reviewId}/reconciliation-data`
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching reconciliation data:", error);
       throw error;
     }
   },

@@ -9,6 +9,7 @@ import { ReviewerLayout } from '@/components/reviewers/ReviewerLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { manuscriptReviewerApi } from '@/services/api';
 import type { ReviewScores } from '@/services/api';
+import ManuscriptDiscrepancyAlert from '@/components/reviewers/DiscrepancyAlert';
 
 interface ReviewCriteria {
   id: keyof ReviewScores;
@@ -26,6 +27,8 @@ interface ManuscriptReviewDetails {
     abstract: string;
     keywords: string[];
     pdfFile?: string;
+    revisedPdfFile?: string;
+    revisionType?: 'minor' | 'major';
     status: string;
   };
   reviewType: 'human' | 'reconciliation';
@@ -53,6 +56,9 @@ const ManuscriptReviewForm: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [previousReview, setPreviousReview] = useState<any>(null);
+const [isRevised, setIsRevised] = useState(false);
+const [conflictingReviews, setConflictingReviews] = useState<any[]>([]);
 
   const [reviewCriteria, setReviewCriteria] = useState<ReviewCriteria[]>([
     {
@@ -125,6 +131,25 @@ const ManuscriptReviewForm: React.FC = () => {
         if (response.success) {
           const review = response.data as ManuscriptReviewDetails;
           setReviewData(review);
+
+          // Check if reconciliation review
+        if (review.reviewType === 'reconciliation') {
+          const reconData = await manuscriptReviewerApi.getReconciliationData(reviewId);
+          if (reconData.success) {
+            setConflictingReviews(reconData.data.conflictingReviews);
+          }
+        }
+        
+        // Check if revised manuscript
+        if (review.manuscript.revisedPdfFile) {
+          setIsRevised(true);
+          // Fetch previous review if exists
+          const historyResponse = await manuscriptReviewerApi.getReviewWithHistory(reviewId);
+          if (historyResponse.success && historyResponse.data.previousReview) {
+            setPreviousReview(historyResponse.data.previousReview);
+          }
+        }
+
           setCommentsForAuthor(review.comments?.commentsForAuthor || '');
           setConfidentialComments(review.comments?.confidentialCommentsToEditor || '');
           setReviewDecision(review.reviewDecision || '');
@@ -383,6 +408,80 @@ const ManuscriptReviewForm: React.FC = () => {
               <p className="text-red-600 text-sm">{error}</p>
             </div>
           )}
+
+          {/* Reconciliation Alert */}
+{isReconciliation && conflictingReviews.length > 0 && (
+  <ManuscriptDiscrepancyAlert conflictingReviews={conflictingReviews} />
+)}
+
+{/* Revised Manuscript Notice */}
+{isRevised && (
+  <div className="bg-purple-50 border border-purple-200 rounded-lg shadow-md p-4 sm:p-6 mb-6">
+    <div className="flex items-start gap-3">
+      <div className="flex-shrink-0">
+        <FileText className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
+      </div>
+      <div className="flex-1">
+        <h2 className="text-base sm:text-lg font-bold text-purple-800 mb-2">
+          Revised Manuscript Submission
+        </h2>
+        <p className="text-sm text-purple-700 mb-3">
+          This is a revised version of a manuscript you previously reviewed. 
+          {reviewData.manuscript.revisionType === 'minor' && ' The author has addressed minor revision requests.'}
+          {reviewData.manuscript.revisionType === 'major' && ' The author has addressed major revision requests.'}
+        </p>
+        
+        {previousReview && (
+          <div className="bg-white rounded-lg p-4 mb-3">
+            <h3 className="font-semibold text-purple-800 mb-2 text-sm">Your Previous Review:</h3>
+            <div className="space-y-2 text-sm">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Score:</span>
+                <span className="font-bold text-purple-700">{previousReview.totalScore}/100</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Decision:</span>
+                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                  previousReview.reviewDecision === 'publishable' ? 'bg-green-100 text-green-800' :
+                  previousReview.reviewDecision === 'publishable_with_minor_revision' ? 'bg-yellow-100 text-yellow-800' :
+                  previousReview.reviewDecision === 'publishable_with_major_revision' ? 'bg-orange-100 text-orange-800' :
+                  'bg-red-100 text-red-800'
+                }`}>
+                  {previousReview.reviewDecision?.replace(/_/g, ' ').toUpperCase()}
+                </span>
+              </div>
+              <div className="mt-2 pt-2 border-t">
+                <span className="text-gray-600 block mb-1">Your Comments:</span>
+                <p className="text-gray-700 text-xs bg-gray-50 p-2 rounded max-h-32 overflow-y-auto">
+                  {previousReview.comments?.commentsForAuthor || 'No comments available'}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="flex flex-col sm:flex-row gap-2">
+          {reviewData.manuscript.revisedPdfFile && (
+            <button
+              onClick={() => window.open(reviewData.manuscript.revisedPdfFile, '_blank')}
+              className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 text-sm"
+            >
+              <FileText className="h-4 w-4 mr-2" />
+              View Revised PDF
+            </button>
+          )}
+          <button
+            onClick={() => window.open(reviewData.manuscript.pdfFile, '_blank')}
+            className="flex-1 inline-flex items-center justify-center px-4 py-2 bg-white border border-purple-300 text-purple-700 rounded-lg hover:bg-purple-50 text-sm"
+          >
+            <FileText className="h-4 w-4 mr-2" />
+            View Original PDF
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
 
           {/* Manuscript Details */}
           <div className="bg-white rounded-lg shadow-md p-4 md:p-6 mb-6">

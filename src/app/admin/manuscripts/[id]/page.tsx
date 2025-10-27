@@ -274,6 +274,50 @@ export default function ManuscriptDetailPage() {
                       </div>
                     </div>
                   )}
+
+{manuscript.revisedPdfFile && (
+  <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6 mb-6">
+    <h2 className="text-lg font-semibold text-gray-900 mb-4">Revision Information</h2>
+    
+    <div className="space-y-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 bg-purple-50 rounded-lg">
+        <div>
+          <p className="text-sm font-medium text-purple-900">Revised Submission</p>
+          <p className="text-xs text-purple-700 mt-1">
+            {manuscript.revisionType === 'minor' ? 'Minor Revision' : 'Major Revision'}
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button
+            onClick={() => window.open(manuscript.revisedPdfFile, '_blank')}
+            size="sm"
+            className="bg-purple-600 hover:bg-purple-700"
+          >
+            <FileText className="h-4 w-4 mr-2" />
+            View Revised PDF
+          </Button>
+          <Button
+            onClick={() => window.open(manuscript.pdfFile, '_blank')}
+            size="sm"
+            variant="outline"
+          >
+            <FileText className="h-4 w-4 mr-2" />
+            View Original
+          </Button>
+        </div>
+      </div>
+
+      {manuscript.originalReviewer && (
+        <div className="p-4 bg-blue-50 rounded-lg">
+          <p className="text-sm text-blue-900">
+            <strong>Assignment:</strong> This major revision has been automatically assigned 
+            to the original reviewer who recommended the revision.
+          </p>
+        </div>
+      )}
+    </div>
+  </div>
+)}
                   
                   {/* Timeline Information */}
                   <div className="mb-8">
