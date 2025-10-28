@@ -9,8 +9,15 @@ import {
   XCircle, 
   RefreshCw,
   FileText,
-  Loader2
+  Loader2,
+  MoreVertical
 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { manuscriptAdminApi, type Manuscript } from '@/services/api';
 import { useAuth } from '@/contexts/AuthContext';
 import { toast } from 'sonner';
@@ -125,9 +132,6 @@ export default function DecisionsPage() {
                   Manuscript
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                  Submitter
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                   Status
                 </th>
                 <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">
@@ -160,16 +164,20 @@ export default function DecisionsPage() {
                       )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{manuscript.submitter.name}</div>
-                      <div className="text-sm text-gray-500">{manuscript.submitter.email}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
                       <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
                         Ready for Decision
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                    <td className="px-6 py-4 text-right text-sm font-medium">
                       <div className="flex justify-end gap-2">
+                        <Button
+                          size="sm"
+                          onClick={() => router.push(`/admin/decisions/${manuscript._id}`)}
+                          variant="outline"
+                        >
+                          <Eye className="h-4 w-4 mr-1" />
+                          View
+                        </Button>
                         <Button
                           size="sm"
                           onClick={() => handleDecisionClick(manuscript, 'approved')}
@@ -178,22 +186,24 @@ export default function DecisionsPage() {
                           <CheckCircle className="h-4 w-4 mr-1" />
                           Approve
                         </Button>
-                        <Button
-                          size="sm"
-                          onClick={() => handleDecisionClick(manuscript, 'rejected')}
-                          variant="outline"
-                          className="border-red-200 text-red-700 hover:bg-red-50"
-                        >
-                          <XCircle className="h-4 w-4 mr-1" />
-                          Reject
-                        </Button>
-                        <Button
-                          size="sm"
-                          onClick={() => router.push(`/admin/manuscripts/${manuscript._id}`)}
-                          variant="outline"
-                        >
-                          <Eye className="h-4 w-4" />
-                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button size="sm" variant="outline" className="px-2">
+                              <MoreVertical className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            <DropdownMenuItem onClick={() => handleDecisionClick(manuscript, 'minor_revision')}>
+                              Minor Revision
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDecisionClick(manuscript, 'major_revision')}>
+                              Major Revision
+                            </DropdownMenuItem>
+                            <DropdownMenuItem onClick={() => handleDecisionClick(manuscript, 'rejected')}>
+                              Reject
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
                       </div>
                     </td>
                   </tr>
@@ -227,10 +237,6 @@ export default function DecisionsPage() {
                       </span>
                     )}
                   </div>
-                  <div className="text-sm">
-                    <p className="text-gray-900 font-medium">{manuscript.submitter.name}</p>
-                    <p className="text-gray-500 text-xs">{manuscript.submitter.email}</p>
-                  </div>
                   <div className="flex gap-2 pt-2 border-t">
                     <Button
                       size="sm"
@@ -249,6 +255,24 @@ export default function DecisionsPage() {
                       <XCircle className="h-4 w-4 mr-1" />
                       Reject
                     </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button size="sm" variant="outline" className="px-2">
+                          <MoreVertical className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem onClick={() => handleDecisionClick(manuscript, 'minor_revision')}>
+                          Minor Revision
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleDecisionClick(manuscript, 'major_revision')}>
+                          Major Revision
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => router.push(`/admin/decisions/${manuscript._id}`)}>
+                          View Details
+                           </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 </div>
               </div>
@@ -327,7 +351,7 @@ export default function DecisionsPage() {
                   onChange={(e) => setFeedback(e.target.value)}
                   rows={6}
                   className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#7A0019] focus:border-transparent"
-                  placeholder="Provide detailed feedback for the author..."
+                  placeholder="This is the '𝗖𝗼𝗺𝗺𝗲𝗻𝘁 𝗙𝗿𝗼𝗺 𝗔𝘂𝘁𝗵𝗼𝗿' that the author will recieve as feedback in his mail and dashboard, so you should make a detailed and constructive comment using all the '𝗖𝗼𝗺𝗺𝗲𝗻𝘁𝘀 𝗙𝗼𝗿 𝗔𝘂𝘁𝗵𝗼𝗿' review comments made by all the reviewers organized into one.  If the decision is a '𝗿𝗲𝗾𝘂𝗲𝘀𝘁 𝗳𝗼𝗿 𝗺𝗶𝗻𝗼𝗿' or '𝗺𝗮𝗷𝗼𝗿 𝗿𝗲𝘃𝗶𝘀𝗶𝗼𝗻' then you should use/copy the '𝗖𝗼𝗺𝗺𝗲𝗻𝘁 𝗙𝗼𝗿 𝗔𝘂𝘁𝗵𝗼𝗿' review comment of the reviewer who gave the review decision you are following."
                 />
               </div>
 

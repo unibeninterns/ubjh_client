@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Eye, Clock, AlertCircle, Save, Send, FileText, Award } from 'lucide-react';
+import { ArrowLeft, Eye, Clock, AlertCircle, Save, Send, FileText, Award } from 'lucide-react';
 import { toast, Toaster } from "sonner";
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { useAuth } from '@/contexts/AuthContext';
@@ -363,6 +363,10 @@ const [conflictingReviews, setConflictingReviews] = useState<any[]>([]);
       <Toaster />
       <div className="min-h-screen bg-gray-50 p-4 md:p-6">
         <div className="max-w-6xl mx-auto">
+            <Link href="/admin/assignments" className="inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 mb-4">
+                <ArrowLeft className="w-4 h-4" />
+                Back to Assignments
+            </Link>
           {/* Header */}
           <div className="bg-white rounded-lg shadow-md p-4 md:p-6 mb-6">
             <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">

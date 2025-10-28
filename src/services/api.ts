@@ -1004,6 +1004,23 @@ export const manuscriptAdminApi = {
       throw error;
     }
   },
+
+  getReassignEligibleReviewers: async (
+    manuscriptId: string
+  ): Promise<EligibleReviewersResponse> => {
+    try {
+      const response = await api.get(
+        `/admin/reassign-review/eligible-reviewers/${manuscriptId}`
+      );
+      return response.data;
+    } catch (error) {
+      console.error(
+        "Failed to fetch eligible reviewers for revised manuscript:",
+        error
+      );
+      throw error;
+    }
+  },
 };
 
 // Get all reviewer invitations

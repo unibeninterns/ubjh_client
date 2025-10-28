@@ -266,6 +266,11 @@ function AdminManuscriptsPage() {
     setReassignReviewerSuccess(false);
     setExistingReviewsForReassignment([]);
     setSelectedReviewToReassign(null);
+
+    if (manuscript.revisedPdfFile) {
+    toast.info('For revised manuscripts, only the admin or original reviewer can be assigned');
+  }
+  
     setShowReassignReviewerModal(true);
     loadExistingReviewsForReassignment(manuscript._id);
   };
@@ -286,7 +291,14 @@ function AdminManuscriptsPage() {
   const loadEligibleReviewersForReassignment = async (manuscriptId: string) => {
     try {
       setReassignReviewerLoading(true);
-      const response = await manuscriptAdminApi.getEligibleReviewers(manuscriptId);
+      
+      let response;
+      if (currentManuscriptForReassignment?.revisedPdfFile) {
+        response = await manuscriptAdminApi.getEligibleReviewersForRevised(manuscriptId);
+      } else {
+        response = await manuscriptAdminApi.getReassignEligibleReviewers(manuscriptId);
+      }
+      
       setEligibleReviewersForReassignment(response.data || []);
     } catch (err) {
       console.error('Failed to load eligible reviewers for reassignment:', err);
@@ -532,6 +544,11 @@ function AdminManuscriptsPage() {
                             )}
                           </div>
                         </th>
+                        <th 
+                        scope="col"
+                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
+  Type
+</th>
                         <th
                           scope="col"
                           className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
@@ -584,6 +601,20 @@ function AdminManuscriptsPage() {
                               </span>
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+  <div className="flex flex-col gap-1">
+    {manuscript.revisedPdfFile && (
+      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+        Revised
+      </span>
+    )}
+    {manuscript.revisionType && (
+      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+        {manuscript.revisionType === 'minor' ? 'Minor Rev' : 'Major Rev'}
+      </span>
+    )}
+  </div>
+</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                               {formatDate(manuscript.createdAt)}
                             </td>
                             <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -627,6 +658,12 @@ function AdminManuscriptsPage() {
                                       </DropdownMenuItem>
                                     );
                                   })()}
+
+                                  {manuscript.revisedPdfFile && manuscript.status === 'under_review' && (
+  <DropdownMenuItem onSelect={() => handleReassignReviewerClick(manuscript)}>
+    <RefreshCw className="h-4 w-4 mr-2" /> Reassign Revised Review
+  </DropdownMenuItem>
+)}
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             </td>
@@ -959,6 +996,14 @@ function AdminManuscriptsPage() {
                         <p className="text-gray-600 text-sm leading-relaxed">
                           Browse and select from a list of eligible reviewers to manually assign the review.
                         </p>
+                        {currentManuscriptForReassignment?.revisedPdfFile && (
+  <div className="mb-4 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+    <p className="text-sm text-purple-800">
+      <strong>Revised Manuscript:</strong> This is a {currentManuscriptForReassignment.revisionType} revision.
+      Only the administrator or the original reviewer can review this submission.
+    </p>
+  </div>
+)}
                       </div>
                     </div>
                   </div>
