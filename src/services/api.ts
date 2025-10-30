@@ -541,6 +541,83 @@ export interface RevisedManuscript extends Manuscript {
   revisedFrom?: string;
 }
 
+export interface Volume {
+  _id: string;
+  volumeNumber: number;
+  year: number;
+  coverImage?: string;
+  description?: string;
+  publishDate: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Issue {
+  _id: string;
+  volume: string | Volume;
+  issueNumber: number;
+  publishDate: string;
+  description?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface PublishedArticle {
+  _id: string;
+  title: string;
+  abstract: string;
+  keywords: string[];
+  pdfFile: string;
+  author: any;
+  coAuthors: any[];
+  manuscriptId?: string;
+  publishDate: string;
+  doi?: string;
+  volume: Volume;
+  issue: Issue;
+  articleType: string;
+  pages?: { start: number; end: number };
+  views: { count: number; viewers: any[] };
+  downloads: { count: number; downloaders: any[] };
+  citationCount: number;
+  license: string;
+  copyrightHolder: string;
+  isPublished: boolean;
+  publishedAt: string;
+  zenodoDepositId?: string;
+  zenodoRecordId?: string;
+  indexingStatus: {
+    googleScholar: boolean;
+    base: boolean;
+    core: boolean;
+    internetArchive: boolean;
+  };
+}
+
+export interface EmailSubscriber {
+  _id: string;
+  email: string;
+  isActive: boolean;
+  subscribedAt: string;
+  lastEmailSent?: string;
+}
+
+export interface FailedJob {
+  _id: string;
+  jobType: string;
+  articleId: string;
+  errorMessage: string;
+  errorStack?: string;
+  attemptCount: number;
+  lastAttemptAt: string;
+  data?: any;
+  resolved: boolean;
+  resolvedAt?: string;
+  createdAt: string;
+}
+
 // Create API instance
 const createApi = (baseURL: string): AxiosInstance => {
   const api = axios.create({
@@ -1587,6 +1664,332 @@ export const adminReviewApi = {
       console.error("Error fetching reconciliation data:", error);
       throw error;
     }
+  },
+};
+
+// ==================== VOLUME API ====================
+export const volumeApi = {
+  // Create volume
+  createVolume: async (formData: FormData) => {
+    const response = await api.post("/publication/volumes", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return response.data;
+  },
+
+  // Get all volumes
+  getVolumes: async (params?: {
+    page?: number;
+    limit?: number;
+    isActive?: boolean;
+  }) => {
+    const response = await api.get("/publication/volumes", { params });
+    return response.data;
+  },
+
+  // Get public volumes
+  getPublicVolumes: async (params?: { page?: number; limit?: number }) => {
+    const response = await api.get("/publication/public/volumes", { params });
+    return response.data;
+  },
+
+  // Get volume by ID
+  getVolumeById: async (id: string) => {
+    const response = await api.get(`/publication/volumes/${id}`);
+    return response.data;
+  },
+
+  // Update volume
+  updateVolume: async (id: string, formData: FormData) => {
+    const response = await api.put(`/publication/volumes/${id}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return response.data;
+  },
+
+  // Delete volume
+  deleteVolume: async (id: string) => {
+    const response = await api.delete(`/publication/volumes/${id}`);
+    return response.data;
+  },
+};
+
+// ==================== ISSUE API ====================
+export const issueApi = {
+  // Create issue
+  createIssue: async (data: {
+    volume: string;
+    issueNumber: number;
+    description?: string;
+    publishDate?: string;
+  }) => {
+    const response = await api.post("/publication/issues", data);
+    return response.data;
+  },
+
+  // Get all issues
+  getIssues: async (params?: {
+    page?: number;
+    limit?: number;
+    volume?: string;
+    isActive?: boolean;
+  }) => {
+    const response = await api.get("/publication/issues", { params });
+    return response.data;
+  },
+
+  // Get public issues
+  getPublicIssues: async (params?: {
+    page?: number;
+    limit?: number;
+    volume?: string;
+  }) => {
+    const response = await api.get("/publication/public/issues", { params });
+    return response.data;
+  },
+
+  // Get issue by ID
+  getIssueById: async (id: string) => {
+    const response = await api.get(`/publication/issues/${id}`);
+    return response.data;
+  },
+
+  // Get issues by volume
+  getIssuesByVolume: async (volumeId: string) => {
+    const response = await api.get(`/publication/volumes/${volumeId}/issues`);
+    return response.data;
+  },
+
+  // Update issue
+  updateIssue: async (
+    id: string,
+    data: {
+      issueNumber?: number;
+      description?: string;
+      publishDate?: string;
+      isActive?: boolean;
+    }
+  ) => {
+    const response = await api.put(`/publication/issues/${id}`, data);
+    return response.data;
+  },
+
+  // Delete issue
+  deleteIssue: async (id: string) => {
+    const response = await api.delete(`/publication/issues/${id}`);
+    return response.data;
+  },
+};
+
+// ==================== PUBLICATION API ====================
+export const publicationApi = {
+  // Get manuscripts ready for publication
+  getPendingPublications: async (params?: {
+    page?: number;
+    limit?: number;
+  }) => {
+    const response = await api.get("/publication/publications/pending", {
+      params,
+    });
+    return response.data;
+  },
+
+  // Publish an article
+  publishArticle: async (
+    articleId: string,
+    data: {
+      volumeId: string;
+      issueId: string;
+      articleType: string;
+      pages?: { start: number; end: number };
+      publishDate?: string;
+      customDOI?: string;
+    }
+  ) => {
+    const response = await api.post(
+      `/publication/publications/${articleId}/publish`,
+      data
+    );
+    return response.data;
+  },
+
+  // Create and publish manual article
+  createManualArticle: async (formData: FormData) => {
+    const response = await api.post(
+      "/publication/publications/manual",
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
+    return response.data;
+  },
+
+  // Get published articles (public)
+  getPublishedArticles: async (params?: {
+    page?: number;
+    limit?: number;
+    volumeId?: string;
+    issueId?: string;
+    articleType?: string;
+  }) => {
+    const response = await api.get("/publication/articles", { params });
+    return response.data;
+  },
+
+  // Get single published article (public)
+  getPublishedArticle: async (id: string) => {
+    const response = await api.get(`/publication/articles/${id}`);
+    return response.data;
+  },
+
+  // Get articles by volume and issue (public)
+  getArticlesByVolumeAndIssue: async (volumeId: string, issueId: string) => {
+    const response = await api.get(
+      `/publication/volumes/${volumeId}/issues/${issueId}/articles`
+    );
+    return response.data;
+  },
+
+  // Get current issue (public)
+  getCurrentIssue: async () => {
+    const response = await api.get("/publication/current-issue");
+    return response.data;
+  },
+
+  // Get archives (public)
+  getArchives: async () => {
+    const response = await api.get("/publication/archives");
+    return response.data;
+  },
+};
+
+// ==================== EMAIL SUBSCRIPTION API ====================
+export const emailSubscriptionApi = {
+  // Subscribe to email alerts (public)
+  subscribe: async (email: string) => {
+    const response = await api.post("/publication/subscribe", { email });
+    return response.data;
+  },
+
+  // Unsubscribe from email alerts (public)
+  unsubscribe: async (token: string) => {
+    const response = await api.get(`/publication/unsubscribe/${token}`);
+    return response.data;
+  },
+
+  // Get all subscribers (admin)
+  getSubscribers: async (params?: {
+    page?: number;
+    limit?: number;
+    isActive?: boolean;
+  }) => {
+    const response = await api.get("/publication/subscribers", { params });
+    return response.data;
+  },
+
+  // Get subscriber statistics (admin)
+  getStatistics: async () => {
+    const response = await api.get("/publication/subscribers/statistics");
+    return response.data;
+  },
+};
+
+// ==================== FAILED JOBS API ====================
+export const failedJobsApi = {
+  // Get all failed jobs
+  getFailedJobs: async (params?: {
+    page?: number;
+    limit?: number;
+    jobType?: string;
+    resolved?: boolean;
+  }) => {
+    const response = await api.get("/publication/failed-jobs", { params });
+    return response.data;
+  },
+
+  // Get failed job statistics
+  getStatistics: async () => {
+    const response = await api.get("/publication/failed-jobs/statistics");
+    return response.data;
+  },
+
+  // Get failed job by ID
+  getFailedJobById: async (id: string) => {
+    const response = await api.get(`/publication/failed-jobs/${id}`);
+    return response.data;
+  },
+
+  // Retry a specific failed job
+  retryFailedJob: async (id: string) => {
+    const response = await api.post(`/publication/failed-jobs/${id}/retry`);
+    return response.data;
+  },
+
+  // Retry all failed jobs
+  retryAllFailedJobs: async () => {
+    const response = await api.post("/publication/failed-jobs/retry-all");
+    return response.data;
+  },
+
+  // Mark failed job as resolved
+  markAsResolved: async (id: string) => {
+    const response = await api.patch(`/publication/failed-jobs/${id}/resolve`);
+    return response.data;
+  },
+
+  // Delete resolved jobs
+  deleteResolvedJobs: async () => {
+    const response = await api.delete("/publication/failed-jobs/resolved");
+    return response.data;
+  },
+};
+
+// ==================== CITATION API ====================
+export const citationApi = {
+  // Get citation in specific format (public)
+  getCitation: async (articleId: string, format: string) => {
+    const response = await api.get(
+      `/publication/articles/${articleId}/citation`,
+      {
+        params: { format },
+      }
+    );
+    return response.data;
+  },
+
+  // Download citation file (public)
+  downloadCitation: async (articleId: string, format: "bibtex" | "ris") => {
+    const response = await api.get(
+      `/publication/articles/${articleId}/citation/download`,
+      {
+        params: { format },
+        responseType: "blob",
+      }
+    );
+    return response.data;
+  },
+
+  // Get all citation formats (public)
+  getAllCitations: async (articleId: string) => {
+    const response = await api.get(
+      `/publication/articles/${articleId}/citations`
+    );
+    return response.data;
+  },
+
+  // Get indexing metadata (public)
+  getIndexingMetadata: async (
+    articleId: string,
+    format: "json-ld" | "google-scholar" | "oai-pmh"
+  ) => {
+    const response = await api.get(
+      `/publication/articles/${articleId}/metadata`,
+      {
+        params: { format },
+      }
+    );
+    return response.data;
   },
 };
 

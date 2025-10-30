@@ -14,6 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
   FileText,
+  Newspaper,
   Users,
   Menu,
   X,
@@ -86,6 +87,7 @@ interface AdminLayoutProps {
 function AdminLayoutComponent({ children }: AdminLayoutProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isArticleDropdownOpen, setIsArticleDropdownOpen] = useState(false);
   const pathname = usePathname();
   const { user, logout } = useAuth();
 
@@ -137,6 +139,58 @@ function AdminLayoutComponent({ children }: AdminLayoutProps) {
     name: "Logout",
     action: handleLogout,
     icon: LogOut,
+  };
+
+  const ArticleDropdown = () => {
+    const articleLinks = [
+      { name: "Publication", href: "/admin/articles/publication" },
+      { name: "Volume", href: "/admin/articles/volume" },
+      { name: "Issues", href: "/admin/articles/issues" },
+    ];
+  
+    return (
+      <div className="space-y-1">
+        <button
+          onClick={() => setIsArticleDropdownOpen(!isArticleDropdownOpen)}
+          className={cn(
+            "flex items-center justify-between w-full px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+            isArticleDropdownOpen
+              ? "bg-[#5A0A1A] text-white"
+              : "text-[#FFE9EE] hover:bg-[#5A0A1A] hover:text-white"
+          )}
+        >
+          <div className="flex items-center space-x-3">
+            <Newspaper className="h-5 w-5 flex-shrink-0" />
+            <span>Articles</span>
+          </div>
+          <ChevronRight
+            className={cn(
+              "h-5 w-5 transition-transform",
+              isArticleDropdownOpen && "transform rotate-90"
+            )}
+          />
+        </button>
+        {isArticleDropdownOpen && (
+          <div className="pl-4 space-y-1">
+            {articleLinks.map((link) => (
+              <Link
+                key={link.name}
+                href={link.href}
+                className={cn(
+                  "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
+                  pathname === link.href
+                    ? "bg-[#5A0A1A] text-white"
+                    : "text-[#FFE9EE] hover:bg-[#5A0A1A] hover:text-white"
+                )}
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                <span>{link.name}</span>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    );
   };
 
   return (
@@ -201,7 +255,7 @@ function AdminLayoutComponent({ children }: AdminLayoutProps) {
           </div>
         )}
 
-        <div className="flex-1 flex flex-col justify-between p-3">
+        <div className="flex-1 flex flex-col justify-between p-3 overflow-y-auto">
           <nav className="space-y-1">
             {navigationItems.map((item) => {
               const isActive = dynamicRoutes.includes(item.href)
@@ -224,6 +278,7 @@ function AdminLayoutComponent({ children }: AdminLayoutProps) {
                 </Link>
               );
             })}
+            <ArticleDropdown />
           </nav>
 
           <nav className="space-y-1">
@@ -317,7 +372,7 @@ function AdminLayoutComponent({ children }: AdminLayoutProps) {
           </div>
         )}
 
-        <div className="flex-1 flex flex-col justify-between p-3">
+        <div className="flex-1 flex flex-col justify-between p-3 overflow-y-auto">
           <nav className="space-y-1">
             {navigationItems.map((item) => {
               const isActive = dynamicRoutes.includes(item.href)
@@ -341,6 +396,7 @@ function AdminLayoutComponent({ children }: AdminLayoutProps) {
                 </Link>
               );
             })}
+            <ArticleDropdown />
           </nav>
 
           <nav className="space-y-1">
