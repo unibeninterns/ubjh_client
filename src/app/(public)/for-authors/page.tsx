@@ -61,7 +61,7 @@ export default function ForAuthorsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white overflow-x-hidden">
      <Header/>
 
       {/* Hero Section */}

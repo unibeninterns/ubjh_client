@@ -250,12 +250,12 @@ export default function CurrentIssuePage() {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white overflow-x-hidden">
       {/* Header */}
      <Header/>
       {/* Issue Header */}
       <section className="bg-gradient-to-br from-[#7A0019] to-[#5A0A1A] text-white py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className=" mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-3 gap-8 items-start">
             {/* Issue Cover */}
             <div className="md:col-span-1">
@@ -334,7 +334,7 @@ export default function CurrentIssuePage() {
 
       {/* Filter Section */}
       <section className="bg-[#FAF7F8] border-b-2 border-[#EAD3D9] py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div>
               <h2 className="text-lg font-bold text-[#212121] mb-1">
@@ -364,7 +364,7 @@ export default function CurrentIssuePage() {
 
       {/* Articles List */}
       <section className="py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="space-y-8">
             {filteredArticles.map((article, index) => (
               <article
@@ -482,7 +482,7 @@ export default function CurrentIssuePage() {
 
       {/* Issue Information Section */}
       <section className="bg-[#FAF7F8] py-12 border-t-2 border-[#EAD3D9]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-8">
             <div className="bg-white border-2 border-[#EAD3D9] rounded-xl p-6">
               <h3 className="text-xl font-bold text-[#7A0019] mb-4 flex items-center gap-2">
