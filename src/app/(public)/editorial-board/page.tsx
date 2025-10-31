@@ -30,7 +30,6 @@ export default function EditorialBoardPage() {
     department: "Department of History & International Studies",
     bio: "Professor Ogunleye is a leading scholar in African political history and decolonization studies. His research focuses on nationalist movements, Pan-Africanism, and post-independence governance in West Africa. He has published extensively on Nigerian political development and serves as a consultant to several African governments on historical memory and reconciliation projects.",
     photo: "/editor-chief.png",
-    orcid: "0000-0001-2345-6789",
     email: "adebayo.ogunleye@uniben.edu",
     specialization: [
       "African Political History",
@@ -58,7 +57,6 @@ export default function EditorialBoardPage() {
       department: "Department of English & Literature",
       bio: "Specializes in postcolonial African literature, feminist literary criticism, and contemporary Nigerian fiction.",
       photo: "/editor-2.png",
-      orcid: "0000-0002-3456-7890",
       email: "chiamaka.eze@uniben.edu",
       specialization: [
         "African Literature",
@@ -73,7 +71,6 @@ export default function EditorialBoardPage() {
       department: "Faculty of Law",
       bio: "Expert in constitutional law, human rights, and customary legal systems in Nigeria with over 20 years of academic and legal practice experience.",
       photo: "/editor-3.png",
-      orcid: "0000-0003-4567-8901",
       email: "ibrahim.suleiman@uniben.edu",
       specialization: [
         "Constitutional Law",

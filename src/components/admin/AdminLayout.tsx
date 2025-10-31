@@ -74,8 +74,8 @@ const navigationItems = [
 
 const bottomItems = [
   {
-    name: "Settings",
-    href: "/admin/settings",
+    name: "Background Jobs",
+    href: "/admin/jobs",
     icon: Settings,
   },
 ];

@@ -41,7 +41,7 @@ const CompletedReviews: React.FC = () => {
       );
       
       setCompletedReviews(completed);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Error fetching completed reviews:', err);
       setError('Failed to load completed reviews. Please try again.');
     } finally {

@@ -128,8 +128,8 @@ export default function ManuscriptSubmissionPage() {
     setSubmitError('');
 
     // Check file type
-    if (file.type !== 'application/pdf') {
-      setSubmitError('Only PDF files are accepted');
+    if (file.type !== 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
+      setSubmitError('Only DOCX files are accepted');
       return false;
     }
 
@@ -230,7 +230,7 @@ export default function ManuscriptSubmissionPage() {
     }
 
     if (!manuscriptFile) {
-      errors.manuscriptFile = 'Please upload your manuscript PDF';
+      errors.manuscriptFile = 'Please upload your manuscript DOCX';
     }
 
     if (!agreedToTerms) {
@@ -859,7 +859,7 @@ export default function ManuscriptSubmissionPage() {
 
             <div className="p-6">
               <p className="text-gray-700 mb-4">
-                Please upload your complete manuscript in PDF format. Ensure it follows the{' '}
+                Please upload your complete manuscript in DOCX format. Ensure it follows the{' '}
                 <Link href="/for-authors" className="text-[#7A0019] underline hover:text-[#5A0A1A]">
                   author guidelines
                 </Link>.
@@ -881,7 +881,7 @@ export default function ManuscriptSubmissionPage() {
                 <input
                   ref={fileInputRef}
                   type="file"
-                  accept=".pdf"
+                  accept=".docx"
                   onChange={handleFileChange}
                   className="hidden"
                   id="manuscript-upload"
@@ -921,7 +921,7 @@ export default function ManuscriptSubmissionPage() {
                       </label>
                       <span className="text-gray-600"> or drag and drop</span>
                     </div>
-                    <p className="text-sm text-gray-500">PDF only, up to 10MB</p>
+                    <p className="text-sm text-gray-500">DOCX only, up to 10MB</p>
                   </div>
                 )}
               </div>

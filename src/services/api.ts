@@ -106,9 +106,10 @@ export interface Manuscript {
   createdAt: string;
   updatedAt: string;
   authorRole?: string;
-  originalReviewer?: any;
+  originalReviewer?: string | object;
   revisionType?: string;
-  assignedReviewerCount?: number; // Added assignedReviewerCount
+  assignedReviewerCount?: number;
+  isReviewProcessCompleted?: boolean;
 }
 
 export interface ManuscriptListResponse {
@@ -564,14 +565,20 @@ export interface Issue {
   updatedAt: string;
 }
 
+export interface AuthorSummary {
+  _id: string;
+  name: string;
+  email: string;
+}
+
 export interface PublishedArticle {
   _id: string;
   title: string;
   abstract: string;
   keywords: string[];
   pdfFile: string;
-  author: any;
-  coAuthors: any[];
+  author: AuthorSummary;
+  coAuthors: AuthorSummary[];
   manuscriptId?: string;
   publishDate: string;
   doi?: string;
@@ -579,21 +586,8 @@ export interface PublishedArticle {
   issue: Issue;
   articleType: string;
   pages?: { start: number; end: number };
-  views: { count: number; viewers: any[] };
-  downloads: { count: number; downloaders: any[] };
-  citationCount: number;
-  license: string;
-  copyrightHolder: string;
-  isPublished: boolean;
-  publishedAt: string;
-  zenodoDepositId?: string;
-  zenodoRecordId?: string;
-  indexingStatus: {
-    googleScholar: boolean;
-    base: boolean;
-    core: boolean;
-    internetArchive: boolean;
-  };
+  viewers: { count: number; viewers: string[] };
+  downloads: { count: number; downloaders: string[] };
 }
 
 export interface EmailSubscriber {
@@ -612,7 +606,7 @@ export interface FailedJob {
   errorStack?: string;
   attemptCount: number;
   lastAttemptAt: string;
-  data?: any;
+  data?: unknown;
   resolved: boolean;
   resolvedAt?: string;
   createdAt: string;
@@ -1022,7 +1016,9 @@ export const manuscriptAdminApi = {
   },
 
   // Get existing reviewers for manuscript
-  getExistingReviewers: async (manuscriptId: string) => {
+  getExistingReviewers: async (
+    manuscriptId: string
+  ): Promise<{ success: boolean; data: { id: string; name: string }[] }> => {
     try {
       const response = await api.get(
         `/admin/reassign-review/existing-reviewers/${manuscriptId}`
@@ -1502,7 +1498,7 @@ export const manuscriptReviewerApi = {
     success: boolean;
     data: {
       review: ManuscriptReviewWithDetails;
-      previousReview?: any;
+      previousReview?: ReviewDetail;
       isRevised: boolean;
       revisionType?: string;
     };
@@ -1627,7 +1623,7 @@ export const adminReviewApi = {
     success: boolean;
     data: {
       review: ManuscriptReviewWithDetails;
-      previousReview?: any;
+      previousReview?: ReviewDetail;
       isRevised: boolean;
       revisionType?: string;
     };

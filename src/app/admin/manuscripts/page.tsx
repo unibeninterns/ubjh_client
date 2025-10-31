@@ -185,21 +185,14 @@ function AdminManuscriptsPage() {
   };
 
   // Helper function to determine if reassign is available
-  const canReassignReview = (manuscript: Manuscript): {
-    canReassign: boolean;
-    isReconciliation: boolean
-  } => {
-    // For regular review reassignment
-    if (manuscript.status === 'under_review') {
-      return { canReassign: true, isReconciliation: false };
+  const canReassignReview = (manuscript: Manuscript): boolean => {
+    // Exception: Always allow reassign for revised manuscripts that are under review
+    if (manuscript.revisedPdfFile && manuscript.status === 'under_review') {
+      return true;
     }
 
-    // For reconciliation review reassignment
-    if (manuscript.status === 'in_reconciliation') {
-      return { canReassign: true, isReconciliation: true };
-    }
-
-    return { canReassign: false, isReconciliation: false };
+    // Otherwise, allow reassign only if the review process is NOT completed
+    return !manuscript.isReviewProcessCompleted;
   };
 
   // Assign Reviewer Functions
@@ -483,6 +476,7 @@ function AdminManuscriptsPage() {
                       <option value="createdAt">Submission Date</option>
                       <option value="title">Title</option>
                       <option value="status">Status</option>
+                      <option value="type">Type</option>
                     </select>
                   </div>
                 </div>
@@ -544,11 +538,18 @@ function AdminManuscriptsPage() {
                             )}
                           </div>
                         </th>
-                        <th 
-                        scope="col"
-                        className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100">
-  Type
-</th>
+                        <th
+                          scope="col"
+                          className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                          onClick={() => toggleSortOrder('type')}
+                        >
+                          <div className="flex items-center">
+                            Type
+                            {filters.sort === 'type' && (
+                              <ArrowUpDown className="ml-1 h-4 w-4" />
+                            )}
+                          </div>
+                        </th>
                         <th
                           scope="col"
                           className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
@@ -649,21 +650,11 @@ function AdminManuscriptsPage() {
                                     </DropdownMenuItem>
                                   )}
 
-                                  {(() => {
-                                    const { canReassign, isReconciliation } = canReassignReview(manuscript);
-                                    return canReassign && (
-                                      <DropdownMenuItem onSelect={() => handleReassignReviewerClick(manuscript)}>
-                                        <RefreshCw className="h-4 w-4 mr-2" /> 
-                                        {isReconciliation ? 'Reassign Reconciliation' : 'Reassign Review'}
-                                      </DropdownMenuItem>
-                                    );
-                                  })()}
-
-                                  {manuscript.revisedPdfFile && manuscript.status === 'under_review' && (
-  <DropdownMenuItem onSelect={() => handleReassignReviewerClick(manuscript)}>
-    <RefreshCw className="h-4 w-4 mr-2" /> Reassign Revised Review
-  </DropdownMenuItem>
-)}
+                                  {canReassignReview(manuscript) && (
+                                    <DropdownMenuItem onSelect={() => handleReassignReviewerClick(manuscript)}>
+                                      <RefreshCw className="h-4 w-4 mr-2" /> Reassign Review
+                                    </DropdownMenuItem>
+                                  )}
                                 </DropdownMenuContent>
                               </DropdownMenu>
                             </td>
@@ -945,25 +936,36 @@ function AdminManuscriptsPage() {
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {existingReviewsForReassignment.map((review) => (
-                        <div
-                          key={review.reviewId}
-                          className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                            selectedReviewToReassign === review.reviewId ? 'border-purple-500 bg-purple-50' : 'border-gray-200 hover:border-purple-300'
-                          }`}
-                          onClick={() => setSelectedReviewToReassign(review.reviewId)}
-                        >
-                          <p className="font-medium">Reviewer: {review.reviewer.name}</p>
-                          <p className="text-sm text-gray-600">Type: {review.reviewType}</p>
-                          <p className="text-sm text-gray-600">Status: {review.status}</p>
-                        </div>
-                      ))}
+                      {existingReviewsForReassignment.map((review) => {
+                        const isRevisedManuscript = currentManuscriptForReassignment?.revisedPdfFile;
+                        const isCompletedReview = review.status === 'completed';
+                        const canSelectReview = isRevisedManuscript || !isCompletedReview;
+
+                        return (
+                          <div
+                            key={review.reviewId}
+                            className={`p-4 border-2 rounded-lg transition-all ${
+                              selectedReviewToReassign === review.reviewId
+                                ? 'border-purple-500 bg-purple-50'
+                                : canSelectReview
+                                ? 'border-gray-200 hover:border-purple-300 cursor-pointer'
+                                : 'border-gray-200 bg-gray-100 text-gray-400 cursor-not-allowed opacity-70'
+                            }`}
+                            onClick={() => canSelectReview && setSelectedReviewToReassign(review.reviewId)}
+                          >
+                            <p className="font-medium">Reviewer: {review.reviewer.name}</p>
+                            <p className="text-sm text-gray-600">Type: {review.reviewType}</p>
+                            <p className="text-sm text-gray-600">Status: {review.status}</p>
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
               ) : !reassignReviewerMode ? (
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {!(currentManuscriptForReassignment?.revisedPdfFile) && (
                     <div 
                       onClick={() => setReassignReviewerMode('auto')}
                       className="group p-6 border-2 border-gray-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all cursor-pointer"
@@ -978,6 +980,7 @@ function AdminManuscriptsPage() {
                         </p>
                       </div>
                     </div>
+                  )}
 
                     <div 
                       onClick={() => {

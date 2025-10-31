@@ -47,7 +47,7 @@ export default function ForAuthorsPage() {
     {
       question: "What file formats should I use for submission?",
       answer:
-        "We prefer PDF for the main manuscript, but also accept DOC/DOCX. Supplementary files can be in various formats (CSV, XLSX for data; PNG, JPG for images). Please ensure all files are clearly labeled.",
+        "We only accept DOCX for the main manuscript. Supplementary files can be in various formats (CSV, XLSX for data; PNG, JPG for images). Please ensure all files are clearly labeled.",
     },
     {
       question: "Do I need an ORCID iD?",
@@ -217,7 +217,7 @@ export default function ForAuthorsPage() {
                         Document Format
                       </h4>
                       <ul className="list-disc list-inside space-y-1 text-gray-700 ml-4">
-                        <li>PDF format only</li>
+                        <li>Only DOCX format is accepted</li>
                         <li>
                           A4 paper size with 2.5cm (1 inch) margins on all sides
                         </li>

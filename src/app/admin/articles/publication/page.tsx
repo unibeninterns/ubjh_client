@@ -142,7 +142,14 @@ export default function PublicationsManagementPage() {
     setIsSubmitting(true);
 
     try {
-      const data: any = {
+      const data: { 
+        volumeId: string; 
+        issueId: string; 
+        articleType: string; 
+        publishDate: string; 
+        pages?: { start: number; end: number }; 
+        customDOI?: string; 
+      } = {
         volumeId: publishForm.volumeId,
         issueId: publishForm.issueId,
         articleType: publishForm.articleType,
@@ -164,8 +171,9 @@ export default function PublicationsManagementPage() {
       toast.success("Article published successfully!");
       setShowPublishDialog(false);
       fetchData();
-    } catch (error: any) {
-      const errorMsg = error.response?.data?.message || "Failed to publish article";
+    } catch (error: unknown) {
+      const errorMsg =
+        error instanceof Error ? error.message : "Failed to publish article";
       setError(errorMsg);
       toast.error(errorMsg);
     } finally {

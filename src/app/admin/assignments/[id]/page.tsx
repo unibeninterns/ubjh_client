@@ -45,6 +45,14 @@ interface ManuscriptReviewDetails {
   reviewDecision?: string;
 }
 
+interface PreviousReview {
+  totalScore: number;
+  reviewDecision: string;
+  comments?: {
+    commentsForAuthor?: string;
+  };
+}
+
 const AdminManuscriptReviewForm: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const router = useRouter();
@@ -57,9 +65,16 @@ const AdminManuscriptReviewForm: React.FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const [previousReview, setPreviousReview] = useState<any>(null);
+  const [previousReview, setPreviousReview] = useState<PreviousReview | null>(null);
 const [isRevised, setIsRevised] = useState(false);
-const [conflictingReviews, setConflictingReviews] = useState<any[]>([]);
+interface ConflictingReview {
+  reviewerId: string;
+  reviewerName: string;
+  totalScore: number;
+  reviewDecision: string;
+}
+
+const [conflictingReviews, setConflictingReviews] = useState<ConflictingReview[]>([]);
 
   const [reviewCriteria, setReviewCriteria] = useState<ReviewCriteria[]>([
     {

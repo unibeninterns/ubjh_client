@@ -46,7 +46,7 @@ export default function SubmissionPortalPage() {
       number: 3,
       title: "Upload Manuscript Files",
       description:
-        "Upload your main manuscript (PDF or DOCX) and any supplementary materials. Maximum file size: 10MB per file.",
+        "Upload your main manuscript (DOCX) and any supplementary materials. Maximum file size: 10MB per file.",
       icon: Upload,
       duration: "2-5 minutes",
     },
@@ -81,7 +81,7 @@ export default function SubmissionPortalPage() {
     },
     {
       title: "File Format",
-      description: "PDF or DOC/DOCX format",
+      description: "DOCX format",
       met: true,
     },
     {
@@ -110,7 +110,7 @@ export default function SubmissionPortalPage() {
     {
       question: "What file formats do you accept?",
       answer:
-        "We accept PDF, DOC, and DOCX formats for the main manuscript. Supplementary files can be in various formats including CSV, XLSX, PNG, and JPG.",
+        "We only accept DOCX formats for the main manuscript. Supplementary files can be in various formats including CSV, XLSX, PNG, and JPG.",
     },
     {
       question: "Do I need an ORCID iD to submit?",

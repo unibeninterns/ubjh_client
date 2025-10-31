@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   BookOpen,
-  Download,
   FileText,
   CheckCircle,
   Clock,
@@ -14,7 +13,6 @@ import {
   Mail,
   ExternalLink,
   ChevronRight,
-  Award,
   Search,
 } from "lucide-react";
 import Header from "@/components/Header"
@@ -49,7 +47,7 @@ export default function HumanitiesJournalHome() {
             Policies
           </Link>
           <Link
-            href="/contact"
+            href="mailto:journalhumanities@uniben.edu"
             className="text-[#7A0019] hover:text-[#5A0A1A] font-medium transition-colors"
           >
             Contact
@@ -119,12 +117,6 @@ export default function HumanitiesJournalHome() {
         </div>
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-6">
-              <Award className="h-4 w-4" />
-              <span className="text-sm font-semibold">
-                Volume 1, Issue 1 (2025) — Now Open for Submissions
-              </span>
-            </div>
             <h2 className="text-5xl font-bold mb-6 leading-tight font-serif">
               Advancing African and Global Perspectives in the Humanities
             </h2>
@@ -485,30 +477,6 @@ export default function HumanitiesJournalHome() {
           </div>
         </div>
       </section>
-
-      {/* Indexing & Trust Indicators */}
-      <section className="py-12 bg-white border-t-2 border-[#EAD3D9]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h3 className="text-center text-sm text-gray-600 font-semibold mb-6">
-            INDEXED & PRESERVED BY
-          </h3>
-          <div className="flex flex-wrap items-center justify-center gap-8">
-            <div className="h-16 w-32 bg-gray-100 rounded flex items-center justify-center">
-              <span className="text-gray-500 font-semibold">Google Scholar</span>
-            </div>
-            <div className="h-16 w-32 bg-gray-100 rounded flex items-center justify-center">
-              <span className="text-gray-500 font-semibold">Crossref</span>
-            </div>
-            <div className="h-16 w-32 bg-gray-100 rounded flex items-center justify-center">
-              <span className="text-gray-500 font-semibold">PKP PN</span>
-            </div>
-            <div className="h-16 w-32 bg-gray-100 rounded flex items-center justify-center">
-              <span className="text-gray-500 font-semibold">DOAJ (pending)</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Footer */}
       <Footer/>
       

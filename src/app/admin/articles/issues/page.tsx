@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { issueApi, volumeApi, Issue, Volume } from "@/services/api";
 import { AdminLayout } from '@/components/admin/AdminLayout'; // Added
 import { useAuth } from '@/contexts/AuthContext'; // Added
@@ -54,16 +54,30 @@ export default function IssuesManagementPage() {
     description: "",
     publishDate: new Date().toISOString().split("T")[0],
   });
+  
+  const fetchIssues = useCallback(async () => {
+  try {
+    setIsLoading(true);
+    const params = selectedVolume !== "all" ? { volume: selectedVolume } : {};
+    const response = await issueApi.getIssues(params);
+    setIssues(response.data);
+  } catch (error) {
+    console.error("Error fetching issues:", error);
+    toast.error("Failed to load issues");
+  } finally {
+    setIsLoading(false);
+  }
+}, [selectedVolume]);
 
   useEffect(() => {
-    if (!isAuthenticated) return; // Added
+    if (!isAuthenticated) return;
     fetchVolumes();
     fetchIssues();
-  }, [isAuthenticated]); // Added isAuthenticated to dependency array
+  }, [isAuthenticated, fetchIssues]);
 
   useEffect(() => {
     fetchIssues();
-  }, [selectedVolume]);
+  }, [selectedVolume, fetchIssues]);
 
   const fetchVolumes = async () => {
     try {
@@ -72,20 +86,6 @@ export default function IssuesManagementPage() {
     } catch (error) {
       console.error("Error fetching volumes:", error);
       toast.error("Failed to load volumes");
-    }
-  };
-
-  const fetchIssues = async () => {
-    try {
-      setIsLoading(true);
-      const params = selectedVolume !== "all" ? { volume: selectedVolume } : {};
-      const response = await issueApi.getIssues(params);
-      setIssues(response.data);
-    } catch (error) {
-      console.error("Error fetching issues:", error);
-      toast.error("Failed to load issues");
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -131,8 +131,9 @@ export default function IssuesManagementPage() {
       setShowDialog(false);
       resetForm();
       fetchIssues();
-    } catch (error: any) {
-      const errorMsg = error.response?.data?.message || "Failed to save issue";
+    } catch (error: unknown) {
+      const errorMsg =
+        error instanceof Error ? error.message : "Failed to save issue";
       setError(errorMsg);
       toast.error(errorMsg);
     } finally {
@@ -159,8 +160,10 @@ export default function IssuesManagementPage() {
       await issueApi.deleteIssue(id);
       toast.success("Issue deleted successfully");
       fetchIssues();
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to delete issue");
+    } catch (error: unknown) {
+      const errorMsg =
+        error instanceof Error ? error.message : "Failed to delete issue";
+      toast.error(errorMsg);
     }
   };
 

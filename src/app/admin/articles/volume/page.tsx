@@ -60,7 +60,7 @@ export default function VolumesManagementPage() {
       setIsLoading(true);
       const response = await volumeApi.getVolumes();
       setVolumes(response.data);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error fetching volumes:", error);
       toast.error("Failed to load volumes");
     } finally {
@@ -124,8 +124,9 @@ export default function VolumesManagementPage() {
       setShowDialog(false);
       resetForm();
       fetchVolumes();
-    } catch (error: any) {
-      const errorMsg = error.response?.data?.message || "Failed to save volume";
+    } catch (error: unknown) {
+      const errorMsg =
+        error instanceof Error ? error.message : "Failed to save volume";
       setError(errorMsg);
       toast.error(errorMsg);
     } finally {
@@ -155,8 +156,10 @@ export default function VolumesManagementPage() {
       await volumeApi.deleteVolume(id);
       toast.success("Volume deleted successfully");
       fetchVolumes();
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to delete volume");
+    } catch (error: unknown) {
+      const errorMsg =
+        error instanceof Error ? error.message : "Failed to delete volume";
+      toast.error(errorMsg);
     }
   };
 

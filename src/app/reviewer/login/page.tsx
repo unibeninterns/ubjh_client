@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent, useEffect } from 'react';
+import { useState, FormEvent } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { AlertCircle, Loader2, LogIn, FileCheck } from 'lucide-react';
 import Link from 'next/link';

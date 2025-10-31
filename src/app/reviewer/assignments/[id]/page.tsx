@@ -45,20 +45,56 @@ interface ManuscriptReviewDetails {
   reviewDecision?: string;
 }
 
+interface PreviousReview {
+
+  totalScore: number;
+
+  reviewDecision: string;
+
+  comments?: {
+
+    commentsForAuthor?: string;
+
+  };
+
+}
+
+
+
 const ManuscriptReviewForm: React.FC = () => {
+
   const { isAuthenticated } = useAuth();
+
   const router = useRouter();
+
   const params = useParams();
+
   const reviewId = params.id as string;
 
+
+
   const [reviewData, setReviewData] = useState<ManuscriptReviewDetails | null>(null);
+
   const [loading, setLoading] = useState(true);
+
   const [saving, setSaving] = useState(false);
+
   const [submitting, setSubmitting] = useState(false);
+
   const [error, setError] = useState<string | null>(null);
-  const [previousReview, setPreviousReview] = useState<any>(null);
+
+
+
+  const [previousReview, setPreviousReview] = useState<PreviousReview | null>(null);
 const [isRevised, setIsRevised] = useState(false);
-const [conflictingReviews, setConflictingReviews] = useState<any[]>([]);
+interface ConflictingReview {
+  reviewerId: string;
+  reviewerName: string;
+  totalScore: number;
+  reviewDecision: string;
+}
+
+const [conflictingReviews, setConflictingReviews] = useState<ConflictingReview[]>([]);
 
   const [reviewCriteria, setReviewCriteria] = useState<ReviewCriteria[]>([
     {

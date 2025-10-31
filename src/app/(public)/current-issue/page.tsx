@@ -307,9 +307,6 @@ export default function CurrentIssuePage() {
                 </button>
               </div>
               <div className="mt-6 pt-6 border-t border-white/20">
-                <p className="text-sm text-[#FFE9EE] mb-2">
-                  <strong>Issue DOI:</strong> {issueData.doi}
-                </p>
                 <p className="text-sm text-[#FFE9EE]">
                   <strong>ISSN:</strong> eISSN: 2XXX-XXXX (Online)
                 </p>

@@ -9,7 +9,6 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import {
   LayoutDashboard,
-  Settings,
   LogOut,
   ChevronLeft,
   ChevronRight,
@@ -40,14 +39,6 @@ const navigationItems = [
     name: "Review Guideline",
     href: "/reviewer/review-guideline",
     icon: BookOpen,
-  },
-];
-
-const bottomItems = [
-  {
-    name: "Settings",
-    href: "/reviewer/settings",
-    icon: Settings,
   },
 ];
 
@@ -194,25 +185,6 @@ function ReviewerLayoutComponent({ children }: ReviewerLayoutProps) {
           </nav>
 
           <nav className="space-y-1">
-            {bottomItems.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                    isActive
-                      ? "bg-[#5A0A1A] text-white"
-                      : "text-[#FFE9EE] hover:bg-[#5A0A1A] hover:text-white"
-                  )}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <item.icon className="h-5 w-5 flex-shrink-0" />
-                  <span>{item.name}</span>
-                </Link>
-              );
-            })}
 
             <button
               onClick={() => {
@@ -311,26 +283,6 @@ function ReviewerLayoutComponent({ children }: ReviewerLayoutProps) {
           </nav>
 
           <nav className="space-y-1">
-            {bottomItems.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.name}
-                  href={item.href}
-                  className={cn(
-                    "flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors",
-                    isActive
-                      ? "bg-[#5A0A1A] text-white"
-                      : "text-[#FFE9EE] hover:bg-[#5A0A1A] hover:text-white",
-                    isCollapsed && "justify-center"
-                  )}
-                  title={isCollapsed ? item.name : undefined}
-                >
-                  <item.icon className="h-5 w-5 flex-shrink-0" />
-                  {!isCollapsed && <span>{item.name}</span>}
-                </Link>
-              );
-            })}
 
             <button
               onClick={logoutItem.action}
