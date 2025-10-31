@@ -103,6 +103,8 @@ export interface Manuscript {
   }>;
   pdfFile: string;
   revisedPdfFile?: string;
+  originPdfFile?: string;
+  originRevisedPdfFile?: string;
   createdAt: string;
   updatedAt: string;
   authorRole?: string;
@@ -908,6 +910,51 @@ export const manuscriptAdminApi = {
       return response.data;
     } catch (error) {
       console.error("Failed to fetch manuscript:", error);
+      throw error;
+    }
+  },
+
+  editManuscript: async (manuscriptId: string, file: File): Promise<any> => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await api.put(
+        `/admin/manuscripts/${manuscriptId}/edit`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to edit manuscript:", error);
+      throw error;
+    }
+  },
+
+  editRevisedManuscript: async (
+    manuscriptId: string,
+    file: File
+  ): Promise<any> => {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await api.put(
+        `/admin/manuscripts/${manuscriptId}/edit-revised`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to edit revised manuscript:", error);
       throw error;
     }
   },

@@ -11,6 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Button } from "@/components/ui/button";
 import { Toaster, toast } from "sonner";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { FileUpload } from '@/components/ui/FileUpload';
 
 interface Faculty {
   faculty: string;
@@ -62,6 +63,12 @@ function AdminManuscriptsPage() {
   const [reassignReviewerSuccess, setReassignReviewerSuccess] = useState(false);
   const [existingReviewsForReassignment, setExistingReviewsForReassignment] = useState<ExistingReviewForReassignment[]>([]); // To store existing reviews for selection
   const [selectedReviewToReassign, setSelectedReviewToReassign] = useState<string | null>(null); // The ID of the review to reassign
+
+  // State for Edit Manuscript Modal
+  const [showEditManuscriptModal, setShowEditManuscriptModal] = useState(false);
+  const [currentManuscriptForEdit, setCurrentManuscriptForEdit] = useState<Manuscript | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [editingManuscript, setEditingManuscript] = useState(false);
 
   const [assigningFaculty, setAssigningFaculty] = useState(false);
   const [expandedFaculty, setExpandedFaculty] = useState<string | null>(null);
@@ -120,6 +127,40 @@ function AdminManuscriptsPage() {
       toast.error("Error while assigning faculty");
     } finally {
       setAssigningFaculty(false);
+    }
+  };
+
+  const handleEditManuscriptClick = (manuscript: Manuscript) => {
+    setCurrentManuscriptForEdit(manuscript);
+    setShowEditManuscriptModal(true);
+  };
+
+  const handleEditManuscriptSubmit = async () => {
+    if (!currentManuscriptForEdit || !selectedFile) return;
+
+    setEditingManuscript(true);
+    toast.info("Editing manuscript...");
+
+    try {
+      const response = await manuscriptAdminApi.editManuscript(
+        currentManuscriptForEdit._id,
+        selectedFile
+      );
+
+      if (response.success) {
+        toast.success("Manuscript edited successfully!");
+        setShowEditManuscriptModal(false);
+        refreshData(); // Refresh manuscripts list
+      } else {
+        toast.error("Failed to edit manuscript");
+      }
+    } catch (error) {
+      console.error("Failed to edit manuscript:", error);
+      toast.error("Error while editing manuscript");
+    } finally {
+      setEditingManuscript(false);
+      setSelectedFile(null);
+      setCurrentManuscriptForEdit(null);
     }
   };
 
@@ -184,8 +225,8 @@ function AdminManuscriptsPage() {
       return true;
     }
 
-    // Otherwise, allow reassign only if the review process is NOT completed
-    return !manuscript.isReviewProcessCompleted;
+    // Otherwise, allow reassign only if the review process is NOT completed AND at least one reviewer is assigned
+    return !manuscript.isReviewProcessCompleted && manuscript.assignedReviewerCount > 0;
   };
 
   // Assign Reviewer Functions
@@ -623,6 +664,12 @@ function AdminManuscriptsPage() {
                                   <DropdownMenuItem onSelect={() => router.push(`/admin/manuscripts/${manuscript._id}`)}>
                                     <Eye className="h-4 w-4 mr-2" /> View Details
                                   </DropdownMenuItem>
+
+                                  {!manuscript.originPdfFile && (
+                                    <DropdownMenuItem onSelect={() => handleEditManuscriptClick(manuscript)}>
+                                      <FileText className="h-4 w-4 mr-2" /> Edit Manuscript
+                                    </DropdownMenuItem>
+                                  )}
                                   
                                   {((manuscript.status === 'submitted' && !manuscript.submitter.assignedFaculty) || (manuscript.submitter.assignedFaculty && manuscript.assignedReviewerCount === 0)) && (
                                     <DropdownMenuItem onSelect={() => { setCurrentManuscriptForFaculty(manuscript); setShowAssignFacultyModal(true); }}>
@@ -631,13 +678,13 @@ function AdminManuscriptsPage() {
                                     </DropdownMenuItem>
                                   )}
 
-                                  {manuscript.submitter.assignedFaculty && manuscript.assignedReviewerCount === 0 && (
+                                  {manuscript.submitter.assignedFaculty && manuscript.originPdfFile && manuscript.assignedReviewerCount === 0 && (
                                     <DropdownMenuItem onSelect={() => handleAssignReviewerClick(manuscript)}>
                                       <UserPlus className="h-4 w-4 mr-2" /> Assign First Reviewer
                                     </DropdownMenuItem>
                                   )}
 
-                                  {manuscript.submitter.assignedFaculty && manuscript.assignedReviewerCount === 1 && (
+                                  {manuscript.submitter.assignedFaculty && manuscript.originPdfFile && manuscript.assignedReviewerCount === 1 && (
                                     <DropdownMenuItem onSelect={() => handleAssignReviewerClick(manuscript)}>
                                       <UserPlus className="h-4 w-4 mr-2" /> Assign Second Reviewer
                                     </DropdownMenuItem>
@@ -1236,6 +1283,27 @@ function AdminManuscriptsPage() {
               disabled={assigningFaculty}
             >
               Cancel
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Manuscript Modal */}
+      <Dialog open={showEditManuscriptModal} onOpenChange={setShowEditManuscriptModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Manuscript</DialogTitle>
+            <DialogDescription>
+              Upload a new version of the manuscript. This will replace the existing file.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <FileUpload onFileSelect={setSelectedFile} />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowEditManuscriptModal(false)}>Cancel</Button>
+            <Button onClick={handleEditManuscriptSubmit} disabled={!selectedFile || editingManuscript}>
+              {editingManuscript ? <Loader2 className="h-4 w-4 animate-spin" /> : "Submit"}
             </Button>
           </DialogFooter>
         </DialogContent>

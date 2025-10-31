@@ -33,6 +33,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { failedJobsApi } from "@/services/api";
+import { AxiosError } from "axios";
 
 interface FailedJob {
   _id: string;
@@ -60,6 +61,13 @@ interface Statistics {
   }>;
 }
 
+interface FailedJobsParams {
+  page: number;
+  limit: number;
+  jobType?: string;
+  resolved?: boolean;
+}
+
 export default function FailedJobsPage() {
   const { isAuthenticated } = useAuth();
   const [jobs, setJobs] = useState<FailedJob[]>([]);
@@ -78,7 +86,7 @@ export default function FailedJobsPage() {
   const fetchJobs = useCallback(async () => {
   try {
     setIsLoading(true);
-    const params: any = { page, limit: 20 };
+    const params: FailedJobsParams = { page, limit: 20 };
     
     if (jobTypeFilter !== "all") {
       params.jobType = jobTypeFilter;
@@ -122,7 +130,7 @@ export default function FailedJobsPage() {
       toast.success("Job retry scheduled successfully");
       fetchJobs();
       fetchStatistics();
-    } catch (error: any) {
+    } catch (error: AxiosError) {
       toast.error(error.response?.data?.message || "Failed to retry job");
     } finally {
       setIsRetrying(false);
@@ -138,7 +146,7 @@ export default function FailedJobsPage() {
       toast.success(`${response.retriedCount} jobs scheduled for retry`);
       fetchJobs();
       fetchStatistics();
-    } catch (error: any) {
+    } catch (error: AxiosError) {
       toast.error(error.response?.data?.message || "Failed to retry jobs");
     } finally {
       setIsRetrying(false);
@@ -151,7 +159,7 @@ export default function FailedJobsPage() {
       toast.success("Job marked as resolved");
       fetchJobs();
       fetchStatistics();
-    } catch (error: any) {
+    } catch (error: AxiosError) {
       toast.error(error.response?.data?.message || "Failed to mark as resolved");
     }
   };
@@ -164,7 +172,7 @@ export default function FailedJobsPage() {
       toast.success(`${response.deletedCount} resolved jobs deleted`);
       fetchJobs();
       fetchStatistics();
-    } catch (error: any) {
+    } catch (error: AxiosError) {
       toast.error(error.response?.data?.message || "Failed to delete resolved jobs");
     }
   };
