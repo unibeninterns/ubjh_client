@@ -21,6 +21,7 @@ import {
 import Footer from "@/components/Footer";
 import { publicationApi, PublishedArticle } from "@/services/api";
 import ArticleNotFound from "@/components/ArticleNotFound";
+import { AxiosError } from "axios";
 
 export default function ArticleDetailPage() {
   const params = useParams();
@@ -28,6 +29,7 @@ export default function ArticleDetailPage() {
   const [articleData, setArticleData] = useState<PublishedArticle | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [articleNotFound, setArticleNotFound] = useState(false);
   const [copiedDOI, setCopiedDOI] = useState(false);
   const [citationFormat, setCitationFormat] = useState("APA");
 
@@ -41,11 +43,15 @@ export default function ArticleDetailPage() {
         if (response.success && response.data) {
           setArticleData(response.data);
         } else {
-          setError("Article not found.");
+          setArticleNotFound(true);
         }
       } catch (err) {
         console.error("Error fetching article:", err);
-        setError("Error loading article. Please try again later.");
+        if (err instanceof AxiosError && err.response?.status === 404) {
+          setArticleNotFound(true);
+        } else {
+          setError("Error loading article. Please try again later.");
+        }
       } finally {
         setIsLoading(false);
       }
@@ -179,8 +185,7 @@ export default function ArticleDetailPage() {
     );
   }
 
-
-  if (!articleData) {
+  if (articleNotFound) {
     return (
       <div className="min-h-screen bg-white">
         <header className="bg-[#7A0019] text-white shadow-lg sticky top-0 z-50">
@@ -214,12 +219,16 @@ export default function ArticleDetailPage() {
             </div>
           </div>
         </header>
-        <div className="flex justify-center items-center py-20">
+        <div className="py-20 mx-auto px-4 sm:px-6 lg:px-8">
           <ArticleNotFound />
         </div>
         <Footer />
       </div>
     );
+  }
+
+  if (!articleData) {
+    return null; // Should not happen if articleNotFound and error are handled
   }
 
   const { articleType, title, abstract, keywords, doi, volume, issue, pages, author, coAuthors, publishDate } = articleData;

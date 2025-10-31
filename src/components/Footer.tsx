@@ -230,8 +230,8 @@ export default function Footer() {
               <ul className="space-y-2">
                 {[
                   { href: "/for-authors", label: "Author Guidelines" },
-                  { href: "/peer-review", label: "Peer Review" },
-                  { href: "/ethics", label: "Publication Ethics" },
+                  { href: "/about#peer-review", label: "Peer Review" },
+                  { href: "/policies#ethics", label: "Publication Ethics" },
                 ].map((link) => (
                   <li key={link.href}>
                     <Link
@@ -276,21 +276,6 @@ export default function Footer() {
             <p>
               © {new Date().getFullYear()} University of Benin — UNIBEN Journal of Humanities
             </p>
-            <div className="flex flex-wrap gap-4 justify-center">
-              {[
-                { href: "/privacy", label: "Privacy Policy" },
-                { href: "/terms", label: "Terms of Use" },
-                { href: "/accessibility", label: "Accessibility" },
-              ].map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="hover:text-[#7A0019] transition-colors"
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </div>
           </div>
         </div>
       </div>

@@ -196,6 +196,15 @@ export interface ReassignReviewRequest {
   newReviewerId?: string;
 }
 
+export interface ExistingReviewForReassignment {
+  reviewId: string;
+  reviewer: {
+    name: string;
+  };
+  reviewType: "human" | "reconciliation";
+  status: string;
+}
+
 export interface ReassignReviewResponse {
   success: boolean;
   message: string;
@@ -1018,7 +1027,7 @@ export const manuscriptAdminApi = {
   // Get existing reviewers for manuscript
   getExistingReviewers: async (
     manuscriptId: string
-  ): Promise<{ success: boolean; data: { id: string; name: string }[] }> => {
+  ): Promise<{ success: boolean; data: ExistingReviewForReassignment[] }> => {
     try {
       const response = await api.get(
         `/admin/reassign-review/existing-reviewers/${manuscriptId}`

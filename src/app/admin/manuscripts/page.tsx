@@ -3,7 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
-import { manuscriptAdminApi, type Manuscript } from '@/services/api';
+import { manuscriptAdminApi, type Manuscript, type ExistingReviewForReassignment } from '@/services/api';
 import { AdminLayout } from '@/components/admin/AdminLayout';
 import { Loader2, FileText, Filter, ArrowUpDown, Eye, RefreshCw, MoreVertical, User, Users, Search, CheckCircle, UserPlus, AlertCircle, Building2, ChevronDown, ChevronRight } from 'lucide-react';
 import { EligibleReviewer } from '@/services/api';
@@ -23,14 +23,7 @@ interface PaginationData {
   currentPage: number;
 }
 
-interface ExistingReviewForReassignment {
-  reviewId: string;
-  reviewer: {
-    name: string;
-  };
-  reviewType: "human" | "reconciliation";
-  status: string;
-}
+
 
 function AdminManuscriptsPage() {
   const { isAuthenticated } = useAuth();    
@@ -272,7 +265,7 @@ function AdminManuscriptsPage() {
     try {
       setReassignReviewerLoading(true);
       const response = await manuscriptAdminApi.getExistingReviewers(manuscriptId);
-      setExistingReviewsForReassignment(response.data.reviews);
+      setExistingReviewsForReassignment(response.data);
     } catch (err) {
       console.error('Failed to load existing reviews for reassignment:', err);
       toast.error('Failed to load existing reviews');

@@ -16,13 +16,21 @@ import {
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { publicationApi, PublishedArticle } from "@/services/api";
-import { IIssue } from "@/components/context/issue.model";
-import { IArticle } from "@/components/context/article.model";
 import NoCurrentIssue from "@/components/NoCurrentIssue";
+import { AxiosError } from "axios";
 
 interface CurrentIssueData {
   issue: IIssue & { volume: { volumeNumber: number; coverImage?: string } }; // Extend IIssue to include volume details
   articles: PublishedArticle[];
+}
+export interface IIssue {
+  volume: string;
+  issueNumber: number;
+  publishDate: Date;
+  description?: string;
+  isActive: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export default function CurrentIssuePage() {
@@ -30,6 +38,7 @@ export default function CurrentIssuePage() {
   const [currentIssueData, setCurrentIssueData] = useState<CurrentIssueData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [noIssueFound, setNoIssueFound] = useState(false);
 
   useEffect(() => {
     const fetchCurrentIssue = async () => {
@@ -39,16 +48,20 @@ export default function CurrentIssuePage() {
         if (response.success && response.data) {
           setCurrentIssueData(response.data);
         } else {
+          // If API returns success:false but no data, treat as a generic error
           setError("Failed to fetch current issue.");
         }
       } catch (err) {
         console.error("Error fetching current issue:", err);
-        setError("Error loading current issue. Please try again later.");
+        if (err instanceof AxiosError && err.response?.status === 404 && err.response?.data?.message === "No published issue found") {
+          setNoIssueFound(true);
+        } else {
+          setError("Error loading current issue. Please try again later.");
+        }
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchCurrentIssue();
   }, []);
 
@@ -98,17 +111,20 @@ export default function CurrentIssuePage() {
     );
   }
 
-
-  if (!currentIssueData || !currentIssueData.issue) {
+  if (noIssueFound) {
     return (
       <div className="min-h-screen bg-white">
         <Header />
-        <div className="flex justify-center items-center py-20">
-          <NoCurrentIssue />
-        </div>
+                <div className="py-20 mx-auto px-4 sm:px-6 lg:px-8">
+                  <NoCurrentIssue />
+                </div>
         <Footer />
       </div>
     );
+  }
+
+  if (!currentIssueData) {
+    return null; // Should not happen if noIssueFound and error are handled, but good practice
   }
 
   const { issue, articles } = currentIssueData;
@@ -119,7 +135,8 @@ export default function CurrentIssuePage() {
     }
     return sum;
   }, 0);
-  const totalViews = articles.reduce((sum, article) => sum + (article.views?.count || 0), 0);
+
+  const totalViews = articles.reduce((sum, article) => sum + (article.viewers?.count || 0), 0);
 
   const publishYear = new Date(issue.publishDate).getFullYear();
   const publishMonthYear = new Date(issue.publishDate).toLocaleDateString("en-US", {
@@ -155,6 +172,7 @@ export default function CurrentIssuePage() {
               <p className="text-xl text-[#FFE9EE] mb-6">
                 Published: {publishMonthYear}
               </p>
+
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
                   <div className="text-3xl font-bold mb-1">{totalArticles}</div>
@@ -177,14 +195,17 @@ export default function CurrentIssuePage() {
               </div>
               <div className="flex flex-wrap gap-3">
                 <button className="inline-flex items-center gap-2 bg-transparent border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-[#7A0019] transition-all">
+
                   <Share2 className="h-5 w-5" />
                   Share Issue
                 </button>
+
                 <button className="inline-flex items-center gap-2 bg-transparent border-2 border-white text-white px-6 py-3 rounded-lg font-semibold hover:bg-white hover:text-[#7A0019] transition-all">
                   <Quote className="h-5 w-5" />
                   Cite Issue
                 </button>
               </div>
+
               <div className="mt-6 pt-6 border-t border-white/20">
                 <p className="text-sm text-[#FFE9EE]">
                   <strong>ISSN:</strong> eISSN: 2XXX-XXXX (Online)
@@ -194,6 +215,7 @@ export default function CurrentIssuePage() {
           </div>
         </div>
       </section>
+
       <section className="bg-[#FAF7F8] border-b-2 border-[#EAD3D9] py-6">
         <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
@@ -210,9 +232,9 @@ export default function CurrentIssuePage() {
                 onChange={(e) => setFilterType(e.target.value)}
                 className="px-4 py-2 border-2 border-[#EAD3D9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#7A0019] font-medium"
               >
+
                 {articleTypes.map((type) => (
-                  <option key={type} value={type}>
-                    {type === "all" ? "All Article Types" : type}
+                  <option key={type} value={type}>                    {type === "all" ? "All Article Types" : type}
                   </option>
                 ))}
               </select>
@@ -220,24 +242,43 @@ export default function CurrentIssuePage() {
           </div>
         </div>
       </section>
+
       <section className="py-12">
+
         <div className="mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+
           {filteredArticles.map((article, index) => (
+
             <Link
+
               href={`/articles/${article._id}`}
+
               key={article._id}
+
               className="block bg-white border-2 border-[#EAD3D9] rounded-xl overflow-hidden hover:shadow-xl hover:border-[#7A0019] transition-all transform hover:scale-[1.02]"
+
             >
+
               <div className="p-8">
+
                 <div className="flex flex-wrap items-center gap-3 mb-4">
+
                   <span className="inline-flex items-center px-3 py-1 bg-[#FFE9EE] border border-[#E6B6C2] text-[#5A0A1A] rounded-full text-xs font-bold uppercase">
+
                     {article.articleType}
+
                   </span>
+
                   <span className="text-sm text-gray-500">Pages {article.pages?.start}-{article.pages?.end}</span>
+
                 </div>
+
                 <h3 className="text-2xl font-bold text-[#212121] mb-4 group-hover:text-[#7A0019] transition-colors font-serif leading-tight">
+
                   {index + 1}. {article.title}
+
                 </h3>
+
                 <div className="mb-4">
                   <div className="flex items-center gap-2 text-gray-700 mb-2">
                     <Users className="h-4 w-4" />
@@ -246,8 +287,11 @@ export default function CurrentIssuePage() {
                     </span>
                   </div>
                   {/* Affiliations are not directly available on PublishedArticle, so skipping for now */}
+
                   {/* <div className="text-sm text-gray-600 ml-6">
+
                     {article.affiliations.join(" • ")}
+
                   </div> */}
                 </div>
                 <div className="mb-4">
@@ -297,6 +341,7 @@ export default function CurrentIssuePage() {
               </p>
             </div>
           </div>
+
           <div className="mt-8 text-center">
             <Link
               href="/archives"
@@ -308,7 +353,12 @@ export default function CurrentIssuePage() {
           </div>
         </div>
       </section>
+
       <Footer />
     </div>
+
   );
+
 }
+
+

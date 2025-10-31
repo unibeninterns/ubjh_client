@@ -235,7 +235,7 @@ export default function AboutPage() {
             </section>
 
             {/* Peer Review Process */}
-            <section>
+            <section id= "peer-review">
               <div className="flex items-center gap-3 mb-6">
                 <div className="w-12 h-12 bg-[#FFE9EE] rounded-full flex items-center justify-center">
                   <Shield className="h-6 w-6 text-[#7A0019]" />
