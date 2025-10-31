@@ -46,17 +46,11 @@ interface ManuscriptReviewDetails {
 }
 
 interface PreviousReview {
-
   totalScore: number;
-
   reviewDecision: string;
-
   comments?: {
-
     commentsForAuthor?: string;
-
   };
-
 }
 
 
@@ -92,6 +86,7 @@ interface ConflictingReview {
   reviewerName: string;
   totalScore: number;
   reviewDecision: string;
+  completedAt: string;
 }
 
 const [conflictingReviews, setConflictingReviews] = useState<ConflictingReview[]>([]);

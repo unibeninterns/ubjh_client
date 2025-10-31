@@ -3,6 +3,7 @@
 import { AlertTriangle, TrendingUp, TrendingDown } from 'lucide-react';
 
 interface ConflictingReview {
+  reviewerId: string;
   reviewerName: string;
   reviewDecision: string;
   totalScore: number;

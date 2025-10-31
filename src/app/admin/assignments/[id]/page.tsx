@@ -72,6 +72,7 @@ interface ConflictingReview {
   reviewerName: string;
   totalScore: number;
   reviewDecision: string;
+  completedAt: string;
 }
 
 const [conflictingReviews, setConflictingReviews] = useState<ConflictingReview[]>([]);

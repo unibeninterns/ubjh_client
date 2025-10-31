@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { ReviewerLayout } from '@/components/reviewers/ReviewerLayout';
 import { useAuth } from '@/contexts/AuthContext';
 import { manuscriptReviewerApi } from '@/services/api';
-import type { ManuscriptReview } from '@/services/api';
+import type { ManuscriptReviewWithDetails } from '@/services/api';
 import {
   CheckCircle,
   FileText,
@@ -23,7 +23,7 @@ import {
 
 const CompletedReviews: React.FC = () => {
   const { isAuthenticated } = useAuth();
-  const [completedReviews, setCompletedReviews] = useState<ManuscriptReview[]>([]);
+  const [completedReviews, setCompletedReviews] = useState<ManuscriptReviewWithDetails[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -37,7 +37,7 @@ const CompletedReviews: React.FC = () => {
       const allAssignments = response.data || [];
       
       const completed = allAssignments.filter(
-        (assignment: ManuscriptReview) => assignment.status === 'completed'
+        (assignment: ManuscriptReviewWithDetails) => assignment.status === 'completed'
       );
       
       setCompletedReviews(completed);
@@ -69,7 +69,7 @@ const CompletedReviews: React.FC = () => {
     return 'Needs Improvement';
   };
 
-  const sortReviews = (reviews: ManuscriptReview[]) => {
+  const sortReviews = (reviews: ManuscriptReviewWithDetails[]) => {
     switch (sortBy) {
       case 'recent':
         return [...reviews].sort((a, b) => new Date(b.completedAt!).getTime() - new Date(a.completedAt!).getTime());
@@ -91,8 +91,8 @@ const CompletedReviews: React.FC = () => {
   );
 
   const getReviewTypeStats = () => {
-    const human = completedReviews.filter(r => r.reviewType === 'human').length;
-    const reconciliation = completedReviews.filter(r => r.reviewType === 'reconciliation').length;
+    const human = completedReviews.filter((r: ManuscriptReviewWithDetails) => r.reviewType === 'human').length;
+    const reconciliation = completedReviews.filter((r: ManuscriptReviewWithDetails) => r.reviewType === 'reconciliation').length;
     return { human, reconciliation };
   };
 

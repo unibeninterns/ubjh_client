@@ -130,8 +130,12 @@ export default function FailedJobsPage() {
       toast.success("Job retry scheduled successfully");
       fetchJobs();
       fetchStatistics();
-    } catch (error: AxiosError) {
-      toast.error(error.response?.data?.message || "Failed to retry job");
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.message || "Failed to retry job");
+      } else {
+        toast.error("An unexpected error occurred");
+      }
     } finally {
       setIsRetrying(false);
     }
@@ -146,8 +150,12 @@ export default function FailedJobsPage() {
       toast.success(`${response.retriedCount} jobs scheduled for retry`);
       fetchJobs();
       fetchStatistics();
-    } catch (error: AxiosError) {
-      toast.error(error.response?.data?.message || "Failed to retry jobs");
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.message || "Failed to retry jobs");
+      } else {
+        toast.error("An unexpected error occurred");
+      }
     } finally {
       setIsRetrying(false);
     }
@@ -159,8 +167,12 @@ export default function FailedJobsPage() {
       toast.success("Job marked as resolved");
       fetchJobs();
       fetchStatistics();
-    } catch (error: AxiosError) {
-      toast.error(error.response?.data?.message || "Failed to mark as resolved");
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.message || "Failed to mark as resolved");
+      } else {
+        toast.error("An unexpected error occurred");
+      }
     }
   };
 
@@ -172,8 +184,12 @@ export default function FailedJobsPage() {
       toast.success(`${response.deletedCount} resolved jobs deleted`);
       fetchJobs();
       fetchStatistics();
-    } catch (error: AxiosError) {
-      toast.error(error.response?.data?.message || "Failed to delete resolved jobs");
+    } catch (error: unknown) {
+      if (error instanceof AxiosError) {
+        toast.error(error.response?.data?.message || "Failed to delete resolved jobs");
+      } else {
+        toast.error("An unexpected error occurred");
+      }
     }
   };
 

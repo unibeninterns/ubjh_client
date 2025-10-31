@@ -11,7 +11,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Button } from "@/components/ui/button";
 import { Toaster, toast } from "sonner";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { FileUpload } from '@/components/ui/FileUpload';
+import { FileUpload } from '@/components/FileUpload';
 
 interface Faculty {
   faculty: string;
@@ -69,6 +69,12 @@ function AdminManuscriptsPage() {
   const [currentManuscriptForEdit, setCurrentManuscriptForEdit] = useState<Manuscript | null>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [editingManuscript, setEditingManuscript] = useState(false);
+
+  // State for Edit Revised Manuscript Modal
+  const [showEditRevisedManuscriptModal, setShowEditRevisedManuscriptModal] = useState(false);
+  const [currentManuscriptForRevisedEdit, setCurrentManuscriptForRevisedEdit] = useState<Manuscript | null>(null);
+  const [selectedRevisedFile, setSelectedRevisedFile] = useState<File | null>(null);
+  const [editingRevisedManuscript, setEditingRevisedManuscript] = useState(false);
 
   const [assigningFaculty, setAssigningFaculty] = useState(false);
   const [expandedFaculty, setExpandedFaculty] = useState<string | null>(null);
@@ -164,6 +170,40 @@ function AdminManuscriptsPage() {
     }
   };
 
+  const handleEditRevisedManuscriptClick = (manuscript: Manuscript) => {
+    setCurrentManuscriptForRevisedEdit(manuscript);
+    setShowEditRevisedManuscriptModal(true);
+  };
+
+  const handleEditRevisedManuscriptSubmit = async () => {
+    if (!currentManuscriptForRevisedEdit || !selectedRevisedFile) return;
+
+    setEditingRevisedManuscript(true);
+    toast.info("Editing revised manuscript...");
+
+    try {
+      const response = await manuscriptAdminApi.editRevisedManuscript(
+        currentManuscriptForRevisedEdit._id,
+        selectedRevisedFile
+      );
+
+      if (response.success) {
+        toast.success("Revised manuscript edited successfully!");
+        setShowEditRevisedManuscriptModal(false);
+        refreshData(); // Refresh manuscripts list
+      } else {
+        toast.error("Failed to edit revised manuscript");
+      }
+    } catch (error) {
+      console.error("Failed to edit revised manuscript:", error);
+      toast.error("Error while editing revised manuscript");
+    } finally {
+      setEditingRevisedManuscript(false);
+      setSelectedRevisedFile(null);
+      setCurrentManuscriptForRevisedEdit(null);
+    }
+  };
+
   useEffect(() => {
     const fetchManuscripts = async () => {
       if (!isAuthenticated) return;
@@ -220,13 +260,16 @@ function AdminManuscriptsPage() {
 
   // Helper function to determine if reassign is available
   const canReassignReview = (manuscript: Manuscript): boolean => {
-    // Exception: Always allow reassign for revised manuscripts that are under review
-    if (manuscript.revisedPdfFile && manuscript.status === 'under_review') {
-      return true;
+    if (manuscript.originRevisedPdfFile) {
+        return true;
     }
 
-    // Otherwise, allow reassign only if the review process is NOT completed AND at least one reviewer is assigned
-    return !manuscript.isReviewProcessCompleted && manuscript.assignedReviewerCount > 0;
+    // For non-revised manuscripts, keep the original logic but exclude revised ones that haven't been edited yet.
+    if (!manuscript.revisedPdfFile) {
+        return !manuscript.isReviewProcessCompleted && (manuscript.assignedReviewerCount ?? 0) > 0;
+    }
+
+    return false;
   };
 
   // Assign Reviewer Functions
@@ -670,21 +713,27 @@ function AdminManuscriptsPage() {
                                       <FileText className="h-4 w-4 mr-2" /> Edit Manuscript
                                     </DropdownMenuItem>
                                   )}
+
+                                  {manuscript.revisedPdfFile && !manuscript.originRevisedPdfFile && (
+                                    <DropdownMenuItem onSelect={() => handleEditRevisedManuscriptClick(manuscript)}>
+                                      <FileText className="h-4 w-4 mr-2" /> Edit Revised Manuscript
+                                    </DropdownMenuItem>
+                                  )}
                                   
-                                  {((manuscript.status === 'submitted' && !manuscript.submitter.assignedFaculty) || (manuscript.submitter.assignedFaculty && manuscript.assignedReviewerCount === 0)) && (
+                                  {((manuscript.status === 'submitted' && !manuscript.submitter.assignedFaculty) || (manuscript.submitter.assignedFaculty && (manuscript.assignedReviewerCount ?? 0) === 0)) && !manuscript.revisedPdfFile && (
                                     <DropdownMenuItem onSelect={() => { setCurrentManuscriptForFaculty(manuscript); setShowAssignFacultyModal(true); }}>
                                       <Building2 className="h-4 w-4 mr-2" /> 
                                       {!manuscript.submitter.assignedFaculty ? 'Assign Faculty' : 'Change Faculty'}
                                     </DropdownMenuItem>
                                   )}
 
-                                  {manuscript.submitter.assignedFaculty && manuscript.originPdfFile && manuscript.assignedReviewerCount === 0 && (
+                                  {manuscript.submitter.assignedFaculty && manuscript.originPdfFile && (manuscript.assignedReviewerCount ?? 0) === 0 && (
                                     <DropdownMenuItem onSelect={() => handleAssignReviewerClick(manuscript)}>
                                       <UserPlus className="h-4 w-4 mr-2" /> Assign First Reviewer
                                     </DropdownMenuItem>
                                   )}
 
-                                  {manuscript.submitter.assignedFaculty && manuscript.originPdfFile && manuscript.assignedReviewerCount === 1 && (
+                                  {manuscript.submitter.assignedFaculty && manuscript.originPdfFile && (manuscript.assignedReviewerCount ?? 0) === 1 && (
                                     <DropdownMenuItem onSelect={() => handleAssignReviewerClick(manuscript)}>
                                       <UserPlus className="h-4 w-4 mr-2" /> Assign Second Reviewer
                                     </DropdownMenuItem>
@@ -1304,6 +1353,27 @@ function AdminManuscriptsPage() {
             <Button variant="outline" onClick={() => setShowEditManuscriptModal(false)}>Cancel</Button>
             <Button onClick={handleEditManuscriptSubmit} disabled={!selectedFile || editingManuscript}>
               {editingManuscript ? <Loader2 className="h-4 w-4 animate-spin" /> : "Submit"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Revised Manuscript Modal */}
+      <Dialog open={showEditRevisedManuscriptModal} onOpenChange={setShowEditRevisedManuscriptModal}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Edit Revised Manuscript</DialogTitle>
+            <DialogDescription>
+              Upload a new version of the revised manuscript. This will replace the existing revised file and trigger the review process.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <FileUpload onFileSelect={setSelectedRevisedFile} />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowEditRevisedManuscriptModal(false)}>Cancel</Button>
+            <Button onClick={handleEditRevisedManuscriptSubmit} disabled={!selectedRevisedFile || editingRevisedManuscript}>
+              {editingRevisedManuscript ? <Loader2 className="h-4 w-4 animate-spin" /> : "Submit"}
             </Button>
           </DialogFooter>
         </DialogContent>

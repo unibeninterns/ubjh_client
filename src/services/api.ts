@@ -127,6 +127,12 @@ export interface ManuscriptDetailResponse {
   data: Manuscript;
 }
 
+export interface EditManuscriptResponse {
+  success: boolean;
+  data: Manuscript;
+  message?: string;
+}
+
 export interface ManuscriptStatistics {
   success: boolean;
   data: {
@@ -599,6 +605,8 @@ export interface PublishedArticle {
   pages?: { start: number; end: number };
   viewers: { count: number; viewers: string[] };
   downloads: { count: number; downloaders: string[] };
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface EmailSubscriber {
@@ -914,7 +922,7 @@ export const manuscriptAdminApi = {
     }
   },
 
-  editManuscript: async (manuscriptId: string, file: File): Promise<any> => {
+  editManuscript: async (manuscriptId: string, file: File): Promise<EditManuscriptResponse> => {
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -938,7 +946,7 @@ export const manuscriptAdminApi = {
   editRevisedManuscript: async (
     manuscriptId: string,
     file: File
-  ): Promise<any> => {
+  ): Promise<EditManuscriptResponse> => {
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -1575,6 +1583,7 @@ export const manuscriptReviewerApi = {
     data: {
       review: ManuscriptReviewWithDetails;
       conflictingReviews: Array<{
+        reviewerId: string;
         reviewerName: string;
         reviewDecision: string;
         totalScore: number;
@@ -1700,6 +1709,7 @@ export const adminReviewApi = {
     data: {
       review: ManuscriptReviewWithDetails;
       conflictingReviews: Array<{
+        reviewerId: string;
         reviewerName: string;
         reviewDecision: string;
         totalScore: number;
