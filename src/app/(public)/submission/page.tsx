@@ -38,7 +38,7 @@ export default function SubmissionPortalPage() {
       number: 2,
       title: "Fill Submission Form",
       description:
-        "Enter article metadata including title, authors, affiliations, abstract, and keywords. Provide ORCID iDs for all authors (recommended).",
+        "Enter article metadata including title, authors, affiliations, abstract, and keywords. Provide ORCID iDs for all authors (required).",
       icon: Upload,
       duration: "5-10 minutes",
     },
@@ -91,7 +91,7 @@ export default function SubmissionPortalPage() {
     },
     {
       title: "ORCID iDs",
-      description: "Recommended for all authors",
+      description: "Required for all authors",
       met: false,
     },
     {
@@ -115,7 +115,7 @@ export default function SubmissionPortalPage() {
     {
       question: "Do I need an ORCID iD to submit?",
       answer:
-        "While not mandatory, we strongly recommend that all authors have ORCID iDs. They help distinguish you from other researchers and make your work more discoverable.",
+        "It is mandatory, we strongly require that all authors have ORCID iDs. They help distinguish you from other researchers and make your work more discoverable.",
     },
     {
       question: "Can I track my submission status?",
@@ -135,7 +135,7 @@ export default function SubmissionPortalPage() {
       <Header/>
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-[#7A0019] to-[#5A0A1A] text-white py-20">
+      <section className="bg-gradient-to-br from-[#7A0019] to-[rgb(90,10,26)] text-white py-20">
         <div className="absolute inset-0 opacity-10">
                   {/* Placeholder for subtle pattern/texture */}
                   <Image
@@ -350,7 +350,7 @@ export default function SubmissionPortalPage() {
                     </div>
                     {!req.met && (
                       <span className="text-xs text-yellow-800 bg-yellow-100 px-2 py-1 rounded-full font-semibold">
-                        Recommended
+                        Required
                       </span>
                     )}
                   </div>
@@ -364,7 +364,7 @@ export default function SubmissionPortalPage() {
                 </h3>
                 <div className="grid md:grid-cols-2 gap-4">
                   <a
-                    href="/files/UBJH_Manuscript_Template.docx"
+                    href="/files/UNIBEN_Journal_Of_Humanities_Templates.docx"
                     className="flex items-center gap-3 p-4 bg-white border-2 border-[#EAD3D9] rounded-lg hover:border-[#7A0019] transition-colors"
                   >
                     <FileText className="h-5 w-5 text-[#7A0019]" />
