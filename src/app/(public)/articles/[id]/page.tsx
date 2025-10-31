@@ -1,8 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import {
   Download,
   Share2,
@@ -15,71 +16,57 @@ import {
   ChevronRight,
   Copy,
   Check,
-  Globe,
   Printer,
 } from "lucide-react";
 import Footer from "@/components/Footer";
+import { publicationApi, PublishedArticle } from "@/services/api";
+import ArticleNotFound from "@/components/ArticleNotFound";
 
 export default function ArticleDetailPage() {
+  const params = useParams();
+  const id = params.id as string;
+  const [articleData, setArticleData] = useState<PublishedArticle | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [copiedDOI, setCopiedDOI] = useState(false);
   const [citationFormat, setCitationFormat] = useState("APA");
 
-  // Mock article data
-  const article = {
-    id: "001",
-    title:
-      "Decolonizing Legal Education in West Africa: A Critical Analysis of Pedagogical Approaches",
-    authors: [
-      {
-        name: "Afolabi O. Johnson",
-        affiliation: "Department of Law, University of Benin, Nigeria",
-        email: "afolabi.johnson@uniben.edu",
-        orcid: "0000-0001-2345-6789",
-        corresponding: true,
-      },
-      {
-        name: "Chinwe M. Okeke",
-        affiliation: "Faculty of Law, University of Lagos, Nigeria",
-        orcid: "0000-0002-3456-7890",
-      },
-    ],
-    abstract:
-      "This study examines the persistence of colonial frameworks in contemporary legal education across West African universities and proposes context-driven pedagogical reforms that center African jurisprudence, customary law, and indigenous legal systems. Through comparative analysis of curricula in Nigeria, Ghana, and Senegal, we demonstrate how Eurocentric approaches continue to marginalize local legal traditions. Drawing on decolonial theory and interviews with law educators, we identify key barriers to curriculum reform and propose actionable strategies for integrating African legal philosophies into mainstream legal education. Our findings suggest that decolonizing legal pedagogy requires not only curriculum revision but also institutional transformation, including the recruitment of diverse faculty, development of local case law databases, and partnerships with traditional legal institutions.",
-    keywords: [
-      "decolonization",
-      "legal education",
-      "West Africa",
-      "pedagogy",
-      "jurisprudence",
-      "customary law",
-      "curriculum reform",
-    ],
-    doi: "10.1234/ubjh.2025.0001",
-    volume: 1,
-    issue: 1,
-    year: 2025,
-    pages: "1-18",
-    articleType: "Research Article",
-    received: "2024-12-15",
-    accepted: "2025-02-10",
-    published: "2025-03-15",
-    views: 342,
-    downloads: 89,
-    citations: 0,
-    license: "CC BY 4.0",
-    funding:
-      "This research was supported by the TETFund National Research Fund (Grant No. NRF/2024/LAW/001).",
-    conflictOfInterest:
-      "The authors declare no conflicts of interest.",
-    dataAvailability:
-      "Interview transcripts and curriculum documents are available upon reasonable request to the corresponding author, subject to ethical approval and institutional permissions.",
-  };
+  useEffect(() => {
+    if (!id) return;
+
+    const fetchArticle = async () => {
+      try {
+        setIsLoading(true);
+        const response = await publicationApi.getPublishedArticle(id);
+        if (response.success && response.data) {
+          setArticleData(response.data);
+        } else {
+          setError("Article not found.");
+        }
+      } catch (err) {
+        console.error("Error fetching article:", err);
+        setError("Error loading article. Please try again later.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchArticle();
+  }, [id]);
 
   const citations = {
-    APA: `Johnson, A. O., & Okeke, C. M. (2025). Decolonizing Legal Education in West Africa: A Critical Analysis of Pedagogical Approaches. UNIBEN Journal of Humanities, 1(1), 1-18. https://doi.org/${article.doi}`,
-    MLA: `Johnson, Afolabi O., and Chinwe M. Okeke. "Decolonizing Legal Education in West Africa: A Critical Analysis of Pedagogical Approaches." UNIBEN Journal of Humanities, vol. 1, no. 1, 2025, pp. 1-18.`,
-    Chicago: `Johnson, Afolabi O., and Chinwe M. Okeke. "Decolonizing Legal Education in West Africa: A Critical Analysis of Pedagogical Approaches." UNIBEN Journal of Humanities 1, no. 1 (2025): 1-18. https://doi.org/${article.doi}.`,
-    Harvard: `Johnson, A.O. and Okeke, C.M., 2025. Decolonizing Legal Education in West Africa: A Critical Analysis of Pedagogical Approaches. UNIBEN Journal of Humanities, 1(1), pp.1-18.`,
+    APA: articleData?.doi
+      ? `Johnson, A. O., & Okeke, C. M. (2025). Decolonizing Legal Education in West Africa: A Critical Analysis of Pedagogical Approaches. UNIBEN Journal of Humanities, ${articleData.volume.volumeNumber}(${articleData.issue.issueNumber}), ${articleData.pages?.start}-${articleData.pages?.end}. https://doi.org/${articleData.doi}`
+      : "",
+    MLA: articleData?.doi
+      ? `Johnson, Afolabi O., and Chinwe M. Okeke. "Decolonizing Legal Education in West Africa: A Critical Analysis of Pedagogical Approaches." UNIBEN Journal of Humanities, vol. ${articleData.volume.volumeNumber}, no. ${articleData.issue.issueNumber}, ${new Date(articleData.publishDate).getFullYear()}, pp. ${articleData.pages?.start}-${articleData.pages?.end}.`
+      : "",
+    Chicago: articleData?.doi
+      ? `Johnson, Afolabi O., and Chinwe M. Okeke. "Decolonizing Legal Education in West Africa: A Critical Analysis of Pedagogical Approaches." UNIBEN Journal of Humanities ${articleData.volume.volumeNumber}, no. ${articleData.issue.issueNumber} (${new Date(articleData.publishDate).getFullYear()}): ${articleData.pages?.start}-${articleData.pages?.end}. https://doi.org/${articleData.doi}.`
+      : "",
+    Harvard: articleData?.doi
+      ? `Johnson, A.O. and Okeke, C.M., ${new Date(articleData.publishDate).getFullYear()}. Decolonizing Legal Education in West Africa: A Critical Analysis of Pedagogical Approaches. UNIBEN Journal of Humanities, ${articleData.volume.volumeNumber}(${articleData.issue.issueNumber}), pp.${articleData.pages?.start}-${articleData.pages?.end}.`
+      : "",
   };
 
   const relatedArticles = [
@@ -98,10 +85,146 @@ export default function ArticleDetailPage() {
   ];
 
   const copyDOI = () => {
-    navigator.clipboard.writeText(`https://doi.org/${article.doi}`);
-    setCopiedDOI(true);
-    setTimeout(() => setCopiedDOI(false), 2000);
+    if (articleData?.doi) {
+      navigator.clipboard.writeText(`https://doi.org/${articleData.doi}`);
+      setCopiedDOI(true);
+      setTimeout(() => setCopiedDOI(false), 2000);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-white">
+        <header className="bg-[#7A0019] text-white shadow-lg sticky top-0 z-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-20">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 bg-white rounded-lg flex items-center justify-center">
+                  <Image
+                    src="/uniben-logo.png"
+                    alt="UNIBEN Logo"
+                    width={48}
+                    height={48}
+                    className="rounded"
+                  />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold tracking-tight">
+                    UNIBEN Journal of Humanities
+                  </h1>
+                  <p className="text-sm text-[#FFE9EE] font-medium">
+                    Article View
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/current-issue"
+                className="text-white hover:text-[#FFE9EE] font-semibold"
+              >
+                ← Back to Issue
+              </Link>
+            </div>
+          </div>
+        </header>
+        <div className="flex justify-center items-center py-20">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#7A0019]"></div>
+            <p className="text-[#7A0019] font-medium">Loading article...</p>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-white">
+        <header className="bg-[#7A0019] text-white shadow-lg sticky top-0 z-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-20">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 bg-white rounded-lg flex items-center justify-center">
+                  <Image
+                    src="/uniben-logo.png"
+                    alt="UNIBEN Logo"
+                    width={48}
+                    height={48}
+                    className="rounded"
+                  />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold tracking-tight">
+                    UNIBEN Journal of Humanities
+                  </h1>
+                  <p className="text-sm text-[#FFE9EE] font-medium">
+                    Article View
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/current-issue"
+                className="text-white hover:text-[#FFE9EE] font-semibold"
+              >
+                ← Back to Issue
+              </Link>
+            </div>
+          </div>
+        </header>
+        <div className="flex justify-center items-center py-20">
+          <div className="text-center text-red-600 font-medium">{error}</div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+
+  if (!articleData) {
+    return (
+      <div className="min-h-screen bg-white">
+        <header className="bg-[#7A0019] text-white shadow-lg sticky top-0 z-50">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-20">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 bg-white rounded-lg flex items-center justify-center">
+                  <Image
+                    src="/uniben-logo.png"
+                    alt="UNIBEN Logo"
+                    width={48}
+                    height={48}
+                    className="rounded"
+                  />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold tracking-tight">
+                    UNIBEN Journal of Humanities
+                  </h1>
+                  <p className="text-sm text-[#FFE9EE] font-medium">
+                    Article View
+                  </p>
+                </div>
+              </div>
+              <Link
+                href="/current-issue"
+                className="text-white hover:text-[#FFE9EE] font-semibold"
+              >
+                ← Back to Issue
+              </Link>
+            </div>
+          </div>
+        </header>
+        <div className="flex justify-center items-center py-20">
+          <ArticleNotFound />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  const { articleType, title, abstract, keywords, doi, volume, issue, pages, author, coAuthors, publishDate } = articleData;
+
+  const allAuthors = [author, ...(coAuthors || [])];
 
   return (
     <div className="min-h-screen bg-white">
@@ -153,7 +276,7 @@ export default function ArticleDetailPage() {
               href="/current-issue"
               className="hover:text-[#7A0019]"
             >
-              Volume {article.volume}, Issue {article.issue} ({article.year})
+              Volume {volume.volumeNumber}, Issue {issue.issueNumber} ({new Date(publishDate).getFullYear()})
             </Link>
             <ChevronRight className="h-4 w-4" />
             <span className="text-gray-900 font-medium">Article</span>
@@ -170,7 +293,7 @@ export default function ArticleDetailPage() {
             <div className="mb-8">
               <div className="flex flex-wrap items-center gap-3 mb-6">
                 <span className="inline-flex items-center px-3 py-1 bg-[#FFE9EE] border border-[#E6B6C2] text-[#5A0A1A] rounded-full text-xs font-bold uppercase">
-                  {article.articleType}
+                  {articleType}
                 </span>
                 <span className="inline-flex items-center px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-bold">
                   OPEN ACCESS
@@ -181,12 +304,12 @@ export default function ArticleDetailPage() {
               </div>
 
               <h1 className="text-4xl font-bold text-[#212121] mb-6 leading-tight font-serif">
-                {article.title}
+                {title}
               </h1>
 
               {/* Authors */}
               <div className="mb-6">
-                {article.authors.map((author, idx) => (
+                {allAuthors.map((auth, idx) => (
                   <div
                     key={idx}
                     className="flex items-start gap-3 mb-3 flex-wrap"
@@ -194,36 +317,22 @@ export default function ArticleDetailPage() {
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="font-semibold text-[#212121]">
-                          {author.name}
-                          {author.corresponding && (
-                            <sup className="text-[#7A0019]">*</sup>
-                          )}
+                          {auth.name}
                         </span>
-                        {author.orcid && (
-                          <a
-                            href={`https://orcid.org/${author.orcid}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[#7A0019] hover:text-[#5A0A1A]"
-                            aria-label="ORCID"
-                          >
-                            <Globe className="h-4 w-4" />
-                          </a>
-                        )}
                       </div>
-                      <p className="text-sm text-gray-600">{author.affiliation}</p>
-                      {author.corresponding && author.email && (
-                        <p className="text-sm text-gray-600">
-                          <sup className="text-[#7A0019]">*</sup> Corresponding
-                          author:{" "}
-                          <a
-                            href={`mailto:${author.email}`}
-                            className="text-[#7A0019] hover:underline"
-                          >
-                            {author.email}
-                          </a>
-                        </p>
-                      )}
+                      {/* Affiliation and ORCID are not directly available on AuthorSummary, skipping for now */}
+                      {/* <p className="text-sm text-gray-600">{auth.affiliation}</p>
+                      {auth.orcid && (
+                        <a
+                          href={`https://orcid.org/${auth.orcid}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[#7A0019] hover:text-[#5A0A1A]"
+                          aria-label="ORCID"
+                        >
+                          <Globe className="h-4 w-4" />
+                        </a>
+                      )} */}
                     </div>
                   </div>
                 ))}
@@ -234,51 +343,39 @@ export default function ArticleDetailPage() {
                 <div className="flex items-center gap-2">
                   <Calendar className="h-4 w-4" />
                   <span>
-                    <strong>Received:</strong> {article.received}
-                  </span>
-                </div>
-                <span>|</span>
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  <span>
-                    <strong>Accepted:</strong> {article.accepted}
-                  </span>
-                </div>
-                <span>|</span>
-                <div className="flex items-center gap-2">
-                  <Calendar className="h-4 w-4" />
-                  <span>
-                    <strong>Published:</strong> {article.published}
+                    <strong>Published:</strong> {new Date(publishDate).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
                   </span>
                 </div>
               </div>
 
               {/* DOI */}
-              <div className="flex items-center gap-3 mb-6">
-                <span className="text-sm font-semibold text-gray-700">
-                  DOI:
-                </span>
-                <code className="px-3 py-1 bg-gray-100 rounded font-mono text-sm">
-                  {article.doi}
-                </code>
-                <button
-                  onClick={copyDOI}
-                  className="inline-flex items-center gap-1 text-[#7A0019] hover:text-[#5A0A1A] text-sm font-semibold"
-                  aria-label="Copy DOI"
-                >
-                  {copiedDOI ? (
-                    <>
-                      <Check className="h-4 w-4" />
-                      Copied!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-4 w-4" />
-                      Copy
-                    </>
-                  )}
-                </button>
-              </div>
+              {doi && (
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="text-sm font-semibold text-gray-700">
+                    DOI:
+                  </span>
+                  <code className="px-3 py-1 bg-gray-100 rounded font-mono text-sm">
+                    {doi}
+                  </code>
+                  <button
+                    onClick={copyDOI}
+                    className="inline-flex items-center gap-1 text-[#7A0019] hover:text-[#5A0A1A] text-sm font-semibold"
+                    aria-label="Copy DOI"
+                  >
+                    {copiedDOI ? (
+                      <>
+                        <Check className="h-4 w-4" />
+                        Copied!
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="h-4 w-4" />
+                        Copy
+                      </>
+                    )}
+                  </button>
+                </div>
+              )}
 
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-3 mb-8">
@@ -311,12 +408,12 @@ export default function ArticleDetailPage() {
                 Abstract
               </h2>
               <p className="text-gray-700 leading-relaxed mb-6">
-                {article.abstract}
+                {abstract}
               </p>
               <div className="bg-[#FAF7F8] rounded-lg p-4">
                 <h3 className="font-semibold text-[#212121] mb-2">Keywords:</h3>
                 <div className="flex flex-wrap gap-2">
-                  {article.keywords.map((keyword, idx) => (
+                  {keywords.map((keyword, idx) => (
                     <span
                       key={idx}
                       className="px-3 py-1 bg-white border border-[#EAD3D9] text-gray-700 rounded-full text-sm"
@@ -409,7 +506,8 @@ export default function ArticleDetailPage() {
             </section>
 
             {/* Declarations */}
-            <section className="mb-8">
+            {/* Assuming these fields are not directly available in PublishedArticle for now */}
+            {/* <section className="mb-8">
               <h2 className="text-2xl font-bold text-[#7A0019] mb-4 font-serif">
                 Declarations
               </h2>
@@ -439,7 +537,7 @@ export default function ArticleDetailPage() {
                   </p>
                 </div>
               </div>
-            </section>
+            </section> */}
 
             {/* Copyright Notice */}
             <section className="bg-green-50 border-2 border-green-200 rounded-xl p-6">
@@ -514,14 +612,14 @@ export default function ArticleDetailPage() {
                     <strong>Journal:</strong> UNIBEN Journal of Humanities
                   </p>
                   <p className="text-sm text-gray-600 mb-1">
-                    <strong>Volume/Issue:</strong> {article.volume}(
-                    {article.issue})
+                    <strong>Volume/Issue:</strong> {volume.volumeNumber}(
+                    {issue.issueNumber})
                   </p>
                   <p className="text-sm text-gray-600 mb-1">
-                    <strong>Year:</strong> {article.year}
+                    <strong>Year:</strong> {new Date(publishDate).getFullYear()}
                   </p>
                   <p className="text-sm text-gray-600">
-                    <strong>Pages:</strong> {article.pages}
+                    <strong>Pages:</strong> {pages?.start}-{pages?.end}
                   </p>
                 </div>
                 <Link

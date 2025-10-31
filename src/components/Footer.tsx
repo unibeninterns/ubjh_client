@@ -8,7 +8,7 @@ export default function Footer() {
   const indexingPlatforms = [
     {
       name: "Google Scholar",
-      logo: "/indexing/google-scholar.png",
+      logo: "/indexing/google-scholar.jpg",
       url: "https://scholar.google.com",
       status: "active",
     },
@@ -137,6 +137,19 @@ export default function Footer() {
                 <div className="text-left">
                   <div className="text-xs font-semibold text-gray-600">Open Access</div>
                   <div className="text-sm font-bold text-green-700">Diamond OA</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="text-center">
+              <div className="flex items-center gap-2 bg-white border-2 border-[#EAD3D9] rounded-lg px-6 py-3">
+                <div className="relative w-18 h-18">
+                  <Image
+                    src="/indexing/open_access.png"
+                    alt="Open Access Image"
+                    fill
+                    className="object-contain"
+                  />
                 </div>
               </div>
             </div>
