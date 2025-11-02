@@ -205,6 +205,14 @@ function AdminManuscriptsPage() {
   };
 
   useEffect(() => {
+    if (!showReassignReviewerModal && !showAssignReviewerModal && !showAssignFacultyModal && !showEditManuscriptModal && !showEditRevisedManuscriptModal) {
+      // Ensure body styles are reset when modal is closed
+      document.body.style.pointerEvents = ''; // Reset to default
+      document.body.style.overflow = ''; // Reset to default
+    }
+  }, [showReassignReviewerModal, showAssignReviewerModal, showAssignFacultyModal, showEditManuscriptModal, showEditRevisedManuscriptModal]);
+
+  useEffect(() => {
     const fetchManuscripts = async () => {
       if (!isAuthenticated) return;
       
@@ -469,10 +477,10 @@ function AdminManuscriptsPage() {
     <AdminLayout>
       <div className="py-6">
         <div className="mx-auto px-4 sm:px-6 md:px-8">
-          <div className="grid flex-1 items-start gap-4 p-4 sm:px-6 sm:py-0 md:gap-8">
+          <div className="grid flex-1 items-start gap-4 p-4 sm:py-0 md:gap-8">
             <div className="flex justify-between items-center mb-6">
               <h1 className="text-2xl font-semibold text-gray-900">Manuscripts</h1>
-              <button 
+              <button
                 onClick={refreshData}
                 className="flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#7A0019]"
               >
