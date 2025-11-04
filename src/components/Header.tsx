@@ -44,10 +44,19 @@ export default function Header() {
     { href: "/about", label: "About" },
   ];
 
+  const linkClass = (path: string) =>
+    `relative font-medium pb-1 border-b-2 transition-colors ${
+      pathname === path
+        ? "font-bold border-[#FFE9EE] text-[#FFE9EE]"
+        : "border-transparent text-white hover:text-[#FFE9EE] hover:border-[#FFE9EE]"
+    }`;
+
   return (
     <header className="bg-[#7A0019] text-white shadow-lg sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Top Row */}
         <div className="flex items-center justify-between h-20">
+          {/* Logo + Title */}
           <Link href="/" className="flex items-center gap-4 group">
             <div className="w-14 h-14 bg-white rounded-lg flex items-center justify-center transition-transform group-hover:scale-105">
               <Image
@@ -60,7 +69,7 @@ export default function Header() {
             </div>
             <div>
               <h1 className="text-lg md:text-xl font-bold tracking-tight transition-colors group-hover:text-[#FFE9EE]">
-                UNIBEN Journal of Humanities
+                UNIBEN Journal of Science, Technology and Innovation
               </h1>
               <p className="text-sm text-[#FFE9EE] font-medium">
                 Open Access • Peer Reviewed
@@ -68,22 +77,15 @@ export default function Header() {
             </div>
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-6">
+          {/* Desktop Navigation */}
+          <nav className="hidden lg:flex items-center gap-4">
             {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={`relative text-sm font-medium transition-colors hover:text-[#FFE9EE] ${
-                  pathname === link.href ? "text-[#FFE9EE]" : "text-white"
-                }`}
-              >
+              <Link key={link.href} href={link.href} className={linkClass(link.href)}>
                 {link.label}
-                {pathname === link.href && (
-                  <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-[#FFE9EE] rounded-full" />
-                )}
               </Link>
             ))}
-            
+
+            {/* Search Toggle */}
             {!isHomePage && (
               <button
                 onClick={() => setIsSearchOpen(!isSearchOpen)}
@@ -93,7 +95,8 @@ export default function Header() {
                 <Search className="h-5 w-5" />
               </button>
             )}
-            
+
+            {/* Submit Button */}
             <Link
               href="/submission"
               className="bg-white text-[#7A0019] px-6 py-2 rounded-full font-semibold hover:bg-[#FFE9EE] transition-all shadow-lg hover:shadow-xl hover:scale-105"
@@ -102,6 +105,7 @@ export default function Header() {
             </Link>
           </nav>
 
+          {/* Mobile Menu + Search */}
           <div className="lg:hidden flex items-center gap-2">
             {!isHomePage && (
               <button
@@ -109,7 +113,7 @@ export default function Header() {
                 className="p-2 hover:bg-white/10 rounded-full transition-colors"
                 aria-label="Search"
               >
-                <Search className="h-5 w-5" />
+                <Search className="h-6 w-6" />
               </button>
             )}
             <button
@@ -122,6 +126,7 @@ export default function Header() {
           </div>
         </div>
 
+        {/* Search Bar */}
         {!isHomePage && isSearchOpen && (
           <div className="pb-4 animate-fade-in">
             <div className="relative">
@@ -146,6 +151,7 @@ export default function Header() {
         )}
       </div>
 
+      {/* Mobile Menu */}
       {isMenuOpen && (
         <div className="lg:hidden bg-[#5A0A1A] border-t border-white/10 animate-slide-down">
           <nav className="flex flex-col p-6 space-y-4">
@@ -154,17 +160,29 @@ export default function Header() {
                 key={link.href}
                 href={link.href}
                 onClick={() => setIsMenuOpen(false)}
-                className={`text-base font-medium transition-colors hover:text-[#FFE9EE] ${
-                  pathname === link.href ? "text-[#FFE9EE]" : "text-white"
-                }`}
+                className={linkClass(link.href)}
               >
                 {link.label}
               </Link>
             ))}
+
+            {/* Mobile Search */}
+            <Link
+              href="/search"
+              onClick={() => setIsMenuOpen(false)}
+              className={`flex items-center gap-2 pb-1 border-b-2 ${
+                pathname === "/search"
+                  ? "font-bold border-[#FFE9EE] text-[#FFE9EE]"
+                  : "border-transparent text-white hover:text-[#FFE9EE] hover:border-[#FFE9EE]"
+              }`}
+            >
+              <Search size={20} /> Advanced Search
+            </Link>
+
             <Link
               href="/submission"
               onClick={() => setIsMenuOpen(false)}
-              className="bg-white text-[#7A0019] px-6 py-3 rounded-full font-semibold hover:bg-[#FFE9EE] transition-all text-center"
+              className="bg-white text-[#7A0019] px-6 py-3 rounded-full font-semibold hover:bg-[#FFE9EE] transition-all text-center shadow-lg hover:shadow-xl"
             >
               Submit Manuscript
             </Link>
