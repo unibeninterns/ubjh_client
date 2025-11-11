@@ -32,6 +32,7 @@ interface PublishedArticle {
   coAuthors: { name: string }[];
   publishDate: Date;
   viewers: { count: number };
+  download: {file: string}
 }
 
 interface CurrentIssueData {
@@ -39,7 +40,7 @@ interface CurrentIssueData {
   articles: PublishedArticle[];
 }
 export interface IIssue {
-  volume: any; // Changed from string to any to match dummy data structure
+  volume: { volumeNumber: number; coverImage?: string };
   issueNumber: number;
   publishDate: Date;
   description?: string;
@@ -56,21 +57,42 @@ export default function CurrentIssueDummyPage() {
   const [noIssueFound, setNoIssueFound] = useState(false);
 
   useEffect(() => {
-    // Simulate fetching data with a delay
-    const loadDummyData = () => {
-      setIsLoading(true);
-      setTimeout(() => {
-        if (dummyCurrentIssue) {
-          setCurrentIssueData(dummyCurrentIssue as any); // Cast to any to match CurrentIssueData type
-        } else {
-          setNoIssueFound(true);
+    const loadDummyData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null); // Reset any previous errors
+  
+        // Simulate fetching data
+        await new Promise((resolve) => setTimeout(resolve, 500));
+  
+        if (!dummyCurrentIssue) {
+          throw new Error("No current issue data found.");
         }
+  
+        setCurrentIssueData(dummyCurrentIssue);
+        setNoIssueFound(false);
+      } catch (err: unknown) {
+        console.error("Error loading current issue:", err);
+      
+        // Safely extract error message
+        let errorMessage = "An unexpected error occurred while loading the issue.";
+      
+        if (err instanceof Error) {
+          errorMessage = err.message;
+        } else if (typeof err === "string") {
+          errorMessage = err;
+        }
+      
+        setError(errorMessage);
+        setNoIssueFound(true);
+      }
+      finally {
         setIsLoading(false);
-      }, 500); // 500ms delay to simulate network request
+      }
     };
-
+  
     loadDummyData();
-  }, []);
+  }, []); 
 
   const filteredArticles =
     filterType === "all"

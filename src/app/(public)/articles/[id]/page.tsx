@@ -34,6 +34,7 @@ interface PublishedArticle {
   coAuthors: { name: string }[];
   publishDate: Date;
   viewers: { count: number };
+  download: {file: string}
 }
 
 export default function ArticleDetailPage() {
@@ -47,23 +48,32 @@ export default function ArticleDetailPage() {
 
   useEffect(() => {
     if (!id) return;
-
-    // Simulate fetching data with a delay
+  
     const loadDummyArticle = () => {
       setIsLoading(true);
+      setError(null);
+      setArticleNotFound(false); // reset
+  
       setTimeout(() => {
-        const foundArticle = dummyArticles.find((article) => article._id === id);
-        if (foundArticle) {
-          setArticleData(foundArticle);
-        } else {
-          setArticleNotFound(true);
+        try {
+          const foundArticle = dummyArticles.find((article) => article._id === id);
+          if (foundArticle) {
+            setArticleData(foundArticle);
+          } else {
+            setArticleNotFound(true); // ✅ properly used now
+          }
+        } catch (err) {
+          console.error("Error loading article:", err);
+          setError("Something went wrong while loading the article.");
+        } finally {
+          setIsLoading(false);
         }
-        setIsLoading(false);
-      }, 500); // 500ms delay to simulate network request
+      }, 500);
     };
-
+  
     loadDummyArticle();
   }, [id]);
+  
 
   const copyDOI = () => {
     if (articleData?.doi) {
@@ -356,10 +366,13 @@ export default function ArticleDetailPage() {
 
               {/* Action Buttons */}
               <div className="flex flex-wrap gap-3 mb-8">
-                <button className="inline-flex items-center gap-2 bg-[#7A0019] text-white px-6 py-3 rounded-lg hover:bg-[#5A0A1A] transition-colors font-semibold">
-                  <Download className="h-5 w-5" />
-                  Download PDF
-                </button>
+              <a href={`/files/${articleData.download.file}`} download className="inline-flex items-center gap-2 bg-[#7A0019] text-white px-8 py-2 rounded-lg transition-colors text-sm font-semibold hover:bg-[#5A0A1A]">
+                
+                
+                <Download className="h-4 w-4" />
+                Download PDF
+   
+              </a>
                 <button className="inline-flex items-center gap-2 border-2 border-[#7A0019] text-[#7A0019] px-6 py-3 rounded-lg hover:bg-[#FFE9EE] transition-colors font-semibold">
                   <Quote className="h-5 w-5" />
                   Cite Article
