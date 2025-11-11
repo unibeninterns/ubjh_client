@@ -109,7 +109,7 @@ export default function ArticleDetailPage() {
                 </div>
               </div>
               <Link
-                href="/current-issue-dummy" // Changed to current-issue-dummy
+                href="/current-issue" // Changed to current-issue-dummy
                 className="text-white hover:text-[#FFE9EE] font-semibold"
               >
                 ← Back to Issue
@@ -153,7 +153,7 @@ export default function ArticleDetailPage() {
               </div>
             </div>
             <Link
-              href="/current-issue-dummy" // Changed to current-issue-dummy
+              href="/current-issue" // Changed to current-issue-dummy
               className="text-white hover:text-[#FFE9EE] font-semibold"
             >
               ← Back to Issue
@@ -194,7 +194,7 @@ export default function ArticleDetailPage() {
                 </div>
               </div>
               <Link
-                href="/current-issue-dummy" // Changed to current-issue-dummy
+                href="/current-issue" // Changed to current-issue-dummy
                 className="text-white hover:text-[#FFE9EE] font-semibold"
               >
                 ← Back to Issue
@@ -244,7 +244,7 @@ export default function ArticleDetailPage() {
               </div>
             </div>
             <Link
-              href="/current-issue-dummy" // Changed to current-issue-dummy
+              href="/current-issue" // Changed to current-issue-dummy
               className="text-white hover:text-[#FFE9EE] font-semibold"
             >
               ← Back to Issue
@@ -265,7 +265,7 @@ export default function ArticleDetailPage() {
             </Link>
             <ChevronRight className="h-4 w-4" />
             <Link
-              href="/current-issue-dummy" // Changed to current-issue-dummy
+              href="/current-issue" // Changed to current-issue-dummy
               className="hover:text-[#7A0019]"
             >
               Volume {volume.volumeNumber}, Issue {issue.issueNumber} ({new Date(publishDate).getFullYear()})
@@ -522,7 +522,7 @@ export default function ArticleDetailPage() {
                   </p>
                 </div>
                 <Link
-                  href="/current-issue" // Changed to current-issue-dummy
+                  href="/current-issue" // Changed to current-issue
                   className="inline-flex items-center gap-2 bg-[#7A0019] text-white px-4 py-2 rounded-lg hover:bg-[#5A0A1A] transition-colors font-semibold text-sm w-full justify-center"
                 >
                   <BookOpen className="h-4 w-4" />
