@@ -1,4 +1,3 @@
-// src/app/current-issue/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -15,16 +14,32 @@ import {
 } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { publicationApi, PublishedArticle } from "@/services/api";
 import NoCurrentIssue from "@/components/NoCurrentIssue";
-import { AxiosError } from "axios";
+import { dummyCurrentIssue } from "@/dummy"; // Import dummy data
+
+// Define a local interface for PublishedArticle to match the dummy data structure
+interface PublishedArticle {
+  _id: string;
+  articleType: string;
+  title: string;
+  abstract: string;
+  keywords: string[];
+  doi?: string;
+  volume: { volumeNumber: number; coverImage?: string };
+  issue: { issueNumber: number };
+  pages: { start: number; end: number };
+  author: { name: string };
+  coAuthors: { name: string }[];
+  publishDate: Date;
+  viewers: { count: number };
+}
 
 interface CurrentIssueData {
-  issue: IIssue & { volume: { volumeNumber: number; coverImage?: string } }; // Extend IIssue to include volume details
+  issue: IIssue & { volume: { volumeNumber: number; coverImage?: string } };
   articles: PublishedArticle[];
 }
 export interface IIssue {
-  volume: string;
+  volume: any; // Changed from string to any to match dummy data structure
   issueNumber: number;
   publishDate: Date;
   description?: string;
@@ -33,7 +48,7 @@ export interface IIssue {
   updatedAt: Date;
 }
 
-export default function CurrentIssuePage() {
+export default function CurrentIssueDummyPage() {
   const [filterType, setFilterType] = useState<string>("all");
   const [currentIssueData, setCurrentIssueData] = useState<CurrentIssueData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -41,28 +56,20 @@ export default function CurrentIssuePage() {
   const [noIssueFound, setNoIssueFound] = useState(false);
 
   useEffect(() => {
-    const fetchCurrentIssue = async () => {
-      try {
-        setIsLoading(true);
-        const response = await publicationApi.getCurrentIssue();
-        if (response.success && response.data) {
-          setCurrentIssueData(response.data);
+    // Simulate fetching data with a delay
+    const loadDummyData = () => {
+      setIsLoading(true);
+      setTimeout(() => {
+        if (dummyCurrentIssue) {
+          setCurrentIssueData(dummyCurrentIssue as any); // Cast to any to match CurrentIssueData type
         } else {
-          // If API returns success:false but no data, treat as a generic error
-          setError("Failed to fetch current issue.");
-        }
-      } catch (err) {
-        console.error("Error fetching current issue:", err);
-        if (err instanceof AxiosError && err.response?.status === 404 && err.response?.data?.message === "No published issue found") {
           setNoIssueFound(true);
-        } else {
-          setError("Error loading current issue. Please try again later.");
         }
-      } finally {
         setIsLoading(false);
-      }
+      }, 500); // 500ms delay to simulate network request
     };
-    fetchCurrentIssue();
+
+    loadDummyData();
   }, []);
 
   const filteredArticles =
@@ -136,8 +143,6 @@ export default function CurrentIssuePage() {
     return sum;
   }, 0);
 
-  const totalViews = articles.reduce((sum, article) => sum + (article.viewers?.count || 0), 0);
-
   const publishYear = new Date(issue.publishDate).getFullYear();
   const publishMonthYear = new Date(issue.publishDate).toLocaleDateString("en-US", {
     year: "numeric",
@@ -185,12 +190,6 @@ export default function CurrentIssuePage() {
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
                   <div className="text-3xl font-bold mb-1">100%</div>
                   <div className="text-sm text-[#FFE9EE]">Open Access</div>
-                </div>
-                <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4">
-                  <div className="text-3xl font-bold mb-1">
-                    {totalViews}
-                  </div>
-                  <div className="text-sm text-[#FFE9EE]">Total Views</div>
                 </div>
               </div>
               <div className="flex flex-wrap gap-3">
@@ -251,7 +250,7 @@ export default function CurrentIssuePage() {
 
             <Link
 
-              href={`/articles/${article._id}`}
+              href={`/articles/${article._id}`} // Changed to articles-dummy
 
               key={article._id}
 
@@ -264,21 +263,13 @@ export default function CurrentIssuePage() {
                 <div className="flex flex-wrap items-center gap-3 mb-4">
 
                   <span className="inline-flex items-center px-3 py-1 bg-[#FFE9EE] border border-[#E6B6C2] text-[#5A0A1A] rounded-full text-xs font-bold uppercase">
-
                     {article.articleType}
-
                   </span>
-
                   <span className="text-sm text-gray-500">Pages {article.pages?.start}-{article.pages?.end}</span>
-
                 </div>
-
                 <h3 className="text-2xl font-bold text-[#212121] mb-4 group-hover:text-[#7A0019] transition-colors font-serif leading-tight">
-
                   {index + 1}. {article.title}
-
                 </h3>
-
                 <div className="mb-4">
                   <div className="flex items-center gap-2 text-gray-700 mb-2">
                     <Users className="h-4 w-4" />
@@ -325,21 +316,6 @@ export default function CurrentIssuePage() {
                 </button>
               </div>
             </div>
-            <div className="bg-white border-2 border-[#EAD3D9] rounded-xl p-6">
-              <h3 className="text-xl font-bold text-[#7A0019] mb-4">Citation Information</h3>
-              <p className="text-sm text-gray-700 mb-2">
-                <strong>Journal Title:</strong> UNIBEN Journal of Humanities
-              </p>
-              <p className="text-sm text-gray-700 mb-2">
-                <strong>Volume/Issue:</strong> {issue.volume.volumeNumber}({issue.issueNumber})
-              </p>
-              <p className="text-sm text-gray-700 mb-2">
-                <strong>Year:</strong> {publishYear}
-              </p>
-              <p className="text-sm text-gray-700">
-                <strong>Pages:</strong> {totalPages}
-              </p>
-            </div>
           </div>
 
           <div className="mt-8 text-center">
@@ -353,12 +329,7 @@ export default function CurrentIssuePage() {
           </div>
         </div>
       </section>
-
       <Footer />
     </div>
-
   );
-
 }
-
-

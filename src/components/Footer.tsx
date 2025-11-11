@@ -108,7 +108,7 @@ export default function Footer() {
                 </div>
                 <div className="text-left">
                   <div className="text-xs font-semibold text-gray-600">Print ISSN</div>
-                  <div className="text-sm font-bold text-[#7A0019]">2XXX-XXXX</div>
+                  <div className="text-sm font-bold text-[#7A0019]">2734-3278</div>
                 </div>
               </div>
             </div>
@@ -122,7 +122,7 @@ export default function Footer() {
                 </div>
                 <div className="text-left">
                   <div className="text-xs font-semibold text-gray-600">Online ISSN</div>
-                  <div className="text-sm font-bold text-[#7A0019]">2XXX-XXXX</div>
+                  <div className="text-sm font-bold text-[#7A0019]">2635-3784</div>
                 </div>
               </div>
             </div>
