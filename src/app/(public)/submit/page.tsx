@@ -92,13 +92,9 @@ export default function ManuscriptSubmissionPage() {
   // Add co-author
   const addCoAuthor = () => {
     if (
-      !currentCoAuthor.name ||
-      !currentCoAuthor.email ||
-      !currentCoAuthor.faculty ||
-      !currentCoAuthor.affiliation ||
-      !currentCoAuthor.orcid
+      !currentCoAuthor.name
     ) {
-      alert('Please fill in all fields for the co-author');
+      alert('Please fill in the required fields for the co-author');
       return;
     }
 
@@ -443,7 +439,7 @@ export default function ManuscriptSubmissionPage() {
                 No Account Required
               </h3>
               <p className="text-sm text-[#7A0019]">
-                You don&apos;t need to create an account to submit your manuscript. Simply fill out the form below, and an account will be automatically created for you. You&apos;ll receive your login credentials via email within 24 hours to access your author dashboard and track your submission.
+                You don&apos;t need to create an account to submit your manuscript. Simply fill out the form below, and an account will be automatically created for you. You&apos;ll receive your login credentials via email within 24 hours to 7 days to access your author dashboard and track your submission.
               </p>
             </div>
           </div>
@@ -759,7 +755,7 @@ export default function ManuscriptSubmissionPage() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Email Address*
+                        Email Address
                       </label>
                       <input
                         type="email"
@@ -773,7 +769,7 @@ export default function ManuscriptSubmissionPage() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Faculty/Department *
+                        Faculty/Department
                       </label>
                       <input
                         type="text"
@@ -787,7 +783,7 @@ export default function ManuscriptSubmissionPage() {
 
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Affiliation *
+                        Affiliation
                       </label>
                       <input
                         type="text"
@@ -801,7 +797,7 @@ export default function ManuscriptSubmissionPage() {
 
                     <div className="md:col-span-2">
                       <label className="block text-sm font-medium text-gray-700 mb-1">
-                        ORCID iD * (Required)
+                        ORCID iD
                       </label>
                       <input
                         type="text"

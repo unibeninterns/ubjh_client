@@ -533,7 +533,7 @@ export default function ArticleDetailPage() {
           </div>
         </div>
       </div>
-
+      
       {/* Footer */}
       <Footer/>
     </div>
