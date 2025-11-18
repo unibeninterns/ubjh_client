@@ -22,7 +22,7 @@ export const dummyArticles = [
     coAuthors: [],
     publishDate: new Date("2025-11-15"),
     viewers: { count: 150 },
-    download: {file: "/ISOTHERMAL AND KINETICS ASSESSMENT OF METAL IONS REMOVAL FROM LEACHATE USING CASSAVA PEEL DERIVED ADSORBENT.pdf"}
+    download: {file: "GENDER SPACE AND THE MISINTERPRETATION.pdf"}
   },
   {
     _id: "60d5f1b3e6b3b3b3b3b3b3b4",
@@ -44,7 +44,7 @@ export const dummyArticles = [
     coAuthors: [],
     publishDate: new Date("2025-11-15"),
     viewers: { count: 250 },
-    download: {file: "/CHEMICAL EVALUATION OF SOME EDIBLE MUSHROOM SPECIES CULTIVATED IN RURAL GARDENS IN EDO STATE, NIGERIA.pdf"}
+    download: {file: "EXTENT OF UTILIZATION OF E-LEARNING.pdf"}
   },
 ];
 
