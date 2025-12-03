@@ -357,7 +357,7 @@ function AdminManuscriptsPage() {
     try {
       setReassignReviewerLoading(true);
       const response = await manuscriptAdminApi.getExistingReviewers(manuscriptId);
-      setExistingReviewsForReassignment(response.data);
+      setExistingReviewsForReassignment(response.data.reviews);
     } catch (err) {
       console.error('Failed to load existing reviews for reassignment:', err);
       toast.error('Failed to load existing reviews');

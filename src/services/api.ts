@@ -922,7 +922,10 @@ export const manuscriptAdminApi = {
     }
   },
 
-  editManuscript: async (manuscriptId: string, file: File): Promise<EditManuscriptResponse> => {
+  editManuscript: async (
+    manuscriptId: string,
+    file: File
+  ): Promise<EditManuscriptResponse> => {
     try {
       const formData = new FormData();
       formData.append("file", file);
@@ -1082,7 +1085,10 @@ export const manuscriptAdminApi = {
   // Get existing reviewers for manuscript
   getExistingReviewers: async (
     manuscriptId: string
-  ): Promise<{ success: boolean; data: ExistingReviewForReassignment[] }> => {
+  ): Promise<{
+    success: boolean;
+    data: { reviews: ExistingReviewForReassignment[] };
+  }> => {
     try {
       const response = await api.get(
         `/admin/reassign-review/existing-reviewers/${manuscriptId}`
