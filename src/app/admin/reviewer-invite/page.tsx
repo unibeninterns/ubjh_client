@@ -37,6 +37,8 @@ interface ReviewerFormState {
   email: string;
   faculty: string;
   affiliation: string;
+  phoneNumber?: string;
+  areaOfSpecialization?: string;
 }
 
 interface Faculty {
@@ -66,6 +68,8 @@ export default function ReviewerInvitationsPage() {
     email: "",
     faculty: "",
     affiliation: "",
+    phoneNumber: "",
+    areaOfSpecialization: "",
   });
   const [showDeleteDialog, setShowDeleteDialog] = useState<boolean>(false);
   const [deletingInvitation, setDeletingInvitation] = useState<Invitation | null>(null);
@@ -213,6 +217,8 @@ export default function ReviewerInvitationsPage() {
         email: "",
         faculty: "",
         affiliation: "",
+        phoneNumber: "",
+        areaOfSpecialization: "",
       });
 
       const response = await api.getReviewerInvitations();
@@ -545,6 +551,28 @@ export default function ReviewerInvitationsPage() {
                     required
                   />
                   {formErrors.affiliation && <p className="text-red-500 text-xs mt-1">{formErrors.affiliation}</p>}
+                </div>
+
+                <div className="space-y-2 col-span-2">
+                  <Label htmlFor="reviewer-phone-number">Phone Number (Optional)</Label>
+                  <Input
+                    id="reviewer-phone-number"
+                    name="phoneNumber"
+                    placeholder="e.g., +2348012345678"
+                    value={reviewerForm.phoneNumber}
+                    onChange={handleInputChange}
+                  />
+                </div>
+
+                <div className="space-y-2 col-span-2">
+                  <Label htmlFor="reviewer-area-of-specialization">Area of Specialization (Optional)</Label>
+                  <Input
+                    id="reviewer-area-of-specialization"
+                    name="areaOfSpecialization"
+                    placeholder="e.g., Artificial Intelligence, African History"
+                    value={reviewerForm.areaOfSpecialization}
+                    onChange={handleInputChange}
+                  />
                 </div>
               </div>
 

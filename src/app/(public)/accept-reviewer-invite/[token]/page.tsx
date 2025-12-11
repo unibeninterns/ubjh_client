@@ -23,6 +23,8 @@ const reviewerProfileSchema = z.object({
   name: z.string().min(2, "Name must be at least 2 characters"),
   faculty: z.string().min(1, "Faculty/Department is required"),
   affiliation: z.string().min(1, "Affiliation is required"),
+  phoneNumber: z.string().optional(),
+  areaOfSpecialization: z.string().optional(),
 });
 
 interface ReviewerRegisterPageProps {
@@ -36,6 +38,8 @@ export default function ReviewerRegisterPage({ params }: ReviewerRegisterPagePro
   const [name, setName] = useState("");
   const [faculty, setFaculty] = useState("");
   const [affiliation, setAffiliation] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [areaOfSpecialization, setAreaOfSpecialization] = useState("");
   
   const [error, setError] = useState("");
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -48,7 +52,9 @@ export default function ReviewerRegisterPage({ params }: ReviewerRegisterPagePro
       reviewerProfileSchema.parse({ 
         name, 
         faculty, 
-        affiliation, 
+        affiliation,
+        phoneNumber,
+        areaOfSpecialization, 
       });
       setValidationErrors({});
       return true;
@@ -81,6 +87,8 @@ export default function ReviewerRegisterPage({ params }: ReviewerRegisterPagePro
         name,
         faculty,
         affiliation,
+        phoneNumber,
+        areaOfSpecialization,
       };
 
       await completeReviewerProfile(token, profileData);
@@ -194,6 +202,30 @@ export default function ReviewerRegisterPage({ params }: ReviewerRegisterPagePro
               {validationErrors.affiliation && (
                 <p className="text-sm text-red-500">{validationErrors.affiliation}</p>
               )}
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="phoneNumber" className="text-sm font-medium">
+                Phone Number (Optional)
+              </label>
+              <Input
+                id="phoneNumber"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                placeholder="e.g., +2348012345678"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <label htmlFor="areaOfSpecialization" className="text-sm font-medium">
+                Area of Specialization (Optional)
+              </label>
+              <Input
+                id="areaOfSpecialization"
+                value={areaOfSpecialization}
+                onChange={(e) => setAreaOfSpecialization(e.target.value)}
+                placeholder="e.g., Artificial Intelligence, African History"
+              />
             </div>
 
             <Button 
