@@ -350,13 +350,13 @@ export default function HumanitiesJournalHome() {
               </div>
               <div className="text-center">
                 <p className="text-sm text-[#7A0019] font-bold mb-1">
-                  LIBRARIAN
+                  ASSOCIATE EDITOR
                 </p>
                 <h3 className="text-lg font-bold text-[#212121] mb-1">
                   Mr Dan
                 </h3>
                 <p className="text-sm text-gray-600 mb-3">
-                  John Harris Library
+                  Librarian, John Harris Library
                   <br />
                   University of Benin
                 </p>

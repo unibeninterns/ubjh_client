@@ -36,8 +36,8 @@ export default function EditorialBoardPage() {
   const associateEditors: EditorProfile[] = [
     {
       name: "Mr Dan",
-      role: "Librarian",
-      affiliation: "John Harris Library, University of Benin",
+      role: "Associate Editor",
+      affiliation: "Librarian, John Harris Library, University of Benin",
       photo: "/editor-2.png",
     },
   ];
