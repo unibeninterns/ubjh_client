@@ -10,8 +10,6 @@ import {
   Clock,
   Shield,
   Globe,
-  Mail,
-  ExternalLink,
   ChevronRight,
   Search,
 } from "lucide-react";
