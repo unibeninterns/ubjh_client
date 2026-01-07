@@ -265,7 +265,7 @@ export default function HumanitiesJournalHome() {
         </div>
       </section>
 
-      {/* Editorial Board Preview */}
+      {/* Editorial Leadership */}
       <section className="py-16 bg-[#FAF7F8]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="block md:flex items-center justify-between mb-10">
@@ -289,53 +289,60 @@ export default function HumanitiesJournalHome() {
           <div className="grid md:grid-cols-3 gap-8">
             {/* Editor-in-Chief Card */}
             <div className="bg-white rounded-xl p-6 shadow-lg border-2 border-[#7A0019]">
-              <div className="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-4">
-                {/* Placeholder for editor photo */}
+              <div className="w-20 h-24 bg-gray-200 rounded-full mx-auto mb-4">
                 <Image
-                  src="/editor-1.png"
+                  src="/editor-chief.png"
                   alt="Editor in Chief"
-                  width={96}
-                  height={96}
+                  width={86}
+                  height={86}
                   className="rounded-full"
                 />
               </div>
-              <div className="text-center">
+              <div className="text-center mt-4">
                 <p className="text-sm text-[#7A0019] font-bold mb-1">
                   EDITOR-IN-CHIEF
                 </p>
                 <h3 className="text-lg font-bold text-[#212121] mb-1">
-                  Prof. Adebayo M. Ogunleye
+                  Professor Edoba B. Omoregie, SAN.
                 </h3>
                 <p className="text-sm text-gray-600 mb-3">
-                  Department of History & International Studies
-                  <br />
-                  University of Benin
+                  Vice Chancellor, University of Benin
                 </p>
-                <div className="flex justify-center gap-2">
-                  <a
-                    href="#"
-                    className="text-[#7A0019] hover:text-[#5A0A1A]"
-                    aria-label="ORCID"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
-                  <a
-                    href="#"
-                    className="text-[#7A0019] hover:text-[#5A0A1A]"
-                    aria-label="Email"
-                  >
-                    <Mail className="h-4 w-4" />
-                  </a>
-                </div>
               </div>
             </div>
 
-            {/* Associate Editor 1 */}
+            {/* Managing Editor */}
+            <div className="bg-white rounded-xl p-6 shadow-md border border-[#EAD3D9] hover:border-[#7A0019] transition-colors">
+              <div className="w-24 h-22 bg-gray-200 rounded-full mx-auto mb-4">
+                <Image
+                  src="/managing-editor.png"
+                  alt="Managing Editor"
+                  width={98}
+                  height={98}
+                  className="rounded-full"
+                />
+              </div>
+              <div className="text-center">
+                <p className="text-sm text-[#7A0019] font-bold mb-1">
+                  MANAGING EDITOR
+                </p>
+                <h3 className="text-lg font-bold text-[#212121] mb-1">
+                  Prof. Ngozi Finette Unuigbe
+                </h3>
+                <p className="text-sm text-gray-600 mb-3">
+                  Director, DRID
+                  <br />
+                  University of Benin
+                </p>
+              </div>
+            </div>
+
+            {/* Librarian */}
             <div className="bg-white rounded-xl p-6 shadow-md border border-[#EAD3D9] hover:border-[#7A0019] transition-colors">
               <div className="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-4">
                 <Image
                   src="/editor-2.png"
-                  alt="Associate Editor"
+                  alt="Librarian"
                   width={96}
                   height={96}
                   className="rounded-full"
@@ -343,76 +350,19 @@ export default function HumanitiesJournalHome() {
               </div>
               <div className="text-center">
                 <p className="text-sm text-[#7A0019] font-bold mb-1">
-                  ASSOCIATE EDITOR
+                  LIBRARIAN
                 </p>
                 <h3 className="text-lg font-bold text-[#212121] mb-1">
-                  Dr. Chiamaka N. Eze
+                  Mr Dan
                 </h3>
                 <p className="text-sm text-gray-600 mb-3">
-                  Department of English & Literature
+                  John Harris Library
                   <br />
                   University of Benin
                 </p>
-                <div className="flex justify-center gap-2">
-                  <a
-                    href="#"
-                    className="text-[#7A0019] hover:text-[#5A0A1A]"
-                    aria-label="ORCID"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
-                  <a
-                    href="#"
-                    className="text-[#7A0019] hover:text-[#5A0A1A]"
-                    aria-label="Email"
-                  >
-                    <Mail className="h-4 w-4" />
-                  </a>
-                </div>
               </div>
             </div>
 
-            {/* Associate Editor 2 */}
-            <div className="bg-white rounded-xl p-6 shadow-md border border-[#EAD3D9] hover:border-[#7A0019] transition-colors">
-              <div className="w-24 h-24 bg-gray-200 rounded-full mx-auto mb-4">
-                <Image
-                  src="/editor-3.png"
-                  alt="Associate Editor"
-                  width={96}
-                  height={96}
-                  className="rounded-full"
-                />
-              </div>
-              <div className="text-center">
-                <p className="text-sm text-[#7A0019] font-bold mb-1">
-                  ASSOCIATE EDITOR
-                </p>
-                <h3 className="text-lg font-bold text-[#212121] mb-1">
-                  Prof. Ibrahim K. Suleiman
-                </h3>
-                <p className="text-sm text-gray-600 mb-3">
-                  Faculty of Law
-                  <br />
-                  University of Benin
-                </p>
-                <div className="flex justify-center gap-2">
-                  <a
-                    href="#"
-                    className="text-[#7A0019] hover:text-[#5A0A1A]"
-                    aria-label="ORCID"
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                  </a>
-                  <a
-                    href="#"
-                    className="text-[#7A0019] hover:text-[#5A0A1A]"
-                    aria-label="Email"
-                  >
-                    <Mail className="h-4 w-4" />
-                  </a>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
