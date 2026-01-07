@@ -23,7 +23,7 @@ export const dummyArticles = [
         affiliation: "Department of Social Work, Faculty of Social Sciences University of Benin, Benin City, Nigeria."
     },
     coAuthors: [],
-    publishDate: new Date("2020-01-01"),
+    publishDate: new Date("2020-12-01"),
     viewers: { count: 150 },
     download: { file: "gender-space-and-misinterpretation.pdf" }
   },
@@ -48,7 +48,7 @@ export const dummyArticles = [
         affiliation: "Department of Vocational and Technical Education Faculty of Education, University of Benin Benin City, Nigeria."
     },
     coAuthors: [],
-    publishDate: new Date("2020-01-01"),
+    publishDate: new Date("2020-12-01"),
     viewers: { count: 250 },
     download: { file: "extent-of-utilization-of-e-learning.pdf" }
   },
@@ -74,7 +74,7 @@ export const dummyArticles = [
       affiliation: "Department of Philosophy, Faculty of Arts University of Benin, P.M.B. 1154 Benin City, Nigeria."
     },
     coAuthors: [],
-    publishDate: new Date("2020-01-01"),
+    publishDate: new Date("2020-12-01"),
     viewers: { count: 0 },
     download: { file: "epistemological-evaluation-of-metaphysical-phenomena.pdf" }
   },
@@ -104,7 +104,7 @@ export const dummyArticles = [
         affiliation: "Department of Educational Management Library and Information Science Faculty of Education University of Benin Benin City."
       }
     ],
-    publishDate: new Date("2020-01-01"),
+    publishDate: new Date("2020-12-01"),
     viewers: { count: 0 },
     download: { file: "demographic-characteristics-attitude-postgraduate-students.pdf" }
   },
@@ -134,7 +134,7 @@ export const dummyArticles = [
         affiliation: "Department of Public Administration University of Benin, Benin City."
       }
     ],
-    publishDate: new Date("2020-01-01"),
+    publishDate: new Date("2020-12-01"),
     viewers: { count: 0 },
     download: { file: "subsidy-removal-policy-analysis.pdf" }
   },
@@ -164,7 +164,7 @@ export const dummyArticles = [
         affiliation: "Department of Political Science and Public Administration Faculty of Management and Social Sciences Edo State University Uzairue, Nigeria."
       }
     ],
-    publishDate: new Date("2020-01-01"),
+    publishDate: new Date("2020-12-01"),
     viewers: { count: 0 },
     download: { file: "impact-of-n-power-programme.pdf" }
   },
@@ -189,7 +189,7 @@ export const dummyArticles = [
       affiliation: "Department of Educational Management Library and Information Science Faculty of Education, University of Benin"
     },
     coAuthors: [],
-    publishDate: new Date("2020-01-01"),
+    publishDate: new Date("2020-12-01"),
     viewers: { count: 0 },
     download: { file: "mentoring-for-enhanced-employment-and-employability.pdf" }
   },
@@ -219,7 +219,7 @@ export const dummyArticles = [
         affiliation: "Department of Economics University of Benin, Benin City, Nigeria."
       }
     ],
-    publishDate: new Date("2020-01-01"),
+    publishDate: new Date("2020-12-01"),
     viewers: { count: 0 },
     download: { file: "structural-changes-and-tax-performance.pdf" }
   },
@@ -249,7 +249,7 @@ export const dummyArticles = [
         affiliation: "Department of Social Work, Faculty of Social Sciences University of Benin, Benin City, Nigeria."
       }
     ],
-    publishDate: new Date("2021-01-01"),
+    publishDate: new Date("2021-06-01"),
     viewers: { count: 0 },
     download: { file: "challenges-of-orphans-as-vulnerable-children.pdf" }
   },
@@ -279,7 +279,7 @@ export const dummyArticles = [
         affiliation: "Department of Social Work, Faculty of Social Sciences, University of Benin, Benin City. Edo State"
       }
     ],
-    publishDate: new Date("2021-01-01"),
+    publishDate: new Date("2021-06-01"),
     viewers: { count: 0 },
     download: { file: "impact-of-school-social-work-mental-health.pdf" }
   },
@@ -309,7 +309,7 @@ export const dummyArticles = [
         affiliation: "Guidance Academy, No. 5, Omoti Avenue, Off Akha Jemen Ideho Street, Off Alufokhai Drive Evboumore Quarters Benin City, Edo State, Nigeria."
       }
     ],
-    publishDate: new Date("2021-01-01"),
+    publishDate: new Date("2021-06-01"),
     viewers: { count: 0 },
     download: { file: "peer-influence-and-self-esteem-as-correlates.pdf" }
   },
