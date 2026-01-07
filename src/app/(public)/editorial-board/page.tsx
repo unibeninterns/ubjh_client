@@ -35,10 +35,10 @@ export default function EditorialBoardPage() {
 
   const associateEditors: EditorProfile[] = [
     {
-      name: "Mr Dan",
+      name: "Professor Jane Igie Aba",
       role: "Associate Editor",
-      affiliation: "Librarian, John Harris Library, University of Benin",
-      photo: "/editor-2.png",
+      affiliation: "University Librarian",
+      photo: "/librarian.png",
     },
   ];
 
@@ -170,7 +170,7 @@ export default function EditorialBoardPage() {
                   className="bg-white border-2 border-[#EAD3D9] rounded-xl p-6 w-full max-w-sm"
                 >
                   <div className="text-center mb-4">
-                    <div className="relative w-24 h-24 mx-auto mb-3">
+                    <div className="relative w-32 h-32 mx-auto mb-3">
                       <Image
                         src={editor.photo}
                         alt={editor.name}
