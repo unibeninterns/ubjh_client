@@ -22,7 +22,7 @@ export default function EditorialBoardPage() {
     name: "Professor Edoba B. Omoregie, SAN.",
     role: "Editor-in-Chief",
     affiliation: "Vice Chancellor for UNIBEN",
-    photo: "/editor-chief.png",
+    photo: "/editor-chiefff.png",
   };
 
   const managingEditor = {
@@ -30,7 +30,7 @@ export default function EditorialBoardPage() {
     role: "Managing Editor",
     affiliation:
       "Director, Directorate of Research, Innovation and Development (DRID)",
-    photo: "/managing-editor.png",
+    photo: "/managing-editorrr.png",
   };
 
   const associateEditors: EditorProfile[] = [
