@@ -57,21 +57,24 @@ export default function Header() {
         {/* Top Row */}
         <div className="flex items-center justify-between h-20">
           {/* Logo + Title */}
-          <Link href="/" className="flex items-center gap-4 group">
-            <div className="w-14 h-14 bg-white rounded-lg flex items-center justify-center transition-transform group-hover:scale-105">
+          <Link href="/" className="flex items-center gap-3 md:gap-4 group">
+            <div className="w-12 h-12 md:w-14 md:h-14 bg-white rounded-lg flex items-center justify-center transition-transform group-hover:scale-105 flex-shrink-0">
               <Image
                 src="/uniben-logo.png"
-                alt="UNIBEN Logo"
+                alt="University of Benin Logo"
                 width={48}
                 height={48}
                 className="rounded"
               />
             </div>
-            <div>
-              <h1 className="text-lg md:text-xl font-bold tracking-tight transition-colors group-hover:text-[#FFE9EE]">
-                UNIBEN Journal of Humanities
+            <div className="min-w-0">
+              <div className="text-[10px] md:text-xs font-semibold text-[#FFE9EE] mb-0.5 tracking-wide">
+                UNIVERSITY OF BENIN
+              </div>
+              <h1 className="text-sm md:text-base lg:text-lg font-bold leading-tight transition-colors group-hover:text-[#FFE9EE]">
+                Journal of Humanities
               </h1>
-              <p className="text-sm text-[#FFE9EE] font-medium">
+              <p className="text-[10px] md:text-xs text-[#FFE9EE] font-medium mt-0.5">
                 Open Access • Peer Reviewed
               </p>
             </div>
@@ -99,7 +102,7 @@ export default function Header() {
             {/* Submit Button */}
             <Link
               href="/submission"
-              className="bg-white text-[#7A0019] px-4 py-2 rounded-full font-semibold hover:bg-[#FFE9EE] transition-all shadow-lg hover:shadow-xl hover:scale-105"
+              className="bg-white text-[#7A0019] px-4 py-2 rounded-full font-semibold hover:bg-[#FFE9EE] transition-all shadow-lg hover:shadow-xl hover:scale-105 whitespace-nowrap"
             >
               Submit Manuscript
             </Link>
