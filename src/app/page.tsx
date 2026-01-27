@@ -117,7 +117,7 @@ export default function HumanitiesJournalHome() {
           <div className="max-w-3xl">
   <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full mb-4">
     <Globe className="h-4 w-4" />
-    <span className="text-sm font-semibold">University of Benin</span>
+    <span className="text-lg font-semibold">University of Benin</span>
   </div>
   <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight font-serif">
     Journal of Humanities
