@@ -631,6 +631,56 @@ export interface FailedJob {
   createdAt: string;
 }
 
+export interface EmailRecipient {
+  userId: string;
+  name: string;
+  email: string;
+  role: string;
+  manuscriptTitle?: string;
+  manuscriptId?: string;
+  manuscriptStatus?: string;
+}
+
+export interface EmailRecipientsResponse {
+  success: boolean;
+  data: EmailRecipient[];
+}
+
+export interface EmailPreviewRequest {
+  recipientIds: string[];
+  subject: string;
+  headerTitle: string;
+  bodyContent: string;
+}
+
+export interface EmailPreviewResponse {
+  success: boolean;
+  data: {
+    previewHtml: string;
+    previewRecipient: {
+      name: string;
+      email: string;
+    };
+  };
+}
+
+export interface SendCampaignRequest {
+  recipientIds: string[];
+  subject: string;
+  headerTitle: string;
+  bodyContent: string;
+}
+
+export interface SendCampaignResponse {
+  success: boolean;
+  message: string;
+  data: {
+    sent: number;
+    failed: number;
+    errors: string[];
+  };
+}
+
 // Create API instance
 const createApi = (baseURL: string): AxiosInstance => {
   const api = axios.create({
@@ -654,7 +704,7 @@ const createApi = (baseURL: string): AxiosInstance => {
       ];
 
       const skipAuth = authEndpoints.some((endpoint) =>
-        config.url?.includes(endpoint)
+        config.url?.includes(endpoint),
       );
 
       if (!skipAuth) {
@@ -666,7 +716,7 @@ const createApi = (baseURL: string): AxiosInstance => {
 
       return config;
     },
-    (error) => Promise.reject(error)
+    (error) => Promise.reject(error),
   );
 
   // Response interceptor - handle token refresh
@@ -724,7 +774,7 @@ const createApi = (baseURL: string): AxiosInstance => {
       }
 
       return Promise.reject(error);
-    }
+    },
   );
 
   return api;
@@ -794,7 +844,7 @@ export const authApi = {
 
   // Author login
   loginAuthor: async (
-    credentials: LoginCredentials
+    credentials: LoginCredentials,
   ): Promise<LoginResponse> => {
     try {
       const response = await api.post("/auth/author-login", credentials);
@@ -814,7 +864,7 @@ export const authApi = {
 
   // Reviewer login
   loginReviewer: async (
-    credentials: LoginCredentials
+    credentials: LoginCredentials,
   ): Promise<LoginResponse> => {
     try {
       const response = await api.post("/auth/reviewer-login", credentials);
@@ -855,7 +905,7 @@ export const authApi = {
 
 export const manuscriptApi = {
   submitManuscript: async (
-    formData: FormData
+    formData: FormData,
   ): Promise<ManuscriptSubmissionResponse> => {
     try {
       const response = await api.post("/submit/manuscript", formData, {
@@ -872,7 +922,7 @@ export const manuscriptApi = {
 
   reviseManuscript: async (
     manuscriptId: string,
-    formData: FormData
+    formData: FormData,
   ): Promise<ManuscriptSubmissionResponse> => {
     try {
       const response = await api.post(
@@ -882,7 +932,7 @@ export const manuscriptApi = {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        }
+        },
       );
       return response.data;
     } catch (error) {
@@ -924,7 +974,7 @@ export const manuscriptAdminApi = {
 
   editManuscript: async (
     manuscriptId: string,
-    file: File
+    file: File,
   ): Promise<EditManuscriptResponse> => {
     try {
       const formData = new FormData();
@@ -937,7 +987,7 @@ export const manuscriptAdminApi = {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        }
+        },
       );
       return response.data;
     } catch (error) {
@@ -948,7 +998,7 @@ export const manuscriptAdminApi = {
 
   editRevisedManuscript: async (
     manuscriptId: string,
-    file: File
+    file: File,
   ): Promise<EditManuscriptResponse> => {
     try {
       const formData = new FormData();
@@ -961,7 +1011,7 @@ export const manuscriptAdminApi = {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        }
+        },
       );
       return response.data;
     } catch (error) {
@@ -1005,7 +1055,7 @@ export const manuscriptAdminApi = {
 
   // Assign faculty to manuscript
   assignFaculty: async (
-    data: AssignFacultyRequest
+    data: AssignFacultyRequest,
   ): Promise<AssignFacultyResponse> => {
     try {
       const response = await api.post("/admin/faculties/assign", data);
@@ -1019,12 +1069,12 @@ export const manuscriptAdminApi = {
   // Assign reviewer to manuscript
   assignReviewer: async (
     manuscriptId: string,
-    data: AssignReviewerRequest
+    data: AssignReviewerRequest,
   ): Promise<AssignReviewerResponse> => {
     try {
       const response = await api.post(
         `/admin/assign-review/${manuscriptId}`,
-        data
+        data,
       );
       return response.data;
     } catch (error) {
@@ -1035,11 +1085,11 @@ export const manuscriptAdminApi = {
 
   // Get eligible reviewers for manuscript
   getEligibleReviewers: async (
-    manuscriptId: string
+    manuscriptId: string,
   ): Promise<EligibleReviewersResponse> => {
     try {
       const response = await api.get(
-        `/admin/assign-review/${manuscriptId}/eligible-reviewers`
+        `/admin/assign-review/${manuscriptId}/eligible-reviewers`,
       );
       return response.data;
     } catch (error) {
@@ -1051,12 +1101,12 @@ export const manuscriptAdminApi = {
   // Reassign regular review
   reassignRegularReview: async (
     reviewId: string,
-    data: ReassignReviewRequest
+    data: ReassignReviewRequest,
   ): Promise<ReassignReviewResponse> => {
     try {
       const response = await api.put(
         `/admin/reassign-review/${reviewId}`,
-        data
+        data,
       );
       return response.data;
     } catch (error) {
@@ -1068,12 +1118,12 @@ export const manuscriptAdminApi = {
   // Reassign reconciliation review
   reassignReconciliationReview: async (
     reviewId: string,
-    data: ReassignReviewRequest
+    data: ReassignReviewRequest,
   ): Promise<ReassignReviewResponse> => {
     try {
       const response = await api.put(
         `/admin/reassign-review/${reviewId}`,
-        data
+        data,
       );
       return response.data;
     } catch (error) {
@@ -1084,14 +1134,14 @@ export const manuscriptAdminApi = {
 
   // Get existing reviewers for manuscript
   getExistingReviewers: async (
-    manuscriptId: string
+    manuscriptId: string,
   ): Promise<{
     success: boolean;
     data: { reviews: ExistingReviewForReassignment[] };
   }> => {
     try {
       const response = await api.get(
-        `/admin/reassign-review/existing-reviewers/${manuscriptId}`
+        `/admin/reassign-review/existing-reviewers/${manuscriptId}`,
       );
       return response.data;
     } catch (error) {
@@ -1117,12 +1167,12 @@ export const manuscriptAdminApi = {
   // Update manuscript status (final decision)
   updateManuscriptStatus: async (
     manuscriptId: string,
-    data: { status: string; feedbackComments: string }
+    data: { status: string; feedbackComments: string },
   ): Promise<ManuscriptDetailResponse> => {
     try {
       const response = await api.put(
         `/admin/decisions/${manuscriptId}/status`,
-        data
+        data,
       );
       return response.data;
     } catch (error) {
@@ -1132,34 +1182,34 @@ export const manuscriptAdminApi = {
   },
 
   getEligibleReviewersForRevised: async (
-    manuscriptId: string
+    manuscriptId: string,
   ): Promise<EligibleReviewersResponse> => {
     try {
       const response = await api.get(
-        `/admin/reassign-review/eligible-reviewers-revised/${manuscriptId}`
+        `/admin/reassign-review/eligible-reviewers-revised/${manuscriptId}`,
       );
       return response.data;
     } catch (error) {
       console.error(
         "Failed to fetch eligible reviewers for revised manuscript:",
-        error
+        error,
       );
       throw error;
     }
   },
 
   getReassignEligibleReviewers: async (
-    manuscriptId: string
+    manuscriptId: string,
   ): Promise<EligibleReviewersResponse> => {
     try {
       const response = await api.get(
-        `/admin/reassign-review/eligible-reviewers/${manuscriptId}`
+        `/admin/reassign-review/eligible-reviewers/${manuscriptId}`,
       );
       return response.data;
     } catch (error) {
       console.error(
         "Failed to fetch eligible reviewers for revised manuscript:",
-        error
+        error,
       );
       throw error;
     }
@@ -1219,7 +1269,7 @@ export const resendReviewerInvitation = async (id: string) => {
   } catch (error) {
     console.error(
       `Error resending invitation to reviewer with ID ${id}:`,
-      error
+      error,
     );
     throw error;
   }
@@ -1310,11 +1360,11 @@ export const getAuthors = async (): Promise<AuthorsResponse> => {
 
 // Get author details
 export const getAuthorDetails = async (
-  authorId: string
+  authorId: string,
 ): Promise<AuthorDetailsResponse> => {
   try {
     const response = await api.get(
-      `/admin/author-management/authors/${authorId}`
+      `/admin/author-management/authors/${authorId}`,
     );
     return response.data;
   } catch (error) {
@@ -1327,7 +1377,7 @@ export const getAuthorDetails = async (
 export const sendAuthorCredentials = async (authorId: string) => {
   try {
     const response = await api.post(
-      `/admin/author-management/authors/${authorId}/send-credentials`
+      `/admin/author-management/authors/${authorId}/send-credentials`,
     );
     return response.data;
   } catch (error) {
@@ -1340,7 +1390,7 @@ export const sendAuthorCredentials = async (authorId: string) => {
 export const resendAuthorCredentials = async (authorId: string) => {
   try {
     const response = await api.post(
-      `/admin/author-management/authors/${authorId}/resend-credentials`
+      `/admin/author-management/authors/${authorId}/resend-credentials`,
     );
     return response.data;
   } catch (error) {
@@ -1357,12 +1407,12 @@ export interface CompleteReviewerProfileData {
 
 export const completeReviewerProfile = async (
   token: string,
-  profileData: CompleteReviewerProfileData
+  profileData: CompleteReviewerProfileData,
 ) => {
   try {
     const response = await api.post(
       `/reviewer/complete-profile/${token}`,
-      profileData
+      profileData,
     );
     return response.data;
   } catch (error) {
@@ -1380,12 +1430,12 @@ export interface CompleteAuthorProfileData {
 
 export const completeAuthorProfile = async (
   token: string,
-  profileData: CompleteAuthorProfileData
+  profileData: CompleteAuthorProfileData,
 ) => {
   try {
     const response = await api.post(
       `/author/complete-profile/${token}`,
-      profileData
+      profileData,
     );
     return response.data;
   } catch (error) {
@@ -1444,17 +1494,17 @@ export const manuscriptReviewApi = {
 
   // Get review details for a specific manuscript
   getReviewDetails: async (
-    manuscriptId: string
+    manuscriptId: string,
   ): Promise<{ success: boolean; data: ManuscriptReviewDetails }> => {
     try {
       const response = await api.get(
-        `/admin/manuscript-reviews/${manuscriptId}`
+        `/admin/manuscript-reviews/${manuscriptId}`,
       );
       return response.data;
     } catch (error) {
       console.error(
         `Failed to fetch review details for manuscript ${manuscriptId}:`,
-        error
+        error,
       );
       throw error;
     }
@@ -1523,7 +1573,7 @@ export const manuscriptReviewerApi = {
   // Submit review
   submitReview: async (
     reviewId: string,
-    reviewData: SubmitReviewRequest
+    reviewData: SubmitReviewRequest,
   ): Promise<{
     success: boolean;
     message: string;
@@ -1532,7 +1582,7 @@ export const manuscriptReviewerApi = {
     try {
       const response = await api.post(
         `/reviewsys/${reviewId}/submit`,
-        reviewData
+        reviewData,
       );
       return response.data;
     } catch (error) {
@@ -1544,7 +1594,7 @@ export const manuscriptReviewerApi = {
   // Save review progress
   saveReviewProgress: async (
     reviewId: string,
-    progressData: SaveReviewProgressRequest
+    progressData: SaveReviewProgressRequest,
   ): Promise<{
     success: boolean;
     message: string;
@@ -1553,7 +1603,7 @@ export const manuscriptReviewerApi = {
     try {
       const response = await api.patch(
         `/reviewsys/${reviewId}/save-progress`,
-        progressData
+        progressData,
       );
       return response.data;
     } catch (error) {
@@ -1563,7 +1613,7 @@ export const manuscriptReviewerApi = {
   },
 
   getReviewWithHistory: async (
-    reviewId: string
+    reviewId: string,
   ): Promise<{
     success: boolean;
     data: {
@@ -1583,7 +1633,7 @@ export const manuscriptReviewerApi = {
   },
 
   getReconciliationData: async (
-    reviewId: string
+    reviewId: string,
   ): Promise<{
     success: boolean;
     data: {
@@ -1599,7 +1649,7 @@ export const manuscriptReviewerApi = {
   }> => {
     try {
       const response = await api.get(
-        `/reviewsys/${reviewId}/reconciliation-data`
+        `/reviewsys/${reviewId}/reconciliation-data`,
       );
       return response.data;
     } catch (error) {
@@ -1635,7 +1685,7 @@ export const adminReviewApi = {
 
   // Get admin review by ID
   getAdminReviewById: async (
-    reviewId: string
+    reviewId: string,
   ): Promise<AdminReviewByIdResponse> => {
     try {
       const response = await api.get(`/admin/reviews/${reviewId}`);
@@ -1649,7 +1699,7 @@ export const adminReviewApi = {
   // Submit admin review
   submitAdminReview: async (
     reviewId: string,
-    reviewData: AdminSubmitReviewRequest
+    reviewData: AdminSubmitReviewRequest,
   ): Promise<{
     success: boolean;
     message: string;
@@ -1658,7 +1708,7 @@ export const adminReviewApi = {
     try {
       const response = await api.post(
         `/admin/reviews/${reviewId}/submit`,
-        reviewData
+        reviewData,
       );
       return response.data;
     } catch (error) {
@@ -1670,7 +1720,7 @@ export const adminReviewApi = {
   // Save admin review progress
   saveAdminReviewProgress: async (
     reviewId: string,
-    progressData: AdminSaveReviewProgressRequest
+    progressData: AdminSaveReviewProgressRequest,
   ): Promise<{
     success: boolean;
     message: string;
@@ -1679,7 +1729,7 @@ export const adminReviewApi = {
     try {
       const response = await api.patch(
         `/admin/reviews/${reviewId}/save`,
-        progressData
+        progressData,
       );
       return response.data;
     } catch (error) {
@@ -1689,7 +1739,7 @@ export const adminReviewApi = {
   },
 
   getReviewWithHistory: async (
-    reviewId: string
+    reviewId: string,
   ): Promise<{
     success: boolean;
     data: {
@@ -1709,7 +1759,7 @@ export const adminReviewApi = {
   },
 
   getReconciliationData: async (
-    reviewId: string
+    reviewId: string,
   ): Promise<{
     success: boolean;
     data: {
@@ -1725,7 +1775,7 @@ export const adminReviewApi = {
   }> => {
     try {
       const response = await api.get(
-        `/admin/reviews/${reviewId}/reconciliation-data`
+        `/admin/reviews/${reviewId}/reconciliation-data`,
       );
       return response.data;
     } catch (error) {
@@ -1836,7 +1886,7 @@ export const issueApi = {
       description?: string;
       publishDate?: string;
       isActive?: boolean;
-    }
+    },
   ) => {
     const response = await api.put(`/publication/issues/${id}`, data);
     return response.data;
@@ -1872,11 +1922,11 @@ export const publicationApi = {
       pages?: { start: number; end: number };
       publishDate?: string;
       customDOI?: string;
-    }
+    },
   ) => {
     const response = await api.post(
       `/publication/publications/${articleId}/publish`,
-      data
+      data,
     );
     return response.data;
   },
@@ -1888,7 +1938,7 @@ export const publicationApi = {
       formData,
       {
         headers: { "Content-Type": "multipart/form-data" },
-      }
+      },
     );
     return response.data;
   },
@@ -1914,7 +1964,7 @@ export const publicationApi = {
   // Get articles by volume and issue (public)
   getArticlesByVolumeAndIssue: async (volumeId: string, issueId: string) => {
     const response = await api.get(
-      `/publication/volumes/${volumeId}/issues/${issueId}/articles`
+      `/publication/volumes/${volumeId}/issues/${issueId}/articles`,
     );
     return response.data;
   },
@@ -2021,7 +2071,7 @@ export const citationApi = {
       `/publication/articles/${articleId}/citation`,
       {
         params: { format },
-      }
+      },
     );
     return response.data;
   },
@@ -2033,7 +2083,7 @@ export const citationApi = {
       {
         params: { format },
         responseType: "blob",
-      }
+      },
     );
     return response.data;
   },
@@ -2041,7 +2091,7 @@ export const citationApi = {
   // Get all citation formats (public)
   getAllCitations: async (articleId: string) => {
     const response = await api.get(
-      `/publication/articles/${articleId}/citations`
+      `/publication/articles/${articleId}/citations`,
     );
     return response.data;
   },
@@ -2049,14 +2099,40 @@ export const citationApi = {
   // Get indexing metadata (public)
   getIndexingMetadata: async (
     articleId: string,
-    format: "json-ld" | "google-scholar" | "oai-pmh"
+    format: "json-ld" | "google-scholar" | "oai-pmh",
   ) => {
     const response = await api.get(
       `/publication/articles/${articleId}/metadata`,
       {
         params: { format },
-      }
+      },
     );
+    return response.data;
+  },
+};
+
+// ==================== EMAIL CAMPAIGN API ====================
+export const emailCampaignApi = {
+  getRecipients: async (params: {
+    role?: string;
+    manuscriptStatus?: string;
+    search?: string;
+  }): Promise<EmailRecipientsResponse> => {
+    const response = await api.get("/admin/campaign/recipients", { params });
+    return response.data;
+  },
+
+  previewEmail: async (
+    data: EmailPreviewRequest,
+  ): Promise<EmailPreviewResponse> => {
+    const response = await api.post("/admin/campaign/preview", data);
+    return response.data;
+  },
+
+  sendCampaign: async (
+    data: SendCampaignRequest,
+  ): Promise<SendCampaignResponse> => {
+    const response = await api.post("/admin/campaign/send", data);
     return response.data;
   },
 };

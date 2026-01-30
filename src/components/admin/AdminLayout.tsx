@@ -21,6 +21,7 @@ import {
   BookUser,
   LinkIcon,
   UserCheck,
+  Mail,
 } from "lucide-react";
 
 const navigationItems = [
@@ -69,6 +70,11 @@ const navigationItems = [
     href: '/admin/decisions', 
     icon: BookUser 
   },
+  {
+  name: "Email Campaign",
+  href: "/admin/email-campaign",
+  icon: Mail,
+},
 
 ];
 
