@@ -2133,7 +2133,9 @@ export const emailCampaignApi = {
     data: EmailPreviewRequest,
   ): Promise<EmailPreviewResponse> => {
     const formData = new FormData();
-    formData.append("recipientIds", JSON.stringify(data.recipientIds));
+    data.recipientIds.forEach((id) => {
+      formData.append("recipientIds", id);
+    });
     formData.append("subject", data.subject);
     formData.append("headerTitle", data.headerTitle);
     formData.append("bodyContent", data.bodyContent);
@@ -2154,7 +2156,9 @@ export const emailCampaignApi = {
     data: SendCampaignRequest,
   ): Promise<SendCampaignResponse> => {
     const formData = new FormData();
-    formData.append("recipientIds", JSON.stringify(data.recipientIds));
+    data.recipientIds.forEach((id) => {
+      formData.append("recipientIds", id);
+    });
     formData.append("subject", data.subject);
     formData.append("headerTitle", data.headerTitle);
     formData.append("bodyContent", data.bodyContent);
