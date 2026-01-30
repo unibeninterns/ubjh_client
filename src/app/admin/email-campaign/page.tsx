@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Image from "next/image";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { useAuth } from "@/contexts/AuthContext";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +11,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { emailCampaignApi, type EmailRecipient } from "@/services/api";
 import { toast, Toaster } from "sonner";
-import { Mail, Search, Users, Eye, Send, Plus, X, Loader2 } from "lucide-react";
+import { Mail, Search, Users, Eye, Send, Plus, Loader2, X } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export default function EmailCampaignPage() {
@@ -37,28 +38,31 @@ export default function EmailCampaignPage() {
   // Sending
   const [isSending, setIsSending] = useState(false);
 
+  const [attachments, setAttachments] = useState<File[]>([]);
+
   // Fetch recipients
   useEffect(() => {
     if (!isAuthenticated) return;
+
+    const fetchRecipients = async () => {
+      setIsLoading(true);
+      try {
+        const response = await emailCampaignApi.getRecipients({
+          role: roleFilter !== "all" ? roleFilter : undefined,
+          manuscriptStatus: statusFilter !== "all" ? statusFilter : undefined,
+          search: searchTerm || undefined,
+        });
+        setRecipients(response.data);
+      } catch (error) {
+        console.error("Failed to fetch recipients:", error);
+        toast.error("Failed to load recipients");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
     fetchRecipients();
   }, [isAuthenticated, roleFilter, statusFilter, searchTerm]);
-
-  const fetchRecipients = async () => {
-    setIsLoading(true);
-    try {
-      const response = await emailCampaignApi.getRecipients({
-        role: roleFilter !== "all" ? roleFilter : undefined,
-        manuscriptStatus: statusFilter !== "all" ? statusFilter : undefined,
-        search: searchTerm || undefined,
-      });
-      setRecipients(response.data);
-    } catch (error) {
-      console.error("Failed to fetch recipients:", error);
-      toast.error("Failed to load recipients");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const toggleRecipient = (userId: string) => {
     const newSelected = new Set(selectedRecipients);
@@ -82,62 +86,105 @@ export default function EmailCampaignPage() {
     setBodyContent(prev => prev + `{{${variable}}}`);
   };
 
-  const handlePreview = async () => {
-    if (selectedRecipients.size === 0) {
-      toast.error("Please select at least one recipient");
-      return;
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const files = Array.from(e.target.files || []);
+  
+  // Validate file types
+  const validTypes = [
+    'image/jpeg',
+    'image/jpg', 
+    'image/png',
+    'image/gif',
+    'image/webp',
+    'application/pdf',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+  ];
+  
+  const validFiles = files.filter(file => {
+    if (!validTypes.includes(file.type)) {
+      toast.error(`${file.name} is not a supported file type`);
+      return false;
     }
-
-    try {
-      const response = await emailCampaignApi.previewEmail({
-        recipientIds: Array.from(selectedRecipients),
-        subject,
-        headerTitle,
-        bodyContent,
-      });
-
-      setPreviewHtml(response.data.previewHtml);
-      setPreviewRecipient(response.data.previewRecipient);
-      setShowPreview(true);
-    } catch (error) {
-      console.error("Preview failed:", error);
-      toast.error("Failed to generate preview");
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error(`${file.name} is too large (max 10MB)`);
+      return false;
     }
-  };
+    return true;
+  });
+  
+  if (attachments.length + validFiles.length > 5) {
+    toast.error('Maximum 5 attachments allowed');
+    return;
+  }
+  
+  setAttachments(prev => [...prev, ...validFiles]);
+};
+
+const removeAttachment = (index: number) => {
+  setAttachments(prev => prev.filter((_, i) => i !== index));
+};
+
+// Update handlePreview
+const handlePreview = async () => {
+  if (selectedRecipients.size === 0) {
+    toast.error("Please select at least one recipient");
+    return;
+  }
+
+  try {
+    const response = await emailCampaignApi.previewEmail({
+      recipientIds: Array.from(selectedRecipients),
+      subject,
+      headerTitle,
+      bodyContent,
+      attachments: attachments.length > 0 ? attachments : undefined,
+    });
+
+    setPreviewHtml(response.data.previewHtml);
+    setPreviewRecipient(response.data.previewRecipient);
+    setShowPreview(true);
+  } catch (error) {
+    console.error("Preview failed:", error);
+    toast.error("Failed to generate preview");
+  }
+};
 
   const handleSend = async () => {
-    if (selectedRecipients.size === 0) {
-      toast.error("Please select at least one recipient");
-      return;
-    }
+  if (selectedRecipients.size === 0) {
+    toast.error("Please select at least one recipient");
+    return;
+  }
 
-    if (!subject || !bodyContent) {
-      toast.error("Please fill in subject and body content");
-      return;
-    }
+  if (!subject || !bodyContent) {
+    toast.error("Please fill in subject and body content");
+    return;
+  }
 
-    setIsSending(true);
-    try {
-      const response = await emailCampaignApi.sendCampaign({
-        recipientIds: Array.from(selectedRecipients),
-        subject,
-        headerTitle: headerTitle || subject,
-        bodyContent,
-      });
-      toast.success(response.message);
-      
-      // Reset form
-      setSubject("");
-      setHeaderTitle("");
-      setBodyContent("");
-      clearSelection();
-    } catch (error) {
-      console.error("Send failed:", error);
-      toast.error("Failed to send email campaign");
-    } finally {
-      setIsSending(false);
-    }
-  };
+  setIsSending(true);
+  try {
+    const response = await emailCampaignApi.sendCampaign({
+      recipientIds: Array.from(selectedRecipients),
+      subject,
+      headerTitle: headerTitle || subject,
+      bodyContent,
+      attachments: attachments.length > 0 ? attachments : undefined,
+    });
+
+    toast.success(response.message);
+    
+    // Reset form
+    setSubject("");
+    setHeaderTitle("");
+    setBodyContent("");
+    setAttachments([]);
+    clearSelection();
+  } catch (error) {
+    console.error("Send failed:", error);
+    toast.error("Failed to send email campaign");
+  } finally {
+    setIsSending(false);
+  }
+};
 
   const availableVariables = [
     { key: "name", label: "Recipient Name" },
@@ -222,6 +269,7 @@ export default function EmailCampaignPage() {
                   </Button>
                 </div>
               </div>
+
               {/* Recipient List */}
               <div className="border rounded-lg max-h-96 overflow-y-auto">
                 {isLoading ? (
@@ -236,7 +284,9 @@ export default function EmailCampaignPage() {
                   recipients.map((recipient) => (
                     <div
                       key={recipient.userId}
-                      className={`p-3 border-b cursor-pointer hover:bg-gray-50 ${selectedRecipients.has(recipient.userId) ? 'bg-[#FFE9EE]' : ''}`}
+                      className={`p-3 border-b cursor-pointer hover:bg-gray-50 ${
+                        selectedRecipients.has(recipient.userId) ? "bg-[#FFE9EE]" : ""
+                      }`}
                       onClick={() => toggleRecipient(recipient.userId)}
                     >
                       <div className="flex items-start justify-between">
@@ -306,7 +356,7 @@ export default function EmailCampaignPage() {
                       size="sm"
                       className="text-xs"
                     >
-                        <Plus className="h-3 w-3 mr-1" />
+                      <Plus className="h-3 w-3 mr-1" />
                       {variable.label}
                     </Button>
                   ))}
@@ -325,6 +375,69 @@ export default function EmailCampaignPage() {
                   className="mt-1 min-h-[300px] font-mono text-sm"
                 />
               </div>
+
+              <div>
+  <Label>Attachments (Optional)</Label>
+  <div className="mt-2">
+    <input
+      type="file"
+      id="attachments"
+      multiple
+      accept="image/*,.pdf,.docx"
+      onChange={handleFileChange}
+      className="hidden"
+    />
+    <label
+      htmlFor="attachments"
+      className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer"
+    >
+      <Plus className="h-4 w-4 mr-2" />
+      Add Attachment
+    </label>
+    <p className="text-xs text-gray-500 mt-1">
+      Supports images, PDFs, and DOCX files. Max 10MB per file, up to 5 files.
+    </p>
+  </div>
+  
+  {attachments.length > 0 && (
+    <div className="mt-3 space-y-2">
+      {attachments.map((file, index) => (
+        <div
+          key={index}
+          className="flex items-center justify-between p-2 bg-gray-50 rounded border"
+        >
+          <div className="flex items-center gap-2 flex-1 min-w-0">
+            {file.type.startsWith('image/') && (
+              <Image 
+                src={URL.createObjectURL(file)} 
+                alt={file.name}
+                width={40}
+                height={40}
+                className="object-cover rounded"
+              />
+            )}
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-gray-900 truncate">
+                {file.name}
+              </p>
+              <p className="text-xs text-gray-500">
+                {(file.size / 1024).toFixed(1)} KB
+              </p>
+            </div>
+          </div>
+          <Button
+            onClick={() => removeAttachment(index)}
+            variant="ghost"
+            size="sm"
+            className="ml-2"
+          >
+            <X className="h-4 w-4 text-red-500" />
+          </Button>
+        </div>
+      ))}
+    </div>
+  )}
+</div>
 
               <div className="flex gap-3">
                 <Button
@@ -358,21 +471,42 @@ export default function EmailCampaignPage() {
         </div>
 
         {/* Preview Modal */}
-        <Dialog open={showPreview} onOpenChange={setShowPreview}>
-          <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle>Email Preview</DialogTitle>
-              {previewRecipient && (
-                <p className="text-sm text-gray-500">
-                  Preview for: {previewRecipient.name} ({previewRecipient.email})
-                </p>
-              )}
-            </DialogHeader>
-            <div className="border rounded-lg p-4 bg-gray-50">
-              <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
-            </div>
-          </DialogContent>
-        </Dialog>
+<Dialog open={showPreview} onOpenChange={setShowPreview}>
+  <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+    <DialogHeader>
+      <DialogTitle>Email Preview</DialogTitle>
+      {previewRecipient && (
+        <p className="text-sm text-gray-500">
+          Preview for: {previewRecipient.name} ({previewRecipient.email})
+        </p>
+      )}
+    </DialogHeader>
+    <div className="space-y-4">
+      <div className="border rounded-lg p-4 bg-gray-50">
+        <div dangerouslySetInnerHTML={{ __html: previewHtml }} />
+      </div>
+      
+      {attachments.length > 0 && (
+        <div className="border-t pt-4">
+          <p className="text-sm font-medium text-gray-700 mb-2">
+            Attachments ({attachments.length}):
+          </p>
+          <div className="space-y-2">
+            {attachments.map((file, index) => (
+              <div key={index} className="flex items-center gap-2 text-sm text-gray-600">
+                <span>📎</span>
+                <span>{file.name}</span>
+                <span className="text-gray-400">
+                  ({(file.size / 1024).toFixed(1)} KB)
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  </DialogContent>
+</Dialog>
       </div>
       <Toaster />
     </AdminLayout>

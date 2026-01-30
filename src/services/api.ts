@@ -651,6 +651,7 @@ export interface EmailPreviewRequest {
   subject: string;
   headerTitle: string;
   bodyContent: string;
+  attachments?: File[];
 }
 
 export interface EmailPreviewResponse {
@@ -661,6 +662,11 @@ export interface EmailPreviewResponse {
       name: string;
       email: string;
     };
+    attachments?: Array<{
+      filename: string;
+      size: number;
+      type: string;
+    }>;
   };
 }
 
@@ -669,6 +675,7 @@ export interface SendCampaignRequest {
   subject: string;
   headerTitle: string;
   bodyContent: string;
+  attachments?: File[];
 }
 
 export interface SendCampaignResponse {
@@ -2125,14 +2132,42 @@ export const emailCampaignApi = {
   previewEmail: async (
     data: EmailPreviewRequest,
   ): Promise<EmailPreviewResponse> => {
-    const response = await api.post("/admin/campaign/preview", data);
+    const formData = new FormData();
+    formData.append("recipientIds", JSON.stringify(data.recipientIds));
+    formData.append("subject", data.subject);
+    formData.append("headerTitle", data.headerTitle);
+    formData.append("bodyContent", data.bodyContent);
+
+    if (data.attachments) {
+      data.attachments.forEach((file) => {
+        formData.append("attachments", file);
+      });
+    }
+
+    const response = await api.post("/admin/campaign/preview", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
     return response.data;
   },
 
   sendCampaign: async (
     data: SendCampaignRequest,
   ): Promise<SendCampaignResponse> => {
-    const response = await api.post("/admin/campaign/send", data);
+    const formData = new FormData();
+    formData.append("recipientIds", JSON.stringify(data.recipientIds));
+    formData.append("subject", data.subject);
+    formData.append("headerTitle", data.headerTitle);
+    formData.append("bodyContent", data.bodyContent);
+
+    if (data.attachments) {
+      data.attachments.forEach((file) => {
+        formData.append("attachments", file);
+      });
+    }
+
+    const response = await api.post("/admin/campaign/send", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
     return response.data;
   },
 };
