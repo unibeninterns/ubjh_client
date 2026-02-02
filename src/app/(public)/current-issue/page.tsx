@@ -229,7 +229,7 @@ export default function CurrentIssueDummyPage() {
 
               <div className="mt-6 pt-6 border-t border-white/20">
                 <p className="text-sm text-[#FFE9EE]">
-                  <strong>ISSN:</strong> eISSN: 2XXX-XXXX (Online)
+                  <strong>ISSN:</strong> eISSN: 3121-763X (Online)
                 </p>
               </div>
             </div>

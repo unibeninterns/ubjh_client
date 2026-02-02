@@ -122,7 +122,7 @@ export default function Footer() {
                 </div>
                 <div className="text-left">
                   <div className="text-xs font-semibold text-gray-600">Online ISSN</div>
-                  <div className="text-sm font-bold text-[#7A0019]">2635-3784</div>
+                  <div className="text-sm font-bold text-[#7A0019]">3121-763X</div>
                 </div>
               </div>
             </div>
