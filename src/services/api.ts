@@ -1221,6 +1221,20 @@ export const manuscriptAdminApi = {
       throw error;
     }
   },
+  searchManuscripts: async (
+    query: string,
+    limit?: number,
+  ): Promise<ManuscriptListResponse> => {
+    try {
+      const response = await api.get("/admin/manuscripts/search", {
+        params: { query, limit },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Failed to search manuscripts:", error);
+      throw error;
+    }
+  },
 };
 
 // Get all reviewer invitations
