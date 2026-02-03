@@ -22,6 +22,7 @@ import {
   LinkIcon,
   UserCheck,
   Mail,
+  AlertTriangle,
 } from "lucide-react";
 
 const navigationItems = [
@@ -75,6 +76,11 @@ const navigationItems = [
   href: "/admin/email-campaign",
   icon: Mail,
 },
+{ 
+    name: 'Override Decision', 
+    href: '/admin/override-decision', 
+    icon: AlertTriangle
+  },
 
 ];
 
