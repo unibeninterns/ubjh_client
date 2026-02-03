@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import RichTextEditor from "@/components/ui/RichTextEditor";
 import { emailCampaignApi, type EmailRecipient } from "@/services/api";
 import { toast, Toaster } from "sonner";
 import { Mail, Search, Users, Eye, Send, Plus, Loader2, X } from "lucide-react";
@@ -368,11 +369,11 @@ const handlePreview = async () => {
 
               <div>
                 <Label>Email Body *</Label>
-                <Textarea
+                <RichTextEditor
                   value={bodyContent}
-                  onChange={(e) => setBodyContent(e.target.value)}
-                  placeholder="Dear {{name}},&#10;&#10;Your manuscript titled '{{manuscriptTitle}}' is currently {{manuscriptStatus}}.&#10;&#10;Best regards,&#10;UBJH Editorial Team"
-                  className="mt-1 min-h-[300px] font-mono text-sm"
+                  onChange={setBodyContent}
+                  placeholder="Dear {{name}},&#10;&#10;Your manuscript titled '{{manuscriptTitle}}' is currently {{manuscriptStatus}}."
+                  className="mt-1"
                 />
               </div>
 
