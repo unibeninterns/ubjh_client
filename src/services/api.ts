@@ -688,6 +688,24 @@ export interface SendCampaignResponse {
   };
 }
 
+export interface OverrideStatusRequest {
+  status: string;
+  reason: string;
+  silentUpdate: boolean;
+}
+
+export interface OverrideStatusResponse {
+  success: boolean;
+  message: string;
+  data: {
+    manuscriptId: string;
+    oldStatus: string;
+    newStatus: string;
+    overrideBy: string;
+    reason: string;
+  };
+}
+
 // Create API instance
 const createApi = (baseURL: string): AxiosInstance => {
   const api = axios.create({
@@ -1232,6 +1250,34 @@ export const manuscriptAdminApi = {
       return response.data;
     } catch (error) {
       console.error("Failed to search manuscripts:", error);
+      throw error;
+    }
+  },
+
+  overrideStatus: async (
+    manuscriptId: string,
+    data: OverrideStatusRequest,
+  ): Promise<OverrideStatusResponse> => {
+    try {
+      const response = await api.post(
+        `/admin/override-decision/${manuscriptId}/override`,
+        data,
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to override status:", error);
+      throw error;
+    }
+  },
+
+  getOverrideHistory: async (manuscriptId: string) => {
+    try {
+      const response = await api.get(
+        `/admin/override-decision/${manuscriptId}/override-history`,
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch override history:", error);
       throw error;
     }
   },

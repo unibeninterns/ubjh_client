@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, useEffect, Suspense, useCallback } from 'react';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AuthContext';
 import { manuscriptAdminApi, type Manuscript, type ExistingReviewForReassignment } from '@/services/api';
 import { AdminLayout } from '@/components/admin/AdminLayout';
@@ -25,6 +25,92 @@ interface PaginationData {
   currentPage: number;
 }
 
+interface ManuscriptFilters {
+  status: string;
+  faculty: string;
+  sort: string;
+  order: 'asc' | 'desc';
+}
+
+function usePaginationPersistence() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  // Get current page from URL or localStorage
+  const getCurrentPage = useCallback(() => {
+    const urlPage = searchParams.get('page');
+    if (urlPage) {
+      return parseInt(urlPage, 10);
+    }
+
+    // Fallback to localStorage
+    const storedPage = localStorage.getItem('manuscripts_current_page');
+    return storedPage ? parseInt(storedPage, 10) : 1;
+  }, [searchParams]);
+
+  // Update URL with current pagination state
+  const updateURL = useCallback((page: number, filters: ManuscriptFilters) => {
+    const params = new URLSearchParams();
+    params.set('page', page.toString());
+    
+    if (filters.status) params.set('status', filters.status);
+    if (filters.faculty) params.set('faculty', filters.faculty);
+    if (filters.sort) params.set('sort', filters.sort);
+    if (filters.order) params.set('order', filters.order);
+
+    router.push(`${pathname}?${params.toString()}`, { scroll: false });
+    
+    // Also save to localStorage as backup
+    localStorage.setItem('manuscripts_current_page', page.toString());
+    localStorage.setItem('manuscripts_filters', JSON.stringify(filters));
+  }, [pathname, router]);
+
+  // Restore filters from URL or localStorage
+  const restoreFilters = useCallback(() => {
+    const urlStatus = searchParams.get('status');
+    const urlFaculty = searchParams.get('faculty');
+    const urlSort = searchParams.get('sort');
+    const urlOrder = searchParams.get('order');
+
+    if (urlStatus || urlFaculty || urlSort || urlOrder) {
+      return {
+        status: urlStatus || '',
+        faculty: urlFaculty || '',
+        sort: urlSort || 'createdAt',
+        order: (urlOrder as 'asc' | 'desc') || 'desc',
+      };
+    }
+
+    // Fallback to localStorage
+    const storedFilters = localStorage.getItem('manuscripts_filters');
+    if (storedFilters) {
+      try {
+        return JSON.parse(storedFilters);
+      } catch {
+        return {
+          status: '',
+          faculty: '',
+          sort: 'createdAt',
+          order: 'desc' as 'asc' | 'desc',
+        };
+      }
+    }
+
+    return {
+      status: '',
+      faculty: '',
+      sort: 'createdAt',
+      order: 'desc' as 'asc' | 'desc',
+    };
+  }, [searchParams]);
+
+  return {
+    getCurrentPage,
+    updateURL,
+    restoreFilters,
+  };
+}
 
 
 function AdminManuscriptsPage() {
@@ -39,6 +125,7 @@ function AdminManuscriptsPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+
   const [showAssignFacultyModal, setShowAssignFacultyModal] = useState(false);
   const [currentManuscriptForFaculty, setCurrentManuscriptForFaculty] = useState<Manuscript | null>(null);
   const [selectedFaculty, setSelectedFaculty] = useState('');
@@ -80,15 +167,19 @@ function AdminManuscriptsPage() {
   const [assigningFaculty, setAssigningFaculty] = useState(false);
   const [expandedFaculty, setExpandedFaculty] = useState<string | null>(null);
   
-  const searchParams = useSearchParams();
   const router = useRouter();
-  
-  const [filters, setFilters] = useState({
-    status: searchParams.get('status') || '',
-    faculty: '',
-    sort: 'createdAt',
-    order: 'desc' as 'asc' | 'desc',
-  });
+
+  // Use the persistence hook
+  const { getCurrentPage, updateURL, restoreFilters } = usePaginationPersistence();
+
+  // Initialize filters from URL/localStorage
+  const [filters, setFilters] = useState<ManuscriptFilters>(() => restoreFilters());
+
+  // Initialize current page from URL/localStorage
+  useEffect(() => {
+    const currentPage = getCurrentPage();
+    setPagination(prev => ({ ...prev, currentPage }));
+  }, [getCurrentPage]);
 
   const [searchQuery, setSearchQuery] = useState('');
 const [searchResults, setSearchResults] = useState<Manuscript[]>([]);
@@ -250,15 +341,22 @@ const [showSearchResults, setShowSearchResults] = useState(false);
     fetchManuscripts();
   }, [isAuthenticated, pagination.currentPage, filters, refreshTrigger]);
 
-  const handleFilterChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const { name, value } = e.target;
+  // Update URL whenever page or filters change
+  useEffect(() => {
+    updateURL(pagination.currentPage, filters);
+  }, [pagination.currentPage, filters, updateURL]);
+
+  const handleFilterChange = (_e: React.ChangeEvent<HTMLSelectElement>) => {
+    const { name, value } = _e.target;
     setFilters(prev => ({ ...prev, [name]: value }));
-    setPagination(prev => ({ ...prev, currentPage: 1 }));
+    setPagination(prev => ({ ...prev, currentPage: 1 })); // Reset to page 1 when filters change
   };
 
   const handlePageChange = (newPage: number) => {
     if (newPage < 1 || newPage > pagination.totalPages) return;
     setPagination(prev => ({ ...prev, currentPage: newPage }));
+    // Scroll to top of page
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const toggleSortOrder = (field: string) => {
