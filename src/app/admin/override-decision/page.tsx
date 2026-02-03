@@ -75,6 +75,12 @@ const STATUS_FLOW = {
     color: "green",
     description: "Approved for publication"
   },
+  published: {
+    label: "Published",
+    next: [],
+    color: "green",
+    description: "Published - end state"
+  },
   rejected: {
     label: "Rejected",
     next: [],
@@ -239,7 +245,7 @@ export default function OverrideDecisionPage() {
                           <span key={idx} className="flex items-center gap-1">
                             <ChevronRight className="h-3 w-3 text-gray-400" />
                             <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusColor(nextStatus)}`}>
-                              {STATUS_FLOW[nextStatus as keyof typeof STATUS_FLOW].label}
+                              {STATUS_FLOW[nextStatus as keyof typeof STATUS_FLOW]?.label || nextStatus}
                             </span>
                           </span>
                         ))}
